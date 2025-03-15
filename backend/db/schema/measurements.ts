@@ -1,10 +1,10 @@
 import {
   decimal,
-  integer,
   pgEnum,
   pgTable,
   serial,
   timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
@@ -25,7 +25,7 @@ export const measurements = pgTable("measurements", {
   hip: decimal(),
   hipUnit: lengthUnitEnum(),
   createdAt: timestamp().defaultNow().notNull(),
-  ownerId: integer()
+  ownerId: uuid()
     .notNull()
     .references(() => users.id),
 });

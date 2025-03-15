@@ -1,9 +1,25 @@
-import { pgTable, text, timestamp, serial } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  uuid,
+  index,
+} from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
-  id: serial().primaryKey().unique().notNull(),
-  username: text().unique().notNull(),
-  displayName: text().notNull(),
-  email: text().unique().notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: uuid().primaryKey().defaultRandom().unique().notNull(),
+    username: text().unique().notNull(),
+    password: text(),
+    displayName: text().notNull(),
+    createdAt: timestamp().defaultNow().notNull(),
+    isOauth: boolean().default(false).notNull(),
+    isDisabled: boolean().default(false).notNull(),
+  },
+  (table) => [
+    index("id_idx").on(table.id),
+    index("username").on(table.username),
+  ],
+);

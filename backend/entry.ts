@@ -1,6 +1,9 @@
 import express from "express";
+import dotenv from "dotenv";
+import { authRouter } from "./routes/auth";
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
@@ -10,3 +13,5 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
+app.use("/auth", authRouter);

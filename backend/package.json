@@ -1,19 +1,28 @@
 {
   "name": "backend",
   "packageManager": "yarn@4.5.2",
+  "scripts": {
+    "dev": "nodemon --ext 'tsx,ts,json' --exec 'tsx' entry.ts"
+  },
   "devDependencies": {
+    "@types/bcrypt": "^5",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9",
     "@types/node": "^22.13.9",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.5",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
     "tsx": "^4.19.3"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "express": "^5.0.1",
+    "jsonwebtoken": "^9.0.2",
     "node-postgres": "^0.6.2",
-    "pg": "^8.13.3"
+    "pg": "^8.13.3",
+    "zod": "^3.24.2"
   }
 }
