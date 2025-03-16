@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { db } from "@/db";
-import { users } from "@/db/schema/users";
-import { salt } from "@/utils/constants";
-import bcrypt from "bcrypt";
-import { signJWT, verifyPassword, verifyToken } from "@/utils/auth";
+import { createUser, signJWT, verifyPassword, verifyToken } from "@/utils/auth";
 
 const loginBodySchema = z.object({
   username: z
@@ -31,7 +27,7 @@ export const loginController = async (
     if (id instanceof Error) {
       throw id;
     }
-    const tokens = signJWT({ id });
+    const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
     res.status(400).json({ error: "Invalid request" });
@@ -44,11 +40,7 @@ export const signUpController = async (
 ) => {
   try {
     const body = signUpBodySchema.parse(req.body);
-    await db.insert(users).values({
-      password: await bcrypt.hash(body.password, salt),
-      username: body.username,
-      displayName: body.displayName,
-    });
+    await createUser(body);
     res.status(200).json({ message: "success" });
   } catch (err) {
     console.error(err);
@@ -72,7 +64,7 @@ export const refreshTokenController = async (
     if (id instanceof Error) {
       throw id;
     }
-    const tokens = signJWT({ id });
+    const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
     console.error(err);
