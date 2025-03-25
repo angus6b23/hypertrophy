@@ -3,7 +3,7 @@ import {
   loginController,
   refreshTokenController,
   signUpController,
-} from "@/controllers/auth";
+} from "backend/controllers/auth";
 
 export const authRouter = Router();
 

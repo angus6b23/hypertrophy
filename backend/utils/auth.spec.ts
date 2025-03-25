@@ -10,6 +10,7 @@ const TEST_IDS = [
   "!@",
   "1234-4321",
   "22b6c64f-f375-4730-8f31-2b6e3fad5a2d",
+  "7c036a6c-dd02-470c-b045-d2eb4d8f8b12",
 ];
 
 describe("JWT functionalities", () => {

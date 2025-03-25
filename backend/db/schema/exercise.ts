@@ -75,5 +75,5 @@ export const exercises = pgTable("exercises", {
   equipment: equipmentEnum("equipment").array().notNull(),
   recordType: recordTypeEnum("record_type").notNull(),
   description: text(),
-  ownerId: uuid().references(() => users.id),
+  ownerId: uuid().references(() => users.id, { onDelete: "set null" }),
 });

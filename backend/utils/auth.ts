@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { jwtSecret } from "./constants";
-import { db } from "@/db";
-import { users } from "@/db/schema/users";
+import { db } from "backend/db";
+import { users } from "backend/db/schema/users";
 import { eq } from "drizzle-orm";
 import { single } from "./db-helper";
 import argon2 from "argon2";
@@ -57,29 +57,25 @@ export const verifyToken = async (
   token: string,
   options?: VerifyTokenOptions,
 ) => {
-  try {
-    const decode = jwt.verify(token, jwtSecret) as AccessToken;
-    if (options?.refreshToken) {
-      if (!decode.isRefresh) {
-        throw new Error("Expected refresh token");
-      }
+  const decode = jwt.verify(token, jwtSecret) as AccessToken;
+  if (options?.refreshToken) {
+    if (!decode.isRefresh) {
+      throw new Error("expected_refresh_token");
     }
-    if (options?.checkDb) {
-      const record = await db
-        .select({ id: users.id, isDisabled: users.isDisabled })
-        .from(users)
-        .where(eq(users.id, decode.id))
-        .then(single);
-      if (record.isDisabled) {
-        throw new Error("User is disabled");
-      } else {
-        return decode.id;
-      }
+  }
+  if (options?.checkDb) {
+    const record = await db
+      .select({ id: users.id, isDisabled: users.isDisabled })
+      .from(users)
+      .where(eq(users.id, decode.id))
+      .then(single);
+    if (record.isDisabled) {
+      throw new Error("user_is_disabled");
     } else {
       return decode.id;
     }
-  } catch (err) {
-    return err as Error;
+  } else {
+    return decode.id;
   }
 };
 
@@ -92,32 +88,28 @@ export const verifyToken = async (
  *
  * @example
  * ```
- * verifyPassword("test", "test")
+ * await verifyPassword("test", "test")
  * ```
  */
 export const verifyPassword = async (username: string, password: string) => {
-  try {
-    const record = await db
-      .select({
-        username: users.username,
-        password: users.password,
-        id: users.id,
-        isDisabled: users.isDisabled,
-      })
-      .from(users)
-      .where(eq(users.username, username))
-      .then(single);
-    if (record.isDisabled) {
-      throw new Error("User is disabled");
-    }
-    const passwordMatch = await argon2.verify(record.password ?? "", password);
-    if (passwordMatch) {
-      return record.id;
-    } else {
-      throw new Error("Password does not match");
-    }
-  } catch (err) {
-    return err as Error;
+  const record = await db
+    .select({
+      username: users.username,
+      password: users.password,
+      id: users.id,
+      isDisabled: users.isDisabled,
+    })
+    .from(users)
+    .where(eq(users.username, username))
+    .then(single);
+  if (record.isDisabled) {
+    throw new Error("user_is_disabled");
+  }
+  const passwordMatch = await argon2.verify(record.password ?? "", password);
+  if (passwordMatch) {
+    return record.id;
+  } else {
+    throw new Error("username_or_password_incorrect");
   }
 };
 
@@ -140,14 +132,10 @@ export const createUser = async (user: {
   password: string;
   displayName: string;
 }) => {
-  try {
-    const record = await db
-      .insert(users)
-      .values({ ...user, password: await argon2.hash(user.password) })
-      .returning({ id: users.id })
-      .then(single);
-    return record.id;
-  } catch (err) {
-    return err as Error;
-  }
+  const record = await db
+    .insert(users)
+    .values({ ...user, password: await argon2.hash(user.password) })
+    .returning({ id: users.id })
+    .then(single);
+  return record.id;
 };

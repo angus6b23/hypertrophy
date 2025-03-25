@@ -27,5 +27,5 @@ export const measurements = pgTable("measurements", {
   createdAt: timestamp().defaultNow().notNull(),
   ownerId: uuid()
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
 });

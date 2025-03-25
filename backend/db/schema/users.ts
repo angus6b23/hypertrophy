@@ -16,6 +16,7 @@ export const users = pgTable(
     displayName: text().notNull(),
     createdAt: timestamp().defaultNow().notNull(),
     isOauth: boolean().default(false).notNull(),
+    oidcEmail: text().unique(),
     isDisabled: boolean().default(false).notNull(),
   },
   (table) => [

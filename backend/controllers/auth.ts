@@ -1,20 +1,34 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createUser, signJWT, verifyPassword, verifyToken } from "@/utils/auth";
+import {
+  createUser,
+  signJWT,
+  verifyPassword,
+  verifyToken,
+} from "backend/utils/auth";
+import { AuthErrors } from "@/share/interfaces/error-codes";
+import { generateOIDCRedirectURL } from "backend/utils/oidc";
+import { handleError } from "../utils/handleError";
 
 const loginBodySchema = z.object({
   username: z
-    .string()
-    .min(3)
-    .max(32)
-    .regex(/^[a-zA-Z0-9_]+$/),
-  password: z.string(),
+    .string({ message: "username_missing" })
+    .min(3, { message: "username_too_short" })
+    .max(32, { message: "username_too_long" })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: "username_invalid_char",
+    }),
+  password: z.string({ message: "password_missing" }),
 });
 type LoginBody = z.infer<typeof loginBodySchema>;
 
 const signUpBodySchema = loginBodySchema.extend({
-  displayName: z.string().min(3).max(32),
+  displayName: z
+    .string({ message: "displayName_missing" })
+    .min(3, { message: "displayName_too_short" })
+    .max(32, { message: "displayName_too_long" }),
 });
+
 type SignUpBody = z.infer<typeof signUpBodySchema>;
 
 export const loginController = async (
@@ -24,13 +38,10 @@ export const loginController = async (
   try {
     const body = loginBodySchema.parse(req.body);
     const id = await verifyPassword(body.username, body.password);
-    if (id instanceof Error) {
-      throw id;
-    }
     const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
-    res.status(400).json({ error: "Invalid request" });
+    handleError(res, err, AuthErrors);
   }
 };
 
@@ -43,8 +54,7 @@ export const signUpController = async (
     await createUser(body);
     res.status(200).json({ message: "success" });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: "Invalid request" });
+    handleError(res, err, AuthErrors);
   }
 };
 
@@ -61,13 +71,18 @@ export const refreshTokenController = async (
       checkDb: true,
       refreshToken: true,
     });
-    if (id instanceof Error) {
-      throw id;
-    }
     const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: "Invalid request" });
+    handleError(res, err, AuthErrors);
+  }
+};
+
+export const redirectOIDC = async (req: Request, res: Response) => {
+  try {
+    const url = await generateOIDCRedirectURL(req.session.id);
+    res.redirect(url.toString());
+  } catch (err) {
+    handleError(res, err, AuthErrors);
   }
 };
