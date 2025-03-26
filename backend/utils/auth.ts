@@ -5,6 +5,7 @@ import { users } from "backend/db/schema/users";
 import { eq } from "drizzle-orm";
 import { single } from "./db-helper";
 import argon2 from "argon2";
+import { AuthErrors, CustomError } from "@/share/interfaces/error-codes";
 
 /**
  * Sign access and refresh token given an id
@@ -60,7 +61,7 @@ export const verifyToken = async (
   const decode = jwt.verify(token, jwtSecret) as AccessToken;
   if (options?.refreshToken) {
     if (!decode.isRefresh) {
-      throw new Error("expected_refresh_token");
+      throw new CustomError(AuthErrors.expected_refresh_token, 400);
     }
   }
   if (options?.checkDb) {
@@ -68,9 +69,10 @@ export const verifyToken = async (
       .select({ id: users.id, isDisabled: users.isDisabled })
       .from(users)
       .where(eq(users.id, decode.id))
+      .limit(1)
       .then(single);
     if (record.isDisabled) {
-      throw new Error("user_is_disabled");
+      throw new CustomError(AuthErrors.user_is_disabled, 403);
     } else {
       return decode.id;
     }
@@ -92,7 +94,7 @@ export const verifyToken = async (
  * ```
  */
 export const verifyPassword = async (username: string, password: string) => {
-  const record = await db
+  const data = await db
     .select({
       username: users.username,
       password: users.password,
@@ -101,16 +103,19 @@ export const verifyPassword = async (username: string, password: string) => {
     })
     .from(users)
     .where(eq(users.username, username))
-    .then(single);
+    .limit(1);
+  if (data.length < 1) {
+    throw new CustomError(AuthErrors.username_or_password_incorrect, 401);
+  }
+  const record = data[0];
   if (record.isDisabled) {
-    throw new Error("user_is_disabled");
+    throw new CustomError(AuthErrors.user_is_disabled, 403);
   }
   const passwordMatch = await argon2.verify(record.password ?? "", password);
-  if (passwordMatch) {
-    return record.id;
-  } else {
-    throw new Error("username_or_password_incorrect");
+  if (!passwordMatch) {
+    throw new CustomError(AuthErrors.username_or_password_incorrect, 401);
   }
+  return record.id;
 };
 
 /**
@@ -132,10 +137,14 @@ export const createUser = async (user: {
   password: string;
   displayName: string;
 }) => {
-  const record = await db
-    .insert(users)
-    .values({ ...user, password: await argon2.hash(user.password) })
-    .returning({ id: users.id })
-    .then(single);
-  return record.id;
+  try {
+    const record = await db
+      .insert(users)
+      .values({ ...user, password: await argon2.hash(user.password) })
+      .returning({ id: users.id })
+      .then(single);
+    return record.id;
+  } catch {
+    throw new CustomError(AuthErrors.username_exists, 400);
+  }
 };

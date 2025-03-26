@@ -12,11 +12,11 @@ import { handleError } from "../utils/handleError";
 
 const loginBodySchema = z.object({
   username: z
-    .string({ message: "username_missing" })
-    .min(3, { message: "username_too_short" })
-    .max(32, { message: "username_too_long" })
+    .string({ message: AuthErrors.username_missing })
+    .min(3, { message: AuthErrors.username_too_short })
+    .max(32, { message: AuthErrors.username_too_long })
     .regex(/^[a-zA-Z0-9_]+$/, {
-      message: "username_invalid_char",
+      message: AuthErrors.username_invalid_char,
     }),
   password: z.string({ message: "password_missing" }),
 });
@@ -24,9 +24,9 @@ type LoginBody = z.infer<typeof loginBodySchema>;
 
 const signUpBodySchema = loginBodySchema.extend({
   displayName: z
-    .string({ message: "displayName_missing" })
-    .min(3, { message: "displayName_too_short" })
-    .max(32, { message: "displayName_too_long" }),
+    .string({ message: AuthErrors.displayName_missing })
+    .min(3, { message: AuthErrors.displayName_too_short })
+    .max(32, { message: AuthErrors.displayName_too_long }),
 });
 
 type SignUpBody = z.infer<typeof signUpBodySchema>;
@@ -41,7 +41,7 @@ export const loginController = async (
     const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
-    handleError(res, err, AuthErrors);
+    handleError(res, err);
   }
 };
 
@@ -54,7 +54,7 @@ export const signUpController = async (
     await createUser(body);
     res.status(200).json({ message: "success" });
   } catch (err) {
-    handleError(res, err, AuthErrors);
+    handleError(res, err);
   }
 };
 
@@ -74,7 +74,7 @@ export const refreshTokenController = async (
     const tokens = signJWT(id);
     res.status(200).json(tokens);
   } catch (err) {
-    handleError(res, err, AuthErrors);
+    handleError(res, err);
   }
 };
 
@@ -83,6 +83,6 @@ export const redirectOIDC = async (req: Request, res: Response) => {
     const url = await generateOIDCRedirectURL(req.session.id);
     res.redirect(url.toString());
   } catch (err) {
-    handleError(res, err, AuthErrors);
+    handleError(res, err);
   }
 };

@@ -4,5 +4,8 @@
   "workspaces": [
     "backend",
     "expo"
-  ]
+  ],
+  "dependencies": {
+    "drizzle-zod": "^0.7.0"
+  }
 }

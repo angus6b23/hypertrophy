@@ -5096,6 +5096,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"drizzle-zod@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "drizzle-zod@npm:0.7.0"
+  peerDependencies:
+    drizzle-orm: ">=0.36.0"
+    zod: ">=3.0.0"
+  checksum: 10c0/9454dc6bf8d4a0c262168d954846b11554c2faa62f09c6bc32161a238e1a3ecd940e6a374af2081206c5a89a76283cd9f3511272e5bdcd012af8b66147e077b1
+  languageName: node
+  linkType: hard
+
 "dunder-proto@npm:^1.0.1":
   version: 1.0.1
   resolution: "dunder-proto@npm:1.0.1"
@@ -6898,6 +6908,8 @@ __metadata:
 "hypertrophy@workspace:.":
   version: 0.0.0-use.local
   resolution: "hypertrophy@workspace:."
+  dependencies:
+    drizzle-zod: "npm:^0.7.0"
   languageName: unknown
   linkType: soft
 

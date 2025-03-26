@@ -1,6 +1,6 @@
 {
-  "id": "c1d2f296-2157-4540-9835-d2ff176dff8c",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "eb8916b7-9086-4e30-81d1-dba9773f67ca",
+  "prevId": "f5078754-0ec7-4990-a0c1-3c3dfc3ba3cd",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -25,14 +25,14 @@
           "type": "mechanics_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "force": {
           "name": "force",
           "type": "force_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "category": {
           "name": "category",
@@ -58,7 +58,7 @@
           "type": "equipment_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "record_type": {
           "name": "record_type",
@@ -458,15 +458,17 @@
       "name": "equipment_enum",
       "schema": "public",
       "values": [
-        "barbell",
-        "dumbbell",
-        "kettlebell",
+        "body only",
         "machine",
         "other",
-        "body_weight",
-        "resistent_band",
-        "foam_roller",
-        "medicine_ball",
+        "foam roll",
+        "kettlebells",
+        "dumbbell",
+        "cable",
+        "barbell",
+        "bands",
+        "medicine ball",
+        "exercise ball",
         "e-z curl bar"
       ]
     },

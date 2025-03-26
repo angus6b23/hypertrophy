@@ -5,21 +5,20 @@ CREATE TYPE "public"."exercise_level_enum" AS ENUM('beginner', 'intermediate', '
 CREATE TYPE "public"."force_enum" AS ENUM('pull', 'push', 'static');--> statement-breakpoint
 CREATE TYPE "public"."mechanics_enum" AS ENUM('compound', 'isolation');--> statement-breakpoint
 CREATE TYPE "public"."record_type_enum" AS ENUM('reps_with_weight', 'reps', 'time', 'distance');--> statement-breakpoint
-CREATE TYPE "public"."length_unit_enum" AS ENUM('inch', 'cm');--> statement-breakpoint
-CREATE TYPE "public"."weight_unit_enum" AS ENUM('lb', 'kg');--> statement-breakpoint
 CREATE TABLE "exercises" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
-	"mechanics" "mechanics_enum",
-	"force" "force_enum",
+	"mechanic" "mechanics_enum" NOT NULL,
+	"force" "force_enum" NOT NULL,
 	"category" "exercise_category_enum" NOT NULL,
 	"primary_muscle" "body_part_enum"[] NOT NULL,
 	"secondary_muscle" "body_part_enum"[] NOT NULL,
-	"equipment" "equipment_enum"[] NOT NULL,
+	"equipment" "equipment_enum" NOT NULL,
 	"record_type" "record_type_enum" NOT NULL,
 	"description" text,
 	"owner_id" uuid,
-	CONSTRAINT "exercises_id_unique" UNIQUE("id")
+	CONSTRAINT "exercises_id_unique" UNIQUE("id"),
+	CONSTRAINT "exercises_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "keystore" (
@@ -32,20 +31,25 @@ CREATE TABLE "keystore" (
 --> statement-breakpoint
 CREATE TABLE "measurements" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"weight" numeric,
-	"weight_unit" "weight_unit_enum",
-	"height" numeric,
-	"height_unit" "length_unit_enum",
-	"body_fat" numeric,
-	"chest" numeric,
-	"chest_unit" "length_unit_enum",
-	"waist" numeric,
-	"waist_unit" "length_unit_enum",
-	"hip" numeric,
-	"hip_unit" "length_unit_enum",
+	"date" date NOT NULL,
+	"weight" real,
+	"height" real,
+	"body_fat" real,
+	"chest" real,
+	"waist" real,
+	"hip" real,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"owner_id" uuid NOT NULL,
 	CONSTRAINT "measurements_id_unique" UNIQUE("id")
+);
+--> statement-breakpoint
+CREATE TABLE "oidc-sessions" (
+	"id" text PRIMARY KEY NOT NULL,
+	"verifier" text NOT NULL,
+	"code_challenge" text NOT NULL,
+	"state" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "oidc-sessions_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -55,11 +59,14 @@ CREATE TABLE "users" (
 	"display_name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"is_oauth" boolean DEFAULT false NOT NULL,
+	"oidc_email" text,
+	"is_disabled" boolean DEFAULT false NOT NULL,
 	CONSTRAINT "users_id_unique" UNIQUE("id"),
-	CONSTRAINT "users_username_unique" UNIQUE("username")
+	CONSTRAINT "users_username_unique" UNIQUE("username"),
+	CONSTRAINT "users_oidcEmail_unique" UNIQUE("oidc_email")
 );
 --> statement-breakpoint
-ALTER TABLE "exercises" ADD CONSTRAINT "exercises_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "measurements" ADD CONSTRAINT "measurements_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "exercises" ADD CONSTRAINT "exercises_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "measurements" ADD CONSTRAINT "measurements_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "id_idx" ON "users" USING btree ("id");--> statement-breakpoint
 CREATE INDEX "username" ON "users" USING btree ("username");

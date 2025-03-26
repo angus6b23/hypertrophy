@@ -1,0 +1,1 @@
+ALTER TABLE "exercises" ALTER COLUMN "force" DROP NOT NULL;

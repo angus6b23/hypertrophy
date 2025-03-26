@@ -1,6 +1,6 @@
 {
-  "id": "452eca05-b4d9-47b0-a429-aa466ee75ccc",
-  "prevId": "5b3f6935-c93f-4417-a602-a22d8289021d",
+  "id": "79ec6290-7299-48a1-b54e-5022503d3c11",
+  "prevId": "c1d2f296-2157-4540-9835-d2ff176dff8c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -20,19 +20,19 @@
           "primaryKey": false,
           "notNull": true
         },
-        "mechanics": {
-          "name": "mechanics",
+        "mechanic": {
+          "name": "mechanic",
           "type": "mechanics_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "force": {
           "name": "force",
           "type": "force_enum",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "category": {
           "name": "category",
@@ -55,9 +55,10 @@
         },
         "equipment": {
           "name": "equipment",
-          "type": "equipment_enum[]",
+          "type": "equipment_enum",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "record_type": {
           "name": "record_type",
@@ -91,7 +92,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -102,6 +103,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "id"
+          ]
+        },
+        "exercises_name_unique": {
+          "name": "exercises_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
           ]
         }
       },
@@ -165,74 +173,45 @@
           "primaryKey": true,
           "notNull": true
         },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
         "weight": {
           "name": "weight",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "weight_unit": {
-          "name": "weight_unit",
-          "type": "weight_unit_enum",
-          "typeSchema": "public",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
         "height": {
           "name": "height",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "height_unit": {
-          "name": "height_unit",
-          "type": "length_unit_enum",
-          "typeSchema": "public",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
         "body_fat": {
           "name": "body_fat",
-          "type": "numeric",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
         "chest": {
           "name": "chest",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "chest_unit": {
-          "name": "chest_unit",
-          "type": "length_unit_enum",
-          "typeSchema": "public",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
         "waist": {
           "name": "waist",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "waist_unit": {
-          "name": "waist_unit",
-          "type": "length_unit_enum",
-          "typeSchema": "public",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
         "hip": {
           "name": "hip",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hip_unit": {
-          "name": "hip_unit",
-          "type": "length_unit_enum",
-          "typeSchema": "public",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
@@ -262,7 +241,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -270,6 +249,58 @@
       "uniqueConstraints": {
         "measurements_id_unique": {
           "name": "measurements_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.oidc-sessions": {
+      "name": "oidc-sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "verifier": {
+          "name": "verifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code_challenge": {
+          "name": "code_challenge",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "oidc-sessions_id_unique": {
+          "name": "oidc-sessions_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
@@ -322,6 +353,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "oidc_email": {
+          "name": "oidc_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "is_disabled": {
           "name": "is_disabled",
@@ -379,6 +416,13 @@
           "columns": [
             "username"
           ]
+        },
+        "users_oidcEmail_unique": {
+          "name": "users_oidcEmail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "oidc_email"
+          ]
         }
       },
       "policies": {},
@@ -414,15 +458,17 @@
       "name": "equipment_enum",
       "schema": "public",
       "values": [
-        "barbell",
-        "dumbbell",
-        "kettlebell",
+        "body only",
         "machine",
         "other",
-        "body_weight",
-        "resistent_band",
-        "foam_roller",
-        "medicine_ball",
+        "foam roll",
+        "kettlebells",
+        "dumbbell",
+        "cable",
+        "barbell",
+        "bands",
+        "medicine ball",
+        "exercise ball",
         "e-z curl bar"
       ]
     },
@@ -473,22 +519,6 @@
         "reps",
         "time",
         "distance"
-      ]
-    },
-    "public.length_unit_enum": {
-      "name": "length_unit_enum",
-      "schema": "public",
-      "values": [
-        "inch",
-        "cm"
-      ]
-    },
-    "public.weight_unit_enum": {
-      "name": "weight_unit_enum",
-      "schema": "public",
-      "values": [
-        "lb",
-        "kg"
       ]
     }
   },

@@ -1,5 +1,7 @@
+import z from "zod";
 import { pgEnum, pgTable, serial, text, uuid } from "drizzle-orm/pg-core";
 import { users } from "./users";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const bodyPartEnum = pgEnum("body_part_enum", [
   "abdominals",
@@ -22,15 +24,17 @@ export const bodyPartEnum = pgEnum("body_part_enum", [
 ]);
 
 export const equipmentEnum = pgEnum("equipment_enum", [
-  "barbell",
-  "dumbbell",
-  "kettlebell",
+  "body only",
   "machine",
   "other",
-  "body_weight",
-  "resistent_band",
-  "foam_roller",
-  "medicine_ball",
+  "foam roll",
+  "kettlebells",
+  "dumbbell",
+  "cable",
+  "barbell",
+  "bands",
+  "medicine ball",
+  "exercise ball",
   "e-z curl bar",
 ]);
 
@@ -66,14 +70,19 @@ export const forceEnum = pgEnum("force_enum", ["pull", "push", "static"]);
 
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey().unique().notNull(),
-  name: text("name").notNull(),
-  mechanics: mechanicsEnum("mechanics"),
+  name: text("name").notNull().unique(),
+  mechanic: mechanicsEnum("mechanic"),
   force: forceEnum("force"),
   category: exerciseCategoryEnum("category").notNull(),
-  primaryMuscle: bodyPartEnum("primary_muscle").array().notNull(),
-  secondaryMuscle: bodyPartEnum("secondary_muscle").array().notNull(),
-  equipment: equipmentEnum("equipment").array().notNull(),
+  primaryMuscles: bodyPartEnum("primary_muscle").array().notNull(),
+  secondaryMuscles: bodyPartEnum("secondary_muscle").array().notNull(),
+  equipment: equipmentEnum("equipment"),
   recordType: recordTypeEnum("record_type").notNull(),
   description: text(),
   ownerId: uuid().references(() => users.id, { onDelete: "set null" }),
 });
+
+export const InsertExerciseSchema = createInsertSchema(exercises);
+export type Exercise = z.infer<typeof InsertExerciseSchema>;
+const SelectExerciseSchema = createSelectSchema(exercises);
+export type DbExercise = z.infer<typeof SelectExerciseSchema>;

@@ -2,7 +2,8 @@
   "name": "backend",
   "packageManager": "yarn@4.5.2",
   "scripts": {
-    "dev": "tsx watch entry.ts"
+    "dev": "tsx watch entry.ts",
+    "migrate": "drizzle-kit generate && drizzle-kit migrate"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
