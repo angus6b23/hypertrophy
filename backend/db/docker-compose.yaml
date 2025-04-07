@@ -11,5 +11,6 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
     container_name: "hypertrophy-db"
+    user: 1000:1000
     ports:
       - 5432:5432

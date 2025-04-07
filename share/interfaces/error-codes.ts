@@ -17,6 +17,7 @@ export const AuthErrors = {
   username_exists: "Username already exists",
   password_missing: "Password required",
   password_too_short: "Password must be longer than 8 characters",
+  password_too_long: "Password must be less than 32 characters long",
   displayName_missing: "Display name is required for signup",
   displayName_too_long: "Display name must be less than 32 characters long",
   displayName_too_short: "Display name must be at least 3 characters long",

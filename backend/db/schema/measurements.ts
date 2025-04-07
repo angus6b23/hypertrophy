@@ -6,6 +6,7 @@ import {
   serial,
   timestamp,
   uuid,
+  text,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import {
@@ -13,10 +14,11 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
-import { MeasurementErrors } from "@/share/interfaces/error-codes";
+import { MeasurementErrors } from "share/interfaces/error-codes";
 
 export const measurements = pgTable("measurements", {
   id: serial().primaryKey().unique().notNull(),
+  localId: text().unique().notNull(),
   date: date("date", { mode: "date" }).notNull(),
   weight: real(),
   height: real(),

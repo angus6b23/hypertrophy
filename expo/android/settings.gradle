@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'hypertrophy'
+rootProject.name = 'my-expo-app'
 
 dependencyResolutionManagement {
   versionCatalogs {

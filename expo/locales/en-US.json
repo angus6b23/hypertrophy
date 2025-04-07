@@ -1,0 +1,60 @@
+{
+  "common": {
+    "progress": "Progress",
+    "workouts": "Workouts",
+    "measurements": "Measurements",
+    "confirm_delete": "Confirm delete",
+    "are_you_sure_to_delete_this_measurement": "Are you sure to delete this measurement",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "update": "Update",
+    "add": "Add",
+    "options": "Options",
+    "UI": "UI",
+    "theme": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "message": {
+    "no_field_entered": "No field entered",
+    "meaasurement_updated": "Meaasurement updated",
+    "measurement_added": "Measurement added"
+  },
+  "measurement": {
+    "add_measurements": "Add measurements",
+    "date": "Date",
+    "weight": "Weight",
+    "height": "Height",
+    "body_fat": "Body fat",
+    "chest": "Chest",
+    "hip": "Hip",
+    "waist": "Waist"
+  },
+  "auth": {
+    "display_name": "Display name",
+    "the_name_to_be_displayed_on_your_profile": "The name to be displayed on your profile",
+    "username": "Username",
+    "the_username_used_for_login": "The username used for login",
+    "password": "Password",
+    "super_secret": "Super secret",
+    "signup": "Signup"
+  },
+  "option": {
+    "preferred_units": "Preferred units",
+    "select_an_option": "Select an option"
+  },
+  "unit": {
+    "workout_weight": "Workout weight",
+    "kg": "Kg",
+    "lbs": "Lbs",
+    "measurement_weight": "Measurement weight",
+    "measurement_length": "Measurement length",
+    "cm": "Cm",
+    "inch": "Inch",
+    "feet": "Feet"
+  }
+}

@@ -1,43 +1,46 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Link, Tabs } from 'expo-router';
+import { CalendarDaysIcon, Code } from 'lucide-react-native';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { HeaderButton } from '../../components/HeaderButton';
+import { TabBarIcon } from '../../components/TabBarIcon';
+
+import { NAV_THEME } from '~/utils/rn-reusables/constants';
+import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const { colorScheme } = useColorScheme();
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: NAV_THEME[colorScheme].primary,
+        tabBarInactiveTintColor: NAV_THEME[colorScheme].neutral,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Tab One',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerShown: true,
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <HeaderButton />
+            </Link>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="two"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Tab Two',
+          tabBarIcon: ({ color }) => <Code size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="progress/index"
+        options={{
+          title: 'Progress',
+          tabBarIcon: ({ color }) => <CalendarDaysIcon size={28} color={color} />,
         }}
       />
     </Tabs>

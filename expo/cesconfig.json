@@ -1,0 +1,36 @@
+{
+  "cesVersion": "2.14.3",
+  "projectName": "my-expo-app",
+  "packages": [
+    {
+      "name": "expo-router",
+      "type": "navigation",
+      "options": {
+        "type": "tabs"
+      }
+    },
+    {
+      "name": "nativewind",
+      "type": "styling"
+    }
+  ],
+  "flags": {
+    "noGit": false,
+    "noInstall": false,
+    "overwrite": false,
+    "importAlias": true,
+    "packageManager": "yarn",
+    "eas": false,
+    "publish": false
+  },
+  "packageManager": {
+    "type": "yarn",
+    "version": "4.7.0"
+  },
+  "os": {
+    "type": "Linux",
+    "platform": "linux",
+    "arch": "x64",
+    "kernelVersion": "6.13.5-1-default"
+  }
+}

@@ -18,11 +18,14 @@ const loginBodySchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, {
       message: AuthErrors.username_invalid_char,
     }),
-  password: z.string({ message: "password_missing" }),
+  password: z
+    .string({ message: AuthErrors.password_missing })
+    .min(8, { message: AuthErrors.password_too_short })
+    .max(32, { message: AuthErrors.password_too_long }),
 });
 type LoginBody = z.infer<typeof loginBodySchema>;
 
-const signUpBodySchema = loginBodySchema.extend({
+export const signUpBodySchema = loginBodySchema.extend({
   displayName: z
     .string({ message: AuthErrors.displayName_missing })
     .min(3, { message: AuthErrors.displayName_too_short })
