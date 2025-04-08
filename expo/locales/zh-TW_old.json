@@ -4,5 +4,8 @@
   },
   "measurement": {
     "bodyFat": "體脂"
+  },
+  "option": {
+    "select_an_option": "選擇一個項目"
   }
 }

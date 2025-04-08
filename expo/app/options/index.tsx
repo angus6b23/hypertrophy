@@ -2,15 +2,19 @@ import { Stack } from 'expo-router';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
+import { toast } from 'sonner-native';
 
 import { OptionListItem } from './option-list-item';
 
-import { List } from '~/components/ui/List';
+import { List, ListItem } from '~/components/ui/List';
 import { YStack } from '~/components/ui/Stacks';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { Text } from '~/components/ui/text';
 import { LengthUnit, WeightUnit } from '~/types/units';
+import { readFile, writeFile } from '~/utils/filesystem';
 import { localeName, Locales, locales } from '~/utils/i18next/resources';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
+import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
 
 function OptionPage() {
@@ -22,6 +26,7 @@ function OptionPage() {
         <YStack gap="lg">
           <UISettings />
           <UnitSettings />
+          <DataSettings />
         </YStack>
       </ScrollView>
     </>
@@ -120,6 +125,58 @@ export const UnitSettings = () => {
               { label: t('unit.feet'), value: LengthUnit.feet },
             ]}
           />
+        </List>
+      </YStack>
+    </>
+  );
+};
+
+const DataSettings = () => {
+  const { t } = useTranslation();
+
+  const measurements = useMeasurementStore((state) => state.data);
+  const exportData = useCallback(async () => {
+    try {
+      // TODO: add implementation for workout
+      const workouts: string[] = [];
+      const data = {
+        workouts,
+        measurements,
+      };
+      const dataJSON = JSON.stringify(data);
+
+      await writeFile({
+        name: `hypertrophy-data-${new Date().toISOString()}.json`,
+        type: 'application/json',
+        content: dataJSON,
+      });
+      toast.success(t('message.data_exported_successfully'));
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  }, [measurements]);
+
+  // TODO: Implement zod data verification and set state
+  const importData = useCallback(async () => {
+    try {
+      const text = await readFile();
+      console.log(text);
+      return text;
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  }, []);
+  return (
+    <>
+      <YStack padding="none">
+        <Text className="text-xl">{t('option.data')}</Text>
+        <List>
+          <ListItem icon={<ThemedIcon name="FolderOutput" />} action={exportData}>
+            <Text className="text-lg">{t('option.export_data')}</Text>
+          </ListItem>
+          <ListItem icon={<ThemedIcon name="FolderInput" />} action={importData}>
+            <Text className="text-lg">{t('option.import_data')}</Text>
+          </ListItem>
         </List>
       </YStack>
     </>

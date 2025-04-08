@@ -1,60 +1,63 @@
 {
- "common": {
-   "progress": "進度",
-   "workouts": "運動",
-   "measurements": "測量",
-   "confirm_delete": "確認刪除",
-   "are_you_sure_to_delete_this_measurement": "確認您是否要刪除此測量",
-   "confirm": "確認",
-   "cancel": "取消",
-   "update": "更新",
-   "add": "新增",
-   "options": "選項",
-   "UI": "使用者介面",
-   "theme": "主題",
-   "system": "系統",
-   "light": "淺色",
-   "dark": "深色",
-   "language": "語言",
-   "edit": "編輯",
-   "delete": "刪除"
- },
- "message": {
-   "no_field_entered": "未輸入任何欄位",
-   "meaasurement_updated": "測量已更新",
-   "measurement_added": "測量已新增"
- },
- "measurement": {
-   "add_measurements": "新增測量",
-   "date": "日期",
-   "weight": "體重",
-   "height": "身高",
-   "body_fat": "體脂",
-   "chest": "胸部",
-   "hip": "臀部",
-   "waist": "腰部"
- },
- "auth": {
-   "display_name": "顯示名稱",
-   "the_name_to_be_displayed_on_your_profile": "個人資料上顯示的名稱",
-   "username": "使用者名稱",
-   "the_username_used_for_login": "用於登入的使用者名稱",
-   "password": "密碼",
-   "super_secret": "超級機密",
-   "signup": "註冊"
- },
- "option": {
-   "preferred_units": "首選單位",
-   "select_an_option": "選擇一個項目"
- },
- "unit": {
-   "workout_weight": "運動重量",
-   "kg": "公斤",
-   "lbs": "磅",
-   "measurement_weight": "測量重量",
-   "measurement_length": "測量長度",
-   "cm": "公分",
-   "inch": "英寸",
-   "feet": "英尺"
- }
+  "common": {
+    "progress": "進度",
+    "workouts": "運動",
+    "measurements": "測量",
+    "confirm_delete": "確認刪除",
+    "are_you_sure_to_delete_this_measurement": "確認您是否要刪除此測量",
+    "confirm": "確認",
+    "cancel": "取消",
+    "update": "更新",
+    "add": "新增",
+    "login": "",
+    "options": "選項",
+    "UI": "使用者介面",
+    "theme": "主題",
+    "system": "系統",
+    "light": "淺色",
+    "dark": "深色",
+    "language": "語言",
+    "edit": "編輯",
+    "delete": "刪除"
+  },
+  "message": {
+    "no_field_entered": "未輸入任何欄位",
+    "meaasurement_updated": "測量已更新",
+    "measurement_added": "測量已新增",
+    "data_exported_to": ""
+  },
+  "measurement": {
+    "add_measurements": "新增測量",
+    "date": "日期",
+    "weight": "體重",
+    "height": "身高",
+    "body_fat": "體脂",
+    "chest": "胸部",
+    "hip": "臀部",
+    "waist": "腰部"
+  },
+  "auth": {
+    "display_name": "顯示名稱",
+    "the_name_to_be_displayed_on_your_profile": "個人資料上顯示的名稱",
+    "username": "使用者名稱",
+    "the_username_used_for_login": "用於登入的使用者名稱",
+    "password": "密碼",
+    "super_secret": "超級機密",
+    "signup": "註冊"
+  },
+  "option": {
+    "preferred_units": "首選單位",
+    "data": "",
+    "export_data": ""
+  },
+  "unit": {
+    "workout_weight": "運動重量",
+    "kg": "公斤",
+    "lbs": "磅",
+    "measurement_weight": "測量重量",
+    "measurement_length": "測量長度",
+    "cm": "公分",
+    "inch": "英寸",
+    "feet": "英尺"
+  }
 }

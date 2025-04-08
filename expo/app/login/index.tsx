@@ -1,3 +1,4 @@
+import { Stack } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Animated, {
@@ -19,26 +20,39 @@ import { Text } from '~/components/ui/text';
 
 function LoginPage() {
   const [tab, setTab] = useState('login');
+  const { t } = useTranslation();
 
   return (
-    <YStack justify="center">
-      <YStack justify="start" fill={false}>
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="w-full flex-row">
-            <TabsTrigger value="login" className="flex-1">
-              <Text>Login</Text>
-            </TabsTrigger>
-            <TabsTrigger value="signup" className="flex-1">
-              <Text>Signup</Text>
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="login">
-            <LoginCard />
-          </TabsContent>
-          <TabsContent value="signup">{/* <SignupCard /> */}</TabsContent>
-        </Tabs>
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          presentation: 'modal',
+          title: t('common.login'),
+        }}
+        name="login"
+      />
+      <YStack justify="center">
+        <YStack justify="start" fill={false}>
+          <Tabs value={tab} onValueChange={setTab}>
+            <TabsList className="w-full flex-row">
+              <TabsTrigger value="login" className="flex-1">
+                <Text>Login</Text>
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="flex-1">
+                <Text>Signup</Text>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <LoginCard />
+            </TabsContent>
+            <TabsContent value="signup">
+              <SignupCard />
+            </TabsContent>
+          </Tabs>
+        </YStack>
       </YStack>
-    </YStack>
+    </>
   );
 }
 

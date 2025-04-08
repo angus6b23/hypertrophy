@@ -4,5 +4,8 @@
   },
   "measurement": {
     "bodyFat": "BodyFat"
+  },
+  "option": {
+    "select_an_option": "Select an option"
   }
 }

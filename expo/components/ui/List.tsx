@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { XStack, YStack } from './Stacks';
 
@@ -16,6 +16,7 @@ export const ListItem = ({
   children,
   icon,
   select,
+  action,
 }: {
   children: React.ReactNode;
   icon?: React.ReactNode;
@@ -24,7 +25,7 @@ export const ListItem = ({
 }) => {
   return (
     <>
-      <View>
+      <Pressable onPress={action}>
         <XStack padding="none" align="center" justify="between" fill={false} className="w-full">
           <XStack justify="start" align="center" fill={false}>
             <View>{icon}</View>
@@ -32,7 +33,7 @@ export const ListItem = ({
           </XStack>
           <View className="flex-1">{select}</View>
         </XStack>
-      </View>
+      </Pressable>
       <Separator orientation="horizontal" />
     </>
   );

@@ -9,6 +9,7 @@
     "cancel": "Cancel",
     "update": "Update",
     "add": "Add",
+    "login": "Login",
     "options": "Options",
     "UI": "UI",
     "theme": "Theme",
@@ -22,7 +23,8 @@
   "message": {
     "no_field_entered": "No field entered",
     "meaasurement_updated": "Meaasurement updated",
-    "measurement_added": "Measurement added"
+    "measurement_added": "Measurement added",
+    "data_exported_to": "Data exported to {{path}}"
   },
   "measurement": {
     "add_measurements": "Add measurements",
@@ -45,7 +47,8 @@
   },
   "option": {
     "preferred_units": "Preferred units",
-    "select_an_option": "Select an option"
+    "data": "Data",
+    "export_data": "Export data"
   },
   "unit": {
     "workout_weight": "Workout weight",

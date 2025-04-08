@@ -11,7 +11,6 @@ import {
   UpdateMeasurementSchema,
 } from "../db/schema/measurements";
 import { CustomError, MeasurementErrors } from "@/share/interfaces/error-codes";
-import { z } from "zod";
 
 export const getMeasurementsController = async (
   req: Request,
