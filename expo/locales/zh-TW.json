@@ -3,6 +3,7 @@
     "progress": "進度",
     "workouts": "運動",
     "measurements": "測量",
+    "statistics": "",
     "confirm_delete": "確認刪除",
     "are_you_sure_to_delete_this_measurement": "確認您是否要刪除此測量",
     "confirm": "確認",
@@ -20,11 +21,14 @@
     "edit": "編輯",
     "delete": "刪除"
   },
+  "stat": {
+    "body_composition": ""
+  },
   "message": {
     "no_field_entered": "未輸入任何欄位",
     "meaasurement_updated": "測量已更新",
     "measurement_added": "測量已新增",
-    "data_exported_to": ""
+    "data_exported_successfully": ""
   },
   "measurement": {
     "add_measurements": "新增測量",
@@ -48,7 +52,8 @@
   "option": {
     "preferred_units": "首選單位",
     "data": "",
-    "export_data": ""
+    "export_data": "",
+    "import_data": ""
   },
   "unit": {
     "workout_weight": "運動重量",
@@ -59,5 +64,13 @@
     "cm": "公分",
     "inch": "英寸",
     "feet": "英尺"
+  },
+  "chart": {
+    "14D": "",
+    "30D": "",
+    "3M": "",
+    "6M": "",
+    "1Y": "",
+    "ALL": ""
   }
 }

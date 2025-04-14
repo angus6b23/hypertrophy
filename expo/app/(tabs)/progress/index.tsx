@@ -7,6 +7,7 @@ import MaterialTabs from 'react-native-material-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MeasurementPage } from './measurement';
+import { StatisticsPage } from './statistics';
 
 import { XStack, YStack } from '~/components/ui/Stacks';
 import { Button } from '~/components/ui/button';
@@ -36,7 +37,7 @@ function ProgresPage() {
           </XStack>
         </XStack>
         <MaterialTabs
-          items={[t('common.workouts'), t('common.measurements')]}
+          items={[t('common.workouts'), t('common.measurements'), t('common.statistics')]}
           selectedIndex={tab}
           onChange={setTab}
           barColor={colors.card}
@@ -44,7 +45,11 @@ function ProgresPage() {
           activeTextColor={colors.text}
           inactiveTextColor={colors.text}
         />
-        <YStack gap="none">{tab === 0 ? <View /> : <MeasurementPage />}</YStack>
+        <YStack gap="none">
+          {tab === 0 && <View />}
+          {tab === 1 && <MeasurementPage />}
+          {tab === 2 && <StatisticsPage />}
+        </YStack>
       </SafeAreaView>
     </>
   );

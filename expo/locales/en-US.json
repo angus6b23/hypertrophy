@@ -3,6 +3,7 @@
     "progress": "Progress",
     "workouts": "Workouts",
     "measurements": "Measurements",
+    "statistics": "Statistics",
     "confirm_delete": "Confirm delete",
     "are_you_sure_to_delete_this_measurement": "Are you sure to delete this measurement",
     "confirm": "Confirm",
@@ -20,11 +21,14 @@
     "edit": "Edit",
     "delete": "Delete"
   },
+  "stat": {
+    "body_composition": "Body composition"
+  },
   "message": {
     "no_field_entered": "No field entered",
     "meaasurement_updated": "Meaasurement updated",
     "measurement_added": "Measurement added",
-    "data_exported_to": "Data exported to {{path}}"
+    "data_exported_successfully": "Data exported successfully"
   },
   "measurement": {
     "add_measurements": "Add measurements",
@@ -48,7 +52,8 @@
   "option": {
     "preferred_units": "Preferred units",
     "data": "Data",
-    "export_data": "Export data"
+    "export_data": "Export data",
+    "import_data": "Import data"
   },
   "unit": {
     "workout_weight": "Workout weight",
@@ -59,5 +64,13 @@
     "cm": "Cm",
     "inch": "Inch",
     "feet": "Feet"
+  },
+  "chart": {
+    "14D": "14D",
+    "30D": "30D",
+    "3M": "3M",
+    "6M": "6M",
+    "1Y": "1Y",
+    "ALL": "ALL"
   }
 }
