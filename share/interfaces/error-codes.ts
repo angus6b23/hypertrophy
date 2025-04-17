@@ -25,6 +25,7 @@ export const AuthErrors = {
   username_or_password_incorrect: "Username or password is incorrect",
   expected_refresh_token: "Token not accepted",
   unauthorized_access: "Unauthorized access",
+  user_id_not_found: "User id not found",
 } as const;
 
 export const MeasurementErrors = {

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { createUser, signJWT, verifyPassword, verifyToken } from "./auth";
+import { createUser, signJWT, verifyPassword, verifyTokenJWT } from "./auth";
 import { users } from "@/db/schema/users";
 import { eq } from "drizzle-orm";
 
@@ -19,7 +19,7 @@ describe("JWT functionalities", () => {
       const tokens = signJWT(id);
       expect(tokens.accessToken).toBeDefined();
       expect(tokens.refreshToken).toBeDefined();
-      const decodedId = await verifyToken(tokens.accessToken);
+      const decodedId = await verifyTokenJWT(tokens.accessToken);
       expect(decodedId).toBe(id);
     });
   });

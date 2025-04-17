@@ -9,7 +9,7 @@ import { Exercise, exercises } from "../db/schema/exercise";
 export const seedExercise = async () => {
   const exercisesData = json.exercises;
   for (const exercise of exercisesData) {
-    let {
+    const {
       name,
       mechanic,
       force,

@@ -5,7 +5,7 @@ import { users } from "backend/db/schema/users";
 import { eq } from "drizzle-orm";
 import { single } from "./db-helper";
 import argon2 from "argon2";
-import { AuthErrors, CustomError } from "@/share/interfaces/error-codes";
+import { AuthErrors, CustomError } from "share/interfaces/error-codes";
 
 /**
  * Sign access and refresh token given an id
@@ -54,7 +54,7 @@ type VerifyTokenOptions = {
  *
  *
  */
-export const verifyToken = async (
+export const verifyTokenJWT = async (
   token: string,
   options?: VerifyTokenOptions,
 ) => {

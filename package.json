@@ -6,7 +6,10 @@
     "expo"
   ],
   "scripts": {
-    "dev:all": "yarn workspace backend start-db && concurrently --kill-others \"yarn workspace backend dev\" \"yarn workspace hypertrophy-app dev\""
+    "dev:all": "yarn workspace backend start-db && concurrently --kill-others \"yarn workspace backend dev\" \"yarn workspace hypertrophy-app dev\"",
+    "dev:db": "yarn workspace backend start-db",
+    "dev:backend": "yarn workspace backend dev",
+    "dev:frontend": "yarn workspace hypertrophy-app dev"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

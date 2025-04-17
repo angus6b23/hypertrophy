@@ -1,13 +1,22 @@
-import { CustomError } from "@/share/interfaces/error-codes";
-import { Response } from "express";
+import { CustomError } from "share/interfaces/error-codes";
+import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-export const handleError = (res: Response, err: unknown) => {
+export const handleError = (err: unknown) => {
   if (err instanceof ZodError) {
-    res.status(400).json({ status: "error", message: err.issues[0].message });
+    return NextResponse.json(
+      { status: "error", message: err.issues[0].message },
+      { status: 400 },
+    );
   } else if (err instanceof CustomError) {
-    res.status(err.code || 400).json({ status: "error", message: err.message });
+    return NextResponse.json(
+      { status: "error", message: err.message },
+      { status: 400 },
+    );
   } else {
-    res.status(400).json({ status: "error", message: "Bad Request" });
+    return NextResponse.json(
+      { status: "error", message: "Bad Request" },
+      { status: 400 },
+    );
   }
 };

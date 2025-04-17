@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "../utils/handleError";
 import {
   deleteMeasurement,
@@ -10,33 +10,35 @@ import {
   InsertMeasurementSchema,
   UpdateMeasurementSchema,
 } from "../db/schema/measurements";
-import { CustomError, MeasurementErrors } from "@/share/interfaces/error-codes";
+import { CustomError, MeasurementErrors } from "share/interfaces/error-codes";
 
-export const getMeasurementsController = async (
-  req: Request,
-  res: Response,
-) => {
+export const getMeasurementsController = async (req: NextRequest) => {
   try {
-    const id = res.locals.id!;
+    const id = req.headers.get("x-user-id")!;
     const currentDate = new Date();
-    const from = req.query.from
-      ? new Date(req.query.from as string)
+    const { searchParams } = new URL(req.url);
+    const from = searchParams.get("from")
+      ? new Date(searchParams.get("from") as string)
       : new Date(currentDate.getTime() - 7 * 24 * 3600 * 1000);
-    const to = req.query.to ? new Date(req.query.to as string) : currentDate;
+    const to = searchParams.get("to")
+      ? new Date(searchParams.get("to") as string)
+      : currentDate;
     const records = await getMeasurements({ from, to, id });
-    res.status(200).json({ status: "success", data: records });
+    return NextResponse.json({ status: "success", data: records });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };
 
-export const postMeasurementsController = async (
-  req: Request,
-  res: Response,
-) => {
+export const postMeasurementsController = async (req: NextRequest) => {
   try {
-    const id = res.locals.id!;
-    const body = { ...req.body, date: new Date(req.body.date), ownerId: id };
+    const ownerId = req.headers.get("x-user-id")!;
+    const json = await req.json();
+    const body = {
+      ...json,
+      date: new Date(json.date),
+      ownerId,
+    };
     const data = InsertMeasurementSchema.parse(body);
     if (
       !data.weight &&
@@ -49,41 +51,43 @@ export const postMeasurementsController = async (
       throw new CustomError(MeasurementErrors.all_fields_empty, 400);
     }
     await insertMeasurement(data);
-    res.status(200).json({ status: "success" });
+    return NextResponse.json({ status: "success" });
   } catch (err) {
-    handleError(res, err);
+    console.error(err);
+    return handleError(err);
   }
 };
 
 export const putMeasurementsController = async (
-  req: Request,
-  res: Response,
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
-    const ownerId = res.locals.id!;
-    const id = Number(req.params.id!);
-    const body = { ...req.body, id, date: new Date(req.body.date), ownerId };
+    const ownerId = req.headers.get("x-user-id")!;
+    const json = await req.json();
+    const id = Number((await params).id);
+    const body = { ...json, id, date: new Date(json.date), ownerId };
     const data = UpdateMeasurementSchema.parse(body);
     if (!data.id) {
       throw new CustomError(MeasurementErrors.id_not_found, 400);
     }
     await updateMeasurement(data);
-    res.status(200).json({ status: "success" });
+    return NextResponse.json({ status: "success" });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };
 
 export const deleteMeasurementsController = async (
-  req: Request,
-  res: Response,
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
-    const ownerId = res.locals.id!;
-    const id = Number(req.params.id!);
+    const ownerId = req.headers.get("x-user-id")!;
+    const id = Number((await params).id);
     await deleteMeasurement(id, ownerId);
-    res.status(200).json({ status: "success" });
+    return NextResponse.json({ status: "success" });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };

@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   createUser,
   signJWT,
   verifyPassword,
-  verifyToken,
+  verifyTokenJWT,
 } from "backend/utils/auth";
-import { AuthErrors } from "@/share/interfaces/error-codes";
+import { AuthErrors } from "share/interfaces/error-codes";
 import { generateOIDCRedirectURL } from "backend/utils/oidc";
 import { handleError } from "../utils/handleError";
 
@@ -23,7 +23,7 @@ const loginBodySchema = z.object({
     .min(8, { message: AuthErrors.password_too_short })
     .max(32, { message: AuthErrors.password_too_long }),
 });
-type LoginBody = z.infer<typeof loginBodySchema>;
+// type LoginBody = z.infer<typeof loginBodySchema>;
 
 export const signUpBodySchema = loginBodySchema.extend({
   displayName: z
@@ -32,60 +32,52 @@ export const signUpBodySchema = loginBodySchema.extend({
     .max(32, { message: AuthErrors.displayName_too_long }),
 });
 
-type SignUpBody = z.infer<typeof signUpBodySchema>;
+// type SignUpBody = z.infer<typeof signUpBodySchema>;
 
-export const loginController = async (
-  req: Request<LoginBody>,
-  res: Response,
-) => {
+export const loginController = async (req: NextRequest) => {
   try {
-    const body = loginBodySchema.parse(req.body);
+    const body = loginBodySchema.parse(await req.json());
     const id = await verifyPassword(body.username, body.password);
     const tokens = signJWT(id);
-    res.status(200).json(tokens);
+    return NextResponse.json({ status: "success", data: tokens });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };
 
-export const signUpController = async (
-  req: Request<SignUpBody>,
-  res: Response,
-) => {
+export const signUpController = async (req: NextRequest) => {
   try {
-    const body = signUpBodySchema.parse(req.body);
+    const body = signUpBodySchema.parse(await req.json());
     await createUser(body);
-    res.status(200).json({ message: "success" });
+    return NextResponse.json({ status: "success" });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };
 
-export const refreshTokenController = async (
-  req: Request<{ refreshToken: string }>,
-  res: Response,
-) => {
+export const refreshTokenController = async (req: NextRequest) => {
   try {
     const schema = z.object({
       refreshToken: z.string(),
     });
-    const body = schema.parse(req.body);
-    const id = await verifyToken(body.refreshToken, {
+    const body = schema.parse(await req.json());
+    const id = await verifyTokenJWT(body.refreshToken, {
       checkDb: true,
       refreshToken: true,
     });
     const tokens = signJWT(id);
-    res.status(200).json(tokens);
+    return NextResponse.json({ status: "success", data: tokens });
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };
 
-export const redirectOIDC = async (req: Request, res: Response) => {
+//TODO: Change hardcoded sessionId
+export const redirectOIDC = async (req: NextRequest) => {
   try {
-    const url = await generateOIDCRedirectURL(req.session.id);
-    res.redirect(url.toString());
+    const url = await generateOIDCRedirectURL("PLACEHOLDER");
+    return NextResponse.redirect(url.toString());
   } catch (err) {
-    handleError(res, err);
+    return handleError(err);
   }
 };

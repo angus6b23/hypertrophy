@@ -6,7 +6,7 @@ import {
   UpdateMeasurement,
 } from "../db/schema/measurements";
 import { single } from "./db-helper";
-import { AuthErrors, CustomError } from "@/share/interfaces/error-codes";
+import { AuthErrors, CustomError } from "share/interfaces/error-codes";
 
 interface GetMeasurementsOption {
   from: Date;
