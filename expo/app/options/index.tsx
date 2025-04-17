@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
@@ -14,6 +14,7 @@ import { LengthUnit, WeightUnit } from '~/types/units';
 import { readFile, writeFile } from '~/utils/filesystem';
 import { localeName, Locales, locales } from '~/utils/i18next/resources';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
+import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
 
@@ -24,6 +25,7 @@ function OptionPage() {
       <Stack.Screen options={{ title: t('common.options'), headerShown: true }} />
       <ScrollView>
         <YStack gap="lg">
+          <AccountSetting />
           <UISettings />
           <UnitSettings />
           <DataSettings />
@@ -160,7 +162,6 @@ const DataSettings = () => {
   const importData = useCallback(async () => {
     try {
       const text = await readFile();
-      console.log(text);
       return text;
     } catch (err) {
       toast.error((err as Error).message);
@@ -177,6 +178,32 @@ const DataSettings = () => {
           <ListItem icon={<ThemedIcon name="FolderInput" />} action={importData}>
             <Text className="text-lg">{t('option.import_data')}</Text>
           </ListItem>
+        </List>
+      </YStack>
+    </>
+  );
+};
+
+// TODO: Add logout option
+const AccountSetting = () => {
+  const { t } = useTranslation();
+  const accountStore = useAccountStore();
+  const router = useRouter();
+  return (
+    <>
+      <YStack padding="none">
+        <Text className="text-xl">{t('option.account')}</Text>
+        <List>
+          {accountStore.isLoggedIn ? (
+            <ListItem icon={<ThemedIcon name="User" />}>
+              <Text className="text-lg">{`${t('option.logged_in_as')} ${accountStore.displayName}`}</Text>
+              <Text className="text-muted-foreground">{accountStore.instance}</Text>
+            </ListItem>
+          ) : (
+            <ListItem icon={<ThemedIcon name="User" />} action={() => router.push('/login')}>
+              <Text className="text-lg">{`${t('option.login_now')} ${accountStore.displayName}`}</Text>
+            </ListItem>
+          )}
         </List>
       </YStack>
     </>

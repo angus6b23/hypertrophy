@@ -148,3 +148,25 @@ export const createUser = async (user: {
     throw new CustomError(AuthErrors.username_exists, 400);
   }
 };
+
+export const getUser = async (userId: string) => {
+  try {
+    const record = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        displayName: users.displayName,
+        createdAt: users.createdAt,
+        isOIDC: users.isOauth,
+        oidcEmail: users.oidcEmail,
+        isDisabled: users.isDisabled,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1)
+      .then(single);
+    return record;
+  } catch {
+    throw new CustomError(AuthErrors.user_id_not_found, 403);
+  }
+};

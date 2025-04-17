@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   createUser,
+  getUser,
   signJWT,
   verifyPassword,
   verifyTokenJWT,
@@ -77,6 +78,16 @@ export const redirectOIDC = async (req: NextRequest) => {
   try {
     const url = await generateOIDCRedirectURL("PLACEHOLDER");
     return NextResponse.redirect(url.toString());
+  } catch (err) {
+    return handleError(err);
+  }
+};
+
+export const meController = async (req: NextRequest) => {
+  try {
+    const id = req.headers.get("x-user-id")!;
+    const user = await getUser(id);
+    return NextResponse.json({ status: "success", data: user });
   } catch (err) {
     return handleError(err);
   }

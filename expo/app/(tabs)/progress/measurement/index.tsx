@@ -24,17 +24,19 @@ export const MeasurementPage = () => {
   const [remove, setRemove] = useState('');
 
   return (
-    <MeasurementContext.Provider value={{ removeId: remove, setRemove }}>
-      <ScrollView>
-        <YStack>
-          {measurements.map((data) => (
-            <MeasurementCard key={data.localId} data={data} />
-          ))}
-        </YStack>
-      </ScrollView>
-      <FloatingButton />
-      <DeleteConfirmDialog />
-    </MeasurementContext.Provider>
+    <>
+      <MeasurementContext.Provider value={{ removeId: remove, setRemove }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
+          <YStack>
+            {measurements.map((data) => (
+              <MeasurementCard key={data.localId} data={data} />
+            ))}
+          </YStack>
+        </ScrollView>
+        <FloatingButton />
+        <DeleteConfirmDialog />
+      </MeasurementContext.Provider>
+    </>
   );
 };
 const FloatingButton = () => {

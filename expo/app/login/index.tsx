@@ -17,6 +17,8 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Text } from '~/components/ui/text';
+import { backend } from '~/utils/backend';
+import { useAccountStore } from '~/utils/stores/account-store';
 
 function LoginPage() {
   const [tab, setTab] = useState('login');
@@ -37,10 +39,10 @@ function LoginPage() {
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="w-full flex-row">
               <TabsTrigger value="login" className="flex-1">
-                <Text>Login</Text>
+                <Text>{t('auth.login')}</Text>
               </TabsTrigger>
               <TabsTrigger value="signup" className="flex-1">
-                <Text>Signup</Text>
+                <Text>{t('auth.signup')}</Text>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="login">
@@ -57,8 +59,11 @@ function LoginPage() {
 }
 
 const LoginCard = () => {
+  const { t } = useTranslation();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const accountStore = useAccountStore();
+
   const changeUserName = useCallback(
     (text: string) => {
       setUserName(text);
@@ -69,11 +74,24 @@ const LoginCard = () => {
   const allValid = useCallback(() => {
     return userName !== '' && password !== '';
   }, [userName, password]);
+  const handleLogin = useCallback(async () => {
+    try {
+      const res = await backend.login(userName, password);
+      if (res.success) {
+        const profile = await backend.me();
+        accountStore.login(profile);
+
+        toast.success(t('auth.logged_in_successfully'));
+      }
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  }, [userName, password]);
   return (
     <Animated.View entering={FadeInLeft} exiting={FadeOutLeft}>
       <YStack className="mt-4 rounded-lg" padding="none" fill={false}>
         <YStack gap="sm" padding="none" className="w-full" fill={false}>
-          <Label>Username</Label>
+          <Label>{t('auth.username')}</Label>
           <Input
             value={userName}
             onChangeText={changeUserName}
@@ -82,7 +100,7 @@ const LoginCard = () => {
           />
         </YStack>
         <YStack gap="sm" padding="none" className="w-full" fill={false}>
-          <Label>Password</Label>
+          <Label>{t('auth.password')}</Label>
           <Input
             value={password}
             onChangeText={changePassword}
@@ -92,8 +110,8 @@ const LoginCard = () => {
             secureTextEntry
           />
         </YStack>
-        <Button className="w-full" onPress={() => toast('pressed')} disabled={!allValid()}>
-          <Text>Log in</Text>
+        <Button className="w-full" onPress={handleLogin} disabled={!allValid()}>
+          <Text>{t('auth.login')}</Text>
         </Button>
       </YStack>
     </Animated.View>

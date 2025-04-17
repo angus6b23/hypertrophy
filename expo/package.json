@@ -47,6 +47,7 @@
     "expo-system-ui": "4",
     "expo-web-browser": "14",
     "i18next": "^24.2.3",
+    "jose": "^6.0.10",
     "lucide-react-native": "^0.486.0",
     "nanoid": "^5.1.5",
     "nativewind": "latest",

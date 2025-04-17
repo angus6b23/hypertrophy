@@ -11131,6 +11131,7 @@ __metadata:
     expo-web-browser: "npm:14"
     i18next: "npm:^24.2.3"
     i18next-parser: "npm:^9.3.0"
+    jose: "npm:^6.0.10"
     lucide-react-native: "npm:^0.486.0"
     nanoid: "npm:^5.1.5"
     nativewind: "npm:latest"

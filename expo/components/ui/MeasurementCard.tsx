@@ -9,16 +9,6 @@ import { ThemedIcon } from './ThemedIcon';
 import { Button } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
