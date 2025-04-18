@@ -64,7 +64,11 @@ export const getMeasurements = ({ from, to, id }: GetMeasurementsOption) => {
  * ```
  */
 export const insertMeasurement = async (data: InsertMeasurement) => {
-  const record = await db.insert(measurements).values(data).returning();
+  const record = await db
+    .insert(measurements)
+    .values(data)
+    .returning()
+    .then(single);
   return record;
 };
 

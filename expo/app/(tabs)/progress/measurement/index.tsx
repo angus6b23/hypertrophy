@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
+import { toast } from 'sonner-native';
 
 import { MeasurementCard } from '~/components/ui/MeasurementCard';
 import { XStack, YStack } from '~/components/ui/Stacks';
@@ -16,6 +17,8 @@ import {
   DialogFooter,
 } from '~/components/ui/dialog';
 import { Text } from '~/components/ui/text';
+import { backend } from '~/utils/backend';
+import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 
 export const MeasurementContext = createContext({ removeId: '', setRemove: (s: string) => {} });
@@ -55,10 +58,24 @@ const FloatingButton = () => {
 const DeleteConfirmDialog = () => {
   const { t } = useTranslation();
   const ctx = useContext(MeasurementContext);
-  const { delete: deleteMeasurement } = useMeasurementStore();
+  const { data, delete: deleteMeasurement } = useMeasurementStore();
+  const { isLoggedIn } = useAccountStore();
+  const handleDelete = useCallback(async () => {
+    deleteMeasurement(ctx.removeId);
+    if (isLoggedIn) {
+      try {
+        const item = data.find((item) => item.localId === ctx.removeId);
+        if (item && item.remoteId) {
+          await backend.measurement.delete(item.remoteId);
+        }
+      } catch {}
+    }
+    ctx.setRemove('');
+    toast.success(t('common.delete_success'));
+  }, [ctx.removeId]);
 
   return (
-    <Dialog open={ctx.removeId !== ''}>
+    <Dialog open={ctx.removeId !== ''} onOpenChange={() => ctx.setRemove('')}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('common.confirm_delete')}</DialogTitle>
@@ -68,13 +85,7 @@ const DeleteConfirmDialog = () => {
         </DialogHeader>
         <DialogFooter>
           <XStack fill={false} padding="none">
-            <Button
-              className="flex-1"
-              variant="destructive"
-              onPress={() => {
-                deleteMeasurement(ctx.removeId);
-                ctx.setRemove('');
-              }}>
+            <Button className="flex-1" variant="destructive" onPress={handleDelete}>
               <Text>{t('common.confirm')}</Text>
             </Button>
             <Button className="flex-1" onPress={() => ctx.setRemove('')}>

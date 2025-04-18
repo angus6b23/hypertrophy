@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Animated, {
@@ -21,6 +21,7 @@ import { backend } from '~/utils/backend';
 import { useAccountStore } from '~/utils/stores/account-store';
 
 function LoginPage() {
+  // TODO: Add Change Instance option
   const [tab, setTab] = useState('login');
   const { t } = useTranslation();
 
@@ -60,6 +61,7 @@ function LoginPage() {
 
 const LoginCard = () => {
   const { t } = useTranslation();
+  const router = useRouter();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const accountStore = useAccountStore();
@@ -76,12 +78,12 @@ const LoginCard = () => {
   }, [userName, password]);
   const handleLogin = useCallback(async () => {
     try {
-      const res = await backend.login(userName, password);
+      const res = await backend.auth.login(userName, password);
       if (res.success) {
-        const profile = await backend.me();
+        const profile = await backend.auth.me();
         accountStore.login(profile);
-
         toast.success(t('auth.logged_in_successfully'));
+        router.dismissAll();
       }
     } catch (error) {
       toast.error((error as Error).message);
@@ -120,14 +122,17 @@ const LoginCard = () => {
 
 const SignupCard = () => {
   const { t } = useTranslation();
+  const router = useRouter();
+
   const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [errors, setErrors] = useState({
     username: '',
     password: '',
     displayName: '',
   });
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const accountStore = useAccountStore();
 
   const changeUserName = useCallback(
     (text: string) => {
@@ -168,6 +173,7 @@ const SignupCard = () => {
     },
     [setPassword]
   );
+
   const changeDisplayName = useCallback((text: string) => {
     const displayNameSchema = z
       .string()
@@ -181,6 +187,19 @@ const SignupCard = () => {
       setErrors((e) => ({ ...e, displayName: '' }));
     }
   }, []);
+
+  const handleSignup = useCallback(async () => {
+    try {
+      await backend.auth.signUp(userName, password, displayName);
+      toast.success(t('auth.sign_up_successfully'));
+      await backend.auth.login(userName, password);
+      const profile = await backend.auth.me();
+      accountStore.login(profile);
+      router.dismissAll();
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  }, [userName, password, displayName]);
 
   const allValid = useCallback(() => {
     return (
@@ -233,7 +252,7 @@ const SignupCard = () => {
           />
           {errors.password && <Label className="mt-0 text-destructive">{errors.password}</Label>}
         </YStack>
-        <Button className="w-full" onPress={() => toast('pressed')} disabled={!allValid()}>
+        <Button className="w-full" onPress={handleSignup} disabled={!allValid()}>
           <Text>{t('auth.signup')}</Text>
         </Button>
       </YStack>

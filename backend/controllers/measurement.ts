@@ -50,8 +50,8 @@ export const postMeasurementsController = async (req: NextRequest) => {
     ) {
       throw new CustomError(MeasurementErrors.all_fields_empty, 400);
     }
-    await insertMeasurement(data);
-    return NextResponse.json({ status: "success" });
+    const returnData = await insertMeasurement(data);
+    return NextResponse.json({ status: "success", data: returnData });
   } catch (err) {
     console.error(err);
     return handleError(err);

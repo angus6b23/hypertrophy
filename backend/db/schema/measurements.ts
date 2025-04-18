@@ -7,6 +7,7 @@ import {
   timestamp,
   uuid,
   text,
+  unique,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import {
@@ -16,21 +17,27 @@ import {
 } from "drizzle-zod";
 import { MeasurementErrors } from "share/interfaces/error-codes";
 
-export const measurements = pgTable("measurements", {
-  id: serial().primaryKey().unique().notNull(),
-  localId: text().unique().notNull(),
-  date: date("date", { mode: "date" }).notNull(),
-  weight: real(),
-  height: real(),
-  bodyFat: real(),
-  chest: real(),
-  waist: real(),
-  hip: real(),
-  createdAt: timestamp().defaultNow().notNull(),
-  ownerId: uuid()
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const measurements = pgTable(
+  "measurements",
+  {
+    id: serial().primaryKey().unique().notNull(),
+    localId: text().notNull(),
+    date: date("date", { mode: "date" }).notNull(),
+    weight: real(),
+    height: real(),
+    bodyFat: real(),
+    chest: real(),
+    waist: real(),
+    hip: real(),
+    createdAt: timestamp().defaultNow().notNull(),
+    ownerId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    uniqueIds: unique("owner_localId_unique").on(table.localId, table.ownerId),
+  }),
+);
 
 const measurementConstraints = {
   weight: (z: ZodNumber) =>

@@ -9,14 +9,17 @@ import { ScrollView, TouchableOpacity, View, StyleSheet } from 'react-native';
 import RNPickerSelect, { Item } from 'react-native-picker-select';
 import { Measurement } from 'share/interfaces/Measurements';
 import { toast } from 'sonner-native';
+import { z } from 'zod';
 
 import { FormField } from '~/components/ui/FormField';
 import { XStack, YStack } from '~/components/ui/Stacks';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { WeightUnit, LengthUnit, weightUnits, lengthUnits } from '~/types/units';
+import { backend } from '~/utils/backend';
 import { removeNullValues } from '~/utils/misc/remove-null-values';
 import { toCm, toKg } from '~/utils/misc/unit-conversion';
+import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
 
@@ -24,6 +27,7 @@ export const MeasurementModal = () => {
   const { t } = useTranslation();
   const measurementStore = useMeasurementStore();
   const preferredUnit = useOptionStore((state) => state.unit);
+  const { isLoggedIn } = useAccountStore();
   const { language } = useOptionStore();
   const router = useRouter();
 
@@ -37,6 +41,7 @@ export const MeasurementModal = () => {
     ? ({ ...record, date: new Date(record!.date) } as Measurement)
     : {
         date: new Date(),
+        remoteId: null,
         localId: nanoid(10),
         weight: null,
         height: null,
@@ -68,7 +73,7 @@ export const MeasurementModal = () => {
     },
     [setState]
   );
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     const unitChange = (data: Measurement) => {
       data.weight = data.weight ? toKg(Number(data.weight), unit.weight) : null;
       data.height = data.height ? toCm(Number(data.height), unit.height) : null;
@@ -78,7 +83,9 @@ export const MeasurementModal = () => {
       data.waist = data.waist ? toCm(Number(data.waist), unit.waist) : null;
       return data;
     };
-    const result = InsertMeasurementSchema.omit({ ownerId: true }).safeParse(unitChange(state));
+    const result = InsertMeasurementSchema.extend({ remoteId: z.number().optional() })
+      .omit({ ownerId: true })
+      .safeParse(unitChange(state));
     if (!result.success || !result.data) {
       toast.error(result.error.errors[0].message);
       return;
@@ -91,12 +98,35 @@ export const MeasurementModal = () => {
     }
     if (recordExist.current) {
       measurementStore.update(newRecord.localId, newRecord);
+      if (isLoggedIn) {
+        try {
+          if (newRecord.remoteId) {
+            await backend.measurement.update(newRecord);
+          } else {
+            const remoteId = await backend.measurement.add(newRecord);
+            measurementStore.update(newRecord.localId, { remoteId });
+          }
+        } catch {
+          measurementStore.update(newRecord.localId, newRecord);
+        }
+      } else {
+        measurementStore.update(newRecord.localId, newRecord);
+      }
       toast.success(t('message.meaasurement_updated'));
       router.back();
     } else {
-      measurementStore.add(newRecord);
+      if (isLoggedIn) {
+        try {
+          const remoteId = await backend.measurement.add(newRecord);
+          measurementStore.add({ ...newRecord, remoteId });
+        } catch {
+          measurementStore.add(newRecord);
+        }
+      } else {
+        measurementStore.add(newRecord);
+      }
       toast.success(t('message.measurement_added'));
-      router.back();
+      router.dismissAll();
     }
   }, [state, unit]);
   const pickerSelectStyles = StyleSheet.create({
@@ -258,7 +288,7 @@ export const MeasurementModal = () => {
         </ScrollView>
         <YStack padding="none" justify="end" fill={false} className="w-full">
           <Button className="w-full" onPress={handleSubmit}>
-            <Text> {recordExist.current ? t('common.update') : t('common.add')} </Text>
+            <Text>{recordExist.current ? t('common.update') : t('common.add')} </Text>
           </Button>
         </YStack>
       </YStack>

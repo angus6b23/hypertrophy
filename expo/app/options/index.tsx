@@ -1,5 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { t } from 'i18next';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
 import { toast } from 'sonner-native';
@@ -7,10 +8,20 @@ import { toast } from 'sonner-native';
 import { OptionListItem } from './option-list-item';
 
 import { List, ListItem } from '~/components/ui/List';
-import { YStack } from '~/components/ui/Stacks';
+import { XStack, YStack } from '~/components/ui/Stacks';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { Button } from '~/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '~/components/ui/dialog';
 import { Text } from '~/components/ui/text';
 import { LengthUnit, WeightUnit } from '~/types/units';
+import { backend } from '~/utils/backend';
 import { readFile, writeFile } from '~/utils/filesystem';
 import { localeName, Locales, locales } from '~/utils/i18next/resources';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
@@ -18,19 +29,28 @@ import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
 
+const OptionContext = createContext({
+  showLogoutDialog: false,
+  setLogoutDialog: (_val: boolean) => {},
+});
+
 function OptionPage() {
   const { t } = useTranslation();
+  const [showLogoutDialog, setLogoutDialog] = useState(false);
   return (
     <>
       <Stack.Screen options={{ title: t('common.options'), headerShown: true }} />
-      <ScrollView>
-        <YStack gap="lg">
-          <AccountSetting />
-          <UISettings />
-          <UnitSettings />
-          <DataSettings />
-        </YStack>
-      </ScrollView>
+      <OptionContext.Provider value={{ showLogoutDialog, setLogoutDialog }}>
+        <LogoutDialog />
+        <ScrollView>
+          <YStack gap="lg">
+            <AccountSetting />
+            <UISettings />
+            <UnitSettings />
+            <DataSettings />
+          </YStack>
+        </ScrollView>
+      </OptionContext.Provider>
     </>
   );
 }
@@ -149,7 +169,7 @@ const DataSettings = () => {
 
       await writeFile({
         name: `hypertrophy-data-${new Date().toISOString()}.json`,
-        type: 'application/json',
+        mimeType: 'application/json',
         content: dataJSON,
       });
       toast.success(t('message.data_exported_successfully'));
@@ -184,18 +204,18 @@ const DataSettings = () => {
   );
 };
 
-// TODO: Add logout option
 const AccountSetting = () => {
   const { t } = useTranslation();
   const accountStore = useAccountStore();
   const router = useRouter();
+  const ctx = useContext(OptionContext);
   return (
     <>
       <YStack padding="none">
         <Text className="text-xl">{t('option.account')}</Text>
         <List>
           {accountStore.isLoggedIn ? (
-            <ListItem icon={<ThemedIcon name="User" />}>
+            <ListItem icon={<ThemedIcon name="User" />} action={() => ctx.setLogoutDialog(true)}>
               <Text className="text-lg">{`${t('option.logged_in_as')} ${accountStore.displayName}`}</Text>
               <Text className="text-muted-foreground">{accountStore.instance}</Text>
             </ListItem>
@@ -207,6 +227,45 @@ const AccountSetting = () => {
         </List>
       </YStack>
     </>
+  );
+};
+
+const LogoutDialog = () => {
+  const { t } = useTranslation();
+  const ctx = useContext(OptionContext);
+  const accountStore = useAccountStore();
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await backend.auth.logout();
+      accountStore.logout();
+      toast.success(t('auth.logged_out_successfully'));
+      ctx.setLogoutDialog(false);
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  }, []);
+  return (
+    <Dialog open={ctx.showLogoutDialog} onOpenChange={(val) => ctx.setLogoutDialog(val)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('option.confirm_logout')}</DialogTitle>
+          <DialogDescription>
+            {t('option.do_you_want_to_logout_current_account?')}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <XStack fill={false} padding="none">
+            <Button className="flex-1" variant="destructive" onPress={handleLogout}>
+              <Text>{t('common.confirm')}</Text>
+            </Button>
+            <Button className="flex-1" onPress={() => ctx.setLogoutDialog(false)}>
+              <Text>{t('common.cancel')}</Text>
+            </Button>
+          </XStack>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 export default OptionPage;

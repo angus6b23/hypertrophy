@@ -8,6 +8,13 @@
       "when": 1744647862634,
       "tag": "0000_uneven_mongoose",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1744993377510,
+      "tag": "0001_long_odin",
+      "breakpoints": true
     }
   ]
 }
