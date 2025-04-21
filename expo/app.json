@@ -9,7 +9,13 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-localization", "expo-secure-store", "expo-document-picker"],
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-document-picker",
+      "expo-asset"
+    ],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true

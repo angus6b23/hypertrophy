@@ -10,6 +10,6 @@ export const debounce = (fn: (...args: any[]) => any, delay = 500) => {
   let timer: any;
   return (...args: any[]) => {
     clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
+    timer = setTimeout(() => fn.apply(this, args), delay);
   };
 };

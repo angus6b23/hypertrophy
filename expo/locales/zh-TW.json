@@ -4,10 +4,12 @@
     "workouts": "運動",
     "measurements": "測量",
     "statistics": "",
+    "delete_success": "",
     "confirm_delete": "確認刪除",
     "are_you_sure_to_delete_this_measurement": "確認您是否要刪除此測量",
     "confirm": "確認",
     "cancel": "取消",
+    "exercises": "",
     "update": "更新",
     "add": "新增",
     "login": "",
@@ -19,10 +21,20 @@
     "dark": "深色",
     "language": "語言",
     "edit": "編輯",
-    "delete": "刪除"
+    "delete": "刪除",
+    "date": ""
   },
   "stat": {
     "body_composition": ""
+  },
+  "exercise": {
+    "search_with_exercise_name": "",
+    "primary_muscle": "",
+    "secondary_muscle": "",
+    "force": "",
+    "mechanic": "",
+    "equipment": "",
+    "category": ""
   },
   "message": {
     "no_field_entered": "未輸入任何欄位",
@@ -41,19 +53,28 @@
     "waist": "腰部"
   },
   "auth": {
+    "login": "",
+    "signup": "註冊",
+    "logged_in_successfully": "",
+    "username": "使用者名稱",
+    "password": "密碼",
+    "sign_up_successfully": "",
     "display_name": "顯示名稱",
     "the_name_to_be_displayed_on_your_profile": "個人資料上顯示的名稱",
-    "username": "使用者名稱",
     "the_username_used_for_login": "用於登入的使用者名稱",
-    "password": "密碼",
     "super_secret": "超級機密",
-    "signup": "註冊"
+    "logged_out_successfully": ""
   },
   "option": {
     "preferred_units": "首選單位",
     "data": "",
     "export_data": "",
-    "import_data": ""
+    "import_data": "",
+    "account": "",
+    "logged_in_as": "",
+    "login_now": "",
+    "confirm_logout": "",
+    "do_you_want_to_logout_current_account?": ""
   },
   "unit": {
     "workout_weight": "運動重量",

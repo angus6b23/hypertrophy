@@ -4,10 +4,12 @@
     "workouts": "Workouts",
     "measurements": "Measurements",
     "statistics": "Statistics",
+    "delete_success": "Delete success",
     "confirm_delete": "Confirm delete",
     "are_you_sure_to_delete_this_measurement": "Are you sure to delete this measurement",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "exercises": "Exercises",
     "update": "Update",
     "add": "Add",
     "login": "Login",
@@ -19,10 +21,20 @@
     "dark": "Dark",
     "language": "Language",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "date": "Date"
   },
   "stat": {
     "body_composition": "Body composition"
+  },
+  "exercise": {
+    "search_with_exercise_name": "Search with exercise name",
+    "primary_muscle": "Primary muscle",
+    "secondary_muscle": "Secondary muscle",
+    "force": "Force",
+    "mechanic": "Mechanic",
+    "equipment": "Equipment",
+    "category": "Category"
   },
   "message": {
     "no_field_entered": "No field entered",
@@ -41,19 +53,28 @@
     "waist": "Waist"
   },
   "auth": {
+    "login": "Login",
+    "signup": "Signup",
+    "logged_in_successfully": "Logged in successfully",
+    "username": "Username",
+    "password": "Password",
+    "sign_up_successfully": "Sign up successfully",
     "display_name": "Display name",
     "the_name_to_be_displayed_on_your_profile": "The name to be displayed on your profile",
-    "username": "Username",
     "the_username_used_for_login": "The username used for login",
-    "password": "Password",
     "super_secret": "Super secret",
-    "signup": "Signup"
+    "logged_out_successfully": "Logged out successfully"
   },
   "option": {
     "preferred_units": "Preferred units",
     "data": "Data",
     "export_data": "Export data",
-    "import_data": "Import data"
+    "import_data": "Import data",
+    "account": "Account",
+    "logged_in_as": "Logged in as",
+    "login_now": "Login now",
+    "confirm_logout": "Confirm logout",
+    "do_you_want_to_logout_current_account?": "Do you want to logout current account?"
   },
   "unit": {
     "workout_weight": "Workout weight",

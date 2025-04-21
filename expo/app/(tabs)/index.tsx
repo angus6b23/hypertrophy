@@ -15,6 +15,9 @@ export default function Home() {
         <Button variant="secondary" size="lg" onPress={() => router.push('/login')}>
           <Text>Button</Text>
         </Button>
+        <Button variant="secondary" size="lg" onPress={() => router.push('/exercise/list')}>
+          <Text>Exercise</Text>
+        </Button>
       </View>
     </>
   );
