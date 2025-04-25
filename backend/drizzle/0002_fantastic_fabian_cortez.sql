@@ -1,0 +1,1 @@
+ALTER TABLE "plan_days" ADD COLUMN "day" integer NOT NULL;

@@ -1,6 +1,6 @@
 {
-  "id": "f56af69c-4ca9-41f7-a4c0-445fc50a2984",
-  "prevId": "ce866099-4689-4cb1-a8e5-3eae782fbeed",
+  "id": "9030f560-fb0f-47d0-8bac-8edc85715a33",
+  "prevId": "f56af69c-4ca9-41f7-a4c0-445fc50a2984",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -339,6 +339,12 @@
         "plan_id": {
           "name": "plan_id",
           "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }

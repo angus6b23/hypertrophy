@@ -1,13 +1,14 @@
 import json from "share/exercises/exercises.json";
 import { db } from "../db";
-import { Exercise, exercises } from "../db/schema/exercise";
+import { exercises } from "../db/schema/exercise";
 
+import { Exercise as ExerciseType } from "share/exercises/types/exercise";
 /**
  * Seeds the database with the exercise data from exercises.json
  *
  */
 export const seedExercise = async () => {
-  const exercisesData = json.exercises;
+  const exercisesData: ExerciseType[] = json.exercises;
   for (const exercise of exercisesData) {
     const {
       name,
@@ -35,3 +36,5 @@ export const seedExercise = async () => {
       .onConflictDoNothing();
   }
 };
+
+seedExercise();

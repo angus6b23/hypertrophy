@@ -1,0 +1,1 @@
+ALTER TABLE "plan_days" DROP COLUMN "local_id";

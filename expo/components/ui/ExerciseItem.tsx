@@ -1,10 +1,11 @@
+import { Image } from 'expo-image';
+import { Link } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Exercise } from 'share/exercises/types/exercise';
-import { Pressable } from 'react-native';
 
 import { XStack } from './Stacks';
+
 import { Text } from '~/components/ui/text';
-import { Image } from 'expo-image';
-import { useEffect, useState } from 'react';
 
 export const ExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   const [img, setImg] = useState<any>();
@@ -16,7 +17,7 @@ export const ExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   }, [exercise]);
   return (
     <>
-      <Pressable>
+      <Link href={`/exercise/${exercise.id!}`}>
         <XStack padding="none" fill={false} align="center">
           <Image
             source={img}
@@ -25,7 +26,7 @@ export const ExerciseItem = ({ exercise }: { exercise: Exercise }) => {
           />
           <Text className="text-lg font-bold">{exercise.name}</Text>
         </XStack>
-      </Pressable>
+      </Link>
     </>
   );
 };

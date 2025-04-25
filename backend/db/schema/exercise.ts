@@ -74,7 +74,7 @@ export const exercises = pgTable("exercises", {
   mechanic: mechanicsEnum("mechanic"),
   force: forceEnum("force"),
   category: exerciseCategoryEnum("category").notNull(),
-  primaryMuscles: bodyPartEnum("primary_muscle").array().notNull(),
+  primaryMuscles: bodyPartEnum("primary_muscle").notNull(),
   secondaryMuscles: bodyPartEnum("secondary_muscle").array().notNull(),
   equipment: equipmentEnum("equipment"),
   recordType: recordTypeEnum("record_type").notNull(),

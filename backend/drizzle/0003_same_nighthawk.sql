@@ -1,0 +1,1 @@
+ALTER TABLE "plan_days" ALTER COLUMN "day" SET DEFAULT 0;

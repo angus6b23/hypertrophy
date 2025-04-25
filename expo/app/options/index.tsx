@@ -1,5 +1,4 @@
 import { Stack, useRouter } from 'expo-router';
-import { t } from 'i18next';
 import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';

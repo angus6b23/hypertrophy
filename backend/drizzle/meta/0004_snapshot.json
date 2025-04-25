@@ -1,6 +1,6 @@
 {
-  "id": "f56af69c-4ca9-41f7-a4c0-445fc50a2984",
-  "prevId": "ce866099-4689-4cb1-a8e5-3eae782fbeed",
+  "id": "8d89469b-c381-4a8b-91bc-cc846ef51938",
+  "prevId": "f24a4229-cfb8-42f5-aadd-a4f745045e86",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -341,6 +341,20 @@
           "type": "serial",
           "primaryKey": false,
           "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {},
@@ -477,7 +491,8 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "local_id": {
           "name": "local_id",

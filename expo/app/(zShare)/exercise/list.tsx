@@ -1,6 +1,8 @@
-import { Stack } from 'expo-router';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import { Stack, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import exerciseDb from 'share/exercises/exercises.json';
 import {
@@ -11,7 +13,6 @@ import {
   Muscle,
   Force,
 } from 'share/exercises/types/exercise';
-import { FlashList } from '@shopify/flash-list';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { CheckboxDropdown } from '~/components/ui/CheckboxDropdown';
@@ -21,8 +22,8 @@ import { XStack, YStack } from '~/components/ui/Stacks';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
 import { enumToObject } from '~/utils/typescript/enumToObject';
-import { View } from 'react-native';
 
 interface ExerciseFilter {
   searchTerm?: string;
@@ -44,9 +45,19 @@ const ExerciseContext = createContext<{
   exercises: [],
 });
 
-const ExerciseListPage = ({ filter }: { filter?: ExerciseFilter }) => {
+const ExerciseListPage = () => {
   const { t } = useTranslation();
-  const [exfilter, setFilter] = useState<ExerciseFilter>(filter ?? {});
+  const navigation = useNavigation();
+  const params = useLocalSearchParams();
+  const [exfilter, setFilter] = useState<ExerciseFilter>(params ?? {});
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setFilter(params);
+    });
+    return unsubscribe;
+  }, [params]);
+
   const [displayEx, setDisplayEx] = useState<Exercise[]>([]);
   const deboucnedFilterFn = useDebouncedCallback(() => {
     const allExercises = exerciseDb.exercises as Exercise[];
@@ -83,11 +94,7 @@ const ExerciseListPage = ({ filter }: { filter?: ExerciseFilter }) => {
       <ExerciseContext.Provider value={{ filter: exfilter, setFilter, exercises: displayEx }}>
         <Stack.Screen options={{ title: t('common.exercises'), headerShown: true }} />
         <ExerciseFilterControl />
-        {/* <ScrollView */}
-        {/*   contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start' }} */}
-        {/*   className="w-full"> */}
         <ExerciseList />
-        {/* </ScrollView> */}
       </ExerciseContext.Provider>
     </>
   );
@@ -99,98 +106,92 @@ const ExerciseFilterControl = () => {
   const { t } = useTranslation();
 
   return (
-    <YStack fill={false} className="w-full">
-      <XStack fill={false} className="w-full" padding="none" gap="sm">
-        <Input
-          placeholder={t('exercise.search_with_exercise_name')}
-          value={filter.searchTerm}
-          onChangeText={(text) => setFilter((prevState) => ({ ...prevState, searchTerm: text }))}
-          className="flex-1"
-        />
-        <Button onPress={() => setFilter({})} variant="ghost">
-          <ThemedIcon name="RotateCcw" size={24} />
-        </Button>
-      </XStack>
-      <ScrollView horizontal>
-        <XStack padding="none">
-          <RadioDropdown
-            buttonText={t('exercise.primary_muscle')}
-            items={enumToObject(Muscle)}
-            currentItem={filter.primaryMuscle}
-            callback={(m) => setFilter((prevState) => ({ ...prevState, primaryMuscle: m }))}
+    <>
+      <YStack fill={false} className="w-full">
+        <XStack fill={false} className="w-full" padding="none" gap="sm">
+          <Input
+            placeholder={t('exercise.search_with_exercise_name')}
+            value={filter.searchTerm}
+            onChangeText={(text) => setFilter((prevState) => ({ ...prevState, searchTerm: text }))}
+            className="flex-1"
           />
-          <CheckboxDropdown
-            buttonText={t('exercise.secondary_muscle')}
-            items={enumToObject(Muscle)}
-            currentItem={filter.secondaryMuscle}
-            callback={(a, m) => {
-              if (a === 'add') {
-                setFilter((prevState) => ({
-                  ...prevState,
-                  secondaryMuscle: [...(prevState.secondaryMuscle || []), m],
-                }));
-              } else {
-                setFilter((prevState) => ({
-                  ...prevState,
-                  secondaryMuscle: prevState.secondaryMuscle?.filter((mm) => mm !== m),
-                }));
-              }
-            }}
-          />
+          <Button onPress={() => setFilter({})} variant="ghost">
+            <ThemedIcon name="RotateCcw" size={24} />
+          </Button>
         </XStack>
-      </ScrollView>
-      <ScrollView horizontal>
-        <XStack padding="none">
-          <RadioDropdown
-            buttonText={t('exercise.force')}
-            items={enumToObject(Force)}
-            currentItem={filter.force}
-            callback={(f) => setFilter((prevState) => ({ ...prevState, force: f }))}
-          />
-          <RadioDropdown
-            buttonText={t('exercise.mechanic')}
-            items={enumToObject(Mechanic)}
-            currentItem={filter.mechanic}
-            callback={(m) => setFilter((prevState) => ({ ...prevState, mechanic: m }))}
-          />
-          <RadioDropdown
-            buttonText={t('exercise.equipment')}
-            items={enumToObject(Equipment)}
-            currentItem={filter.equipment}
-            callback={(e) => setFilter((prevState) => ({ ...prevState, equipment: e }))}
-          />
-          <RadioDropdown
-            buttonText={t('exercise.category')}
-            items={enumToObject(Category)}
-            currentItem={filter.category}
-            callback={(c) => setFilter((prevState) => ({ ...prevState, category: c }))}
-          />
-        </XStack>
-      </ScrollView>
-    </YStack>
+        <ScrollView horizontal>
+          <XStack padding="none">
+            <RadioDropdown
+              buttonText={t('exercise.primary_muscle')}
+              items={enumToObject(Muscle)}
+              currentItem={filter.primaryMuscle}
+              callback={(m) => setFilter((prevState) => ({ ...prevState, primaryMuscle: m }))}
+            />
+            <CheckboxDropdown
+              buttonText={t('exercise.secondary_muscle')}
+              items={enumToObject(Muscle)}
+              currentItem={filter.secondaryMuscle}
+              callback={(a, m) => {
+                if (a === 'add') {
+                  setFilter((prevState) => ({
+                    ...prevState,
+                    secondaryMuscle: [...(prevState.secondaryMuscle || []), m],
+                  }));
+                } else {
+                  setFilter((prevState) => ({
+                    ...prevState,
+                    secondaryMuscle: prevState.secondaryMuscle?.filter((mm) => mm !== m),
+                  }));
+                }
+              }}
+            />
+          </XStack>
+        </ScrollView>
+        <ScrollView horizontal>
+          <XStack padding="none">
+            <RadioDropdown
+              buttonText={t('exercise.force')}
+              items={enumToObject(Force)}
+              currentItem={filter.force}
+              callback={(f) => setFilter((prevState) => ({ ...prevState, force: f }))}
+            />
+            <RadioDropdown
+              buttonText={t('exercise.mechanic')}
+              items={enumToObject(Mechanic)}
+              currentItem={filter.mechanic}
+              callback={(m) => setFilter((prevState) => ({ ...prevState, mechanic: m }))}
+            />
+            <RadioDropdown
+              buttonText={t('exercise.equipment')}
+              items={enumToObject(Equipment)}
+              currentItem={filter.equipment}
+              callback={(e) => setFilter((prevState) => ({ ...prevState, equipment: e }))}
+            />
+            <RadioDropdown
+              buttonText={t('exercise.category')}
+              items={enumToObject(Category)}
+              currentItem={filter.category}
+              callback={(c) => setFilter((prevState) => ({ ...prevState, category: c }))}
+            />
+          </XStack>
+        </ScrollView>
+      </YStack>
+    </>
   );
 };
 
 const ExerciseList = () => {
-  const { exercises } = useContext(ExerciseContext);
-  const listRef = useRef<FlashList<Exercise>>(null);
-  const [innerData, setInnerData] = useState(exercises.slice(0, 20));
-
+  const { exercises, filter } = useContext(ExerciseContext);
+  const [innerData, infinityScroll] = useInfinityScroll(exercises);
+  const listRef = useRef(null);
   useEffect(() => {
-    setInnerData(exercises.slice(0, 20));
-    listRef.current?.scrollToIndex({
-      index: 0,
-      animated: true,
-    });
-  }, [exercises]);
-  const infinityScroll = useDebouncedCallback(() => {
-    setInnerData((prev) => [...prev, ...exercises.slice(prev.length, prev.length + 20)]);
-  }, 200);
+    listRef.current?.scrollToIndex({ index: 0 });
+  }, [filter]);
   return (
     <>
       <FlashList
-        ref={listRef}
         data={innerData}
+        ref={listRef}
         keyExtractor={(item) => item.id!.toString()}
         contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8 }}
         ItemSeparatorComponent={() => <View className="h-4" />}
@@ -199,9 +200,6 @@ const ExerciseList = () => {
         onEndReached={infinityScroll}
         onEndReachedThreshold={1}
       />
-      {/* {exercises.map((ex) => ( */}
-      {/*   <ExerciseItem exercise={ex} key={ex.name} /> */}
-      {/* ))} */}
     </>
   );
 };

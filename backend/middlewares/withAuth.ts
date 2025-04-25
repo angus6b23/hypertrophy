@@ -3,13 +3,13 @@ import { MiddlewareFactory } from "./stackHandler";
 import { AuthErrors } from "share/interfaces/error-codes";
 import { verifyTokenJose } from "@/utils/jwt";
 
-const requireAuthPaths = ["/api/measurement", "/api/me"];
+const PATHS_REQUIRE_AUTH = ["/api/measurement", "/api/me", "/api/plans"];
 
 export const withAuth: MiddlewareFactory = (next) => {
   return async (req: NextRequest, _next: NextFetchEvent) => {
     try {
       const pathname = req.nextUrl.pathname;
-      if (requireAuthPaths.some((path) => pathname.startsWith(path))) {
+      if (PATHS_REQUIRE_AUTH.some((path) => pathname.startsWith(path))) {
         const token = req.headers.get("Authorization");
         if (!token) {
           return NextResponse.json(

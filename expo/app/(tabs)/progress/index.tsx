@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MeasurementPage } from './measurement';
 import { StatisticsPage } from './statistics';
 
-import { XStack, YStack } from '~/components/ui/Stacks';
+import { XStack } from '~/components/ui/Stacks';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useColors } from '~/utils/rn-reusables/useColors';
@@ -45,11 +45,9 @@ function ProgresPage() {
           activeTextColor={colors.text}
           inactiveTextColor={colors.text}
         />
-        <YStack gap="none">
-          {tab === 0 && <View />}
-          {tab === 1 && <MeasurementPage />}
-          {tab === 2 && <StatisticsPage />}
-        </YStack>
+        {tab === 0 && <View />}
+        {tab === 1 && <MeasurementPage />}
+        {tab === 2 && <StatisticsPage />}
       </SafeAreaView>
     </>
   );

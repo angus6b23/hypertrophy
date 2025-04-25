@@ -1,11 +1,12 @@
+import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
 import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { toast } from 'sonner-native';
 
 import { MeasurementCard } from '~/components/ui/MeasurementCard';
-import { XStack, YStack } from '~/components/ui/Stacks';
+import { XStack } from '~/components/ui/Stacks';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { Button } from '~/components/ui/button';
 import {
@@ -18,6 +19,7 @@ import {
 } from '~/components/ui/dialog';
 import { Text } from '~/components/ui/text';
 import { backend } from '~/utils/backend';
+import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 
@@ -25,17 +27,22 @@ export const MeasurementContext = createContext({ removeId: '', setRemove: (s: s
 export const MeasurementPage = () => {
   const measurements = useMeasurementStore((state) => state.data);
   const [remove, setRemove] = useState('');
+  const [innerData, infinityScroll] = useInfinityScroll(measurements);
 
   return (
     <>
       <MeasurementContext.Provider value={{ removeId: remove, setRemove }}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
-          <YStack>
-            {measurements.map((data) => (
-              <MeasurementCard key={data.localId} data={data} />
-            ))}
-          </YStack>
-        </ScrollView>
+        <FlashList
+          data={innerData}
+          keyExtractor={(item) => item.localId}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8 }}
+          ItemSeparatorComponent={() => <View className="h-4" />}
+          renderItem={(item) => <MeasurementCard data={item.item} />}
+          estimatedItemSize={200}
+          onEndReached={infinityScroll}
+          onEndReachedThreshold={1}
+        />
+
         <FloatingButton />
         <DeleteConfirmDialog />
       </MeasurementContext.Provider>

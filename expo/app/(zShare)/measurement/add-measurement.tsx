@@ -83,11 +83,12 @@ export const MeasurementModal = () => {
       data.waist = data.waist ? toCm(Number(data.waist), unit.waist) : null;
       return data;
     };
-    const result = InsertMeasurementSchema.extend({ remoteId: z.number().optional() })
+    const result = InsertMeasurementSchema.extend({ remoteId: z.number().nullable().optional() })
       .omit({ ownerId: true })
       .safeParse(unitChange(state));
     if (!result.success || !result.data) {
       toast.error(result.error.errors[0].message);
+      console.error(result.error);
       return;
     }
     removeNullValues(result.data);
