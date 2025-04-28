@@ -1,5 +1,6 @@
 export interface Plan {
   id?: number;
+  ownerId?: string;
   name: string;
   description?: string;
   localId: string;

@@ -17,6 +17,13 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
+        name="workout"
+        options={{
+          title: 'Workout',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: 'Tab One',
@@ -41,6 +48,12 @@ export default function TabLayout() {
         options={{
           title: 'Progress',
           tabBarIcon: ({ color }) => <CalendarDaysIcon size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="workout/listPlan"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

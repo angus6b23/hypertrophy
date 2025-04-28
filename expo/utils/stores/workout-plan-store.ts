@@ -14,7 +14,7 @@ interface WorkoutPlanAction {
   update: (localId: string, data: Partial<Plan>) => void;
   delete: (localId: string) => void;
 }
-export const useMeasurementStore = create<WorkoutPlanAction & WorkoutPlanState>()(
+export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>()(
   persist<WorkoutPlanState & WorkoutPlanAction>(
     (set) => ({
       plans: [],

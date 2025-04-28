@@ -11,7 +11,7 @@ export const handleError = (err: unknown) => {
   } else if (err instanceof CustomError) {
     return NextResponse.json(
       { status: "error", message: err.message },
-      { status: 400 },
+      { status: err.code },
     );
   } else {
     return NextResponse.json(

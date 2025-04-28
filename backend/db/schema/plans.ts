@@ -10,13 +10,16 @@ import { users } from "./users";
 import { exercises } from "./exercise";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
+import { createUpdateSchema } from "drizzle-zod";
 
 export const plans = pgTable("plans", {
   id: serial().primaryKey().unique().notNull(),
   name: text().notNull(),
   description: text().notNull().default(""),
   localId: text().notNull(),
-  ownerId: uuid().references(() => users.id, { onDelete: "cascade" }),
+  ownerId: uuid()
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   isPublic: boolean().default(false).notNull(),
   isWeekday: boolean().default(true).notNull(),
 });
@@ -43,3 +46,6 @@ export const insertPlanDaysSchema = createInsertSchema(planDays);
 export type PlanDay = z.infer<typeof insertPlanDaysSchema>;
 export const insertPlanExercisesSchema = createInsertSchema(planExercises);
 export type PlanExercises = z.infer<typeof insertPlanExercisesSchema>;
+export const updatePlanSchema = createUpdateSchema(plans);
+export const updatePlanDaysSchema = createUpdateSchema(planDays);
+export const updatePlanExercisesSchema = createUpdateSchema(planExercises);

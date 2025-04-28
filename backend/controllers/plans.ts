@@ -1,21 +1,20 @@
-import {
-  insertPlanDaysSchema,
-  insertPlanExercisesSchema,
-  insertPlanSchema,
-} from "@/db/schema/plans";
 import { handleError } from "@/utils/handleError";
 import {
+  clearPlan,
   deletePlan,
   getPlanDetails,
+  getPlanOnwer,
   getPublicPlans,
   getUserPlan,
-  insertPlan,
-  insertPlanDay,
-  insertPlanExercise,
+  insertPlanPayload,
 } from "@/utils/plans";
 import { NextRequest, NextResponse } from "next/server";
-import { CustomError, PathErrors } from "share/interfaces/error-codes";
-import { Plan, PlanDay, PlanExercise } from "share/interfaces/Workout";
+import {
+  AuthErrors,
+  CustomError,
+  PathErrors,
+} from "share/interfaces/error-codes";
+import { Plan } from "share/interfaces/Workout";
 
 export const getPlansController = async (req: NextRequest) => {
   try {
@@ -40,28 +39,7 @@ export const postPlansController = async (req: NextRequest) => {
     const ownerId = req.headers.get("x-user-id")!;
     const json = await req.json();
     const data = { ...json, ownerId };
-    const { days, ...rest }: { days: PlanDay[]; rest: Omit<Plan, "days"> } =
-      data;
-
-    const plan = insertPlanSchema.parse(rest);
-    const { id: planId } = await insertPlan(plan);
-    for (const day of days) {
-      const dayWithPlanId = { ...day, planId };
-      const {
-        exercises,
-        ...rest
-      }: { exercises: PlanExercise[]; rest: Omit<PlanDay, "exercises"> } =
-        dayWithPlanId;
-      const parsedDay = insertPlanDaysSchema.parse(rest);
-      const { id: dayId } = await insertPlanDay(parsedDay);
-      for (const exercise of exercises) {
-        const exerciseWithPlanDayId = { ...exercise, dayId };
-        const parsedExercise = insertPlanExercisesSchema.parse(
-          exerciseWithPlanDayId,
-        );
-        await insertPlanExercise(parsedExercise);
-      }
-    }
+    await insertPlanPayload(data);
     return NextResponse.json({ status: "success" });
   } catch (err) {
     console.error(err);
@@ -91,9 +69,43 @@ export const getPlanDetailsController = async (
   try {
     const ownerId = req.headers.get("x-user-id");
     const { id } = await params;
+    // Check if id is number
+    if (isNaN(Number(id))) throw new CustomError(PathErrors.id_invalid, 400);
+    // Fetch Plan
+    const planDetail = await getPlanDetails(Number(id));
+    // Check id exist in plan and plan ownership
+    if (!planDetail.id) throw new CustomError(PathErrors.id_not_found, 404);
+    if (planDetail.ownerId !== ownerId || !planDetail.isPublic)
+      throw new CustomError(AuthErrors.unauthorized_access, 403);
     return NextResponse.json({
       status: "success",
-      data: await getPlanDetails(Number(id)),
+      data: planDetail,
+    });
+  } catch (err) {
+    return handleError(err);
+  }
+};
+
+export const putPlanController = async (
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
+  try {
+    const ownerId = req.headers.get("x-user-id")!;
+    const json: Plan = await req.json();
+    // Check if id is number
+    const { id } = await params;
+    if (isNaN(Number(id))) throw new CustomError(PathErrors.id_invalid, 400);
+    // Check id exist in plan and plan ownership
+    const planOwner = await getPlanOnwer(Number(id));
+    if (planOwner !== ownerId)
+      throw new CustomError(AuthErrors.unauthorized_access, 403);
+
+    await clearPlan(Number(id));
+    await insertPlanPayload({ ...json, ownerId, id: Number(id) });
+
+    return NextResponse.json({
+      status: "success",
     });
   } catch (err) {
     console.error(err);

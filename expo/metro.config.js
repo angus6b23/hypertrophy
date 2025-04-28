@@ -4,7 +4,7 @@ const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
 
 /** @type {import('expo/metro-config').MetroConfig} */
-// eslint-disable-next-line no-undef
+ 
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
 const config = getDefaultConfig(projectRoot);

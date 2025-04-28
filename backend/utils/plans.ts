@@ -6,12 +6,16 @@ import {
   planDays,
   plans,
   planExercises,
+  insertPlanDaysSchema,
+  insertPlanExercisesSchema,
+  insertPlanSchema,
 } from "@/db/schema/plans";
 import { and, asc, eq, gt } from "drizzle-orm";
 import { single } from "./db-helper";
 import {
   Plan as PlanType,
   PlanDay as PlanDayType,
+  PlanExercise,
 } from "share/interfaces/Workout";
 
 export const getUserPlan = async (userId: string) => {
@@ -30,6 +34,16 @@ export const getPublicPlans = async (cursor = 0) => {
     .where(and(eq(plans.isPublic, true), gt(plans.id, cursor)))
     .orderBy(asc(plans.id));
   return publicPlans;
+};
+
+export const getPlanOnwer = async (id: number) => {
+  const plan = await db
+    .select()
+    .from(plans)
+    .where(eq(plans.id, id))
+    .limit(1)
+    .then(single);
+  return plan.ownerId;
 };
 
 export const getPlanDetails = async (id: number) => {
@@ -61,7 +75,15 @@ export const getPlanDetails = async (id: number) => {
 };
 
 export const insertPlan = async (plan: Plan) => {
-  const newPlan = await db.insert(plans).values(plan).returning().then(single);
+  const newPlan = await db
+    .insert(plans)
+    .values(plan)
+    .onConflictDoUpdate({
+      target: plans.id,
+      set: { ...plan },
+    })
+    .returning()
+    .then(single);
   return newPlan;
 };
 
@@ -85,4 +107,38 @@ export const insertPlanExercise = async (planExercise: PlanExercises) => {
 
 export const deletePlan = async (id: number) => {
   await db.delete(plans).where(eq(plans.id, id));
+};
+
+export const updatePlan = async (id: number, plan: Plan) => {
+  // Deconstruct id and ownerId, disallowing chaning of these fields
+  const { id: _id, ownerId: _ownerId, ...planData } = plan;
+  await db.update(plans).set(planData).where(eq(plans.id, id));
+};
+
+export const insertPlanPayload = async (payload: PlanType) => {
+  const { days, ...rest }: { days: PlanDayType[]; rest: Omit<Plan, "days"> } =
+    payload;
+  const plan = insertPlanSchema.parse(rest);
+  const { id: planId } = await insertPlan(plan);
+  for (const day of days) {
+    const dayWithPlanId = { ...day, planId };
+    const {
+      exercises,
+      ...rest
+    }: { exercises: PlanExercise[]; rest: Omit<PlanDay, "exercises"> } =
+      dayWithPlanId;
+    const parsedDay = insertPlanDaysSchema.parse(rest);
+    const { id: dayId } = await insertPlanDay(parsedDay);
+    for (const exercise of exercises) {
+      const exerciseWithPlanDayId = { ...exercise, dayId };
+      const parsedExercise = insertPlanExercisesSchema.parse(
+        exerciseWithPlanDayId,
+      );
+      await insertPlanExercise(parsedExercise);
+    }
+  }
+};
+
+export const clearPlan = async (id: number) => {
+  await db.delete(planDays).where(eq(planDays.planId, id));
 };
