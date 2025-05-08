@@ -35,7 +35,7 @@ export const MeasurementPage = () => {
         <FlashList
           data={innerData}
           keyExtractor={(item) => item.localId}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12 }}
           ItemSeparatorComponent={() => <View className="h-4" />}
           renderItem={(item) => <MeasurementCard data={item.item} />}
           estimatedItemSize={200}

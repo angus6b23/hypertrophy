@@ -12,6 +12,7 @@
     "dev:frontend": "yarn workspace hypertrophy-app dev"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "eslint-config-expo": "^9.2.0"
   }
 }

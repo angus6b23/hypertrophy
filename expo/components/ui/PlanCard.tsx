@@ -17,9 +17,11 @@ import { Text } from './text';
 import { MyPlansContext } from '~/app/(tabs)/workout/listPlan';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
+import { useRouter } from 'expo-router';
 
 export const PlanCard = ({ plan }: { plan: Plan }) => {
   const workoutPlanStore = useWorkoutPlanStore();
+  const router = useRouter();
   const { t } = useTranslation();
   return (
     <Card className="w-full text-foreground">
@@ -32,7 +34,10 @@ export const PlanCard = ({ plan }: { plan: Plan }) => {
       <CardContent>
         <Text className="text-muted-foreground">{plan.description}</Text>
         <Button
-          onPress={() => workoutPlanStore.change(plan.localId)}
+          onPress={() => {
+            workoutPlanStore.change(plan.localId);
+            router.replace('/(tabs)/workout');
+          }}
           className="mt-2 w-full"
           disabled={workoutPlanStore.currentPlan === plan.localId}>
           <Text>
@@ -50,6 +55,7 @@ export const CardDropDown = (props: { id: string }) => {
   const { t } = useTranslation();
   const colors = useColors();
   const ctx = useContext(MyPlansContext);
+  const workoutPlanStore = useWorkoutPlanStore();
 
   return (
     <DropdownMenu>
@@ -73,16 +79,22 @@ export const CardDropDown = (props: { id: string }) => {
             <Text>{t('common.edit')}</Text>
           </XStack>
         </DropdownMenuItem>
-        <DropdownMenuItem onPress={() => ctx.setPlanId(props.id)}>
-          <XStack
-            padding="sm"
-            align="center"
-            justify="between"
-            style={{ backgroundColor: 'transparent' }}>
-            <ThemedIcon name="Trash" size={16} color={colors.notification} />
-            <Text className="text-destructive">{t('common.delete')}</Text>
-          </XStack>
-        </DropdownMenuItem>
+        {props.id !== workoutPlanStore.currentPlan && (
+          <DropdownMenuItem
+            onPress={() => {
+              ctx.setPlanId(props.id);
+              ctx.setShowDeleteDialog(true);
+            }}>
+            <XStack
+              padding="sm"
+              align="center"
+              justify="between"
+              style={{ backgroundColor: 'transparent' }}>
+              <ThemedIcon name="Trash" size={16} color={colors.notification} />
+              <Text className="text-destructive">{t('common.delete')}</Text>
+            </XStack>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

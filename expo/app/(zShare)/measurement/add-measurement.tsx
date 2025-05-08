@@ -163,7 +163,7 @@ export const MeasurementModal = () => {
       />
       <YStack padding="lg" justify="between">
         <ScrollView
-          className="w-full pb-2"
+          className="w-full "
           contentContainerStyle={{
             display: 'flex',
             flexDirection: 'column',

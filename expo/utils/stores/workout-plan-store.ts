@@ -12,7 +12,7 @@ interface WorkoutPlanAction {
   add: (data: Plan) => void;
   change: (newPlanId: string) => void;
   update: (localId: string, data: Partial<Plan>) => void;
-  delete: (localId: string) => void;
+  remove: (localId: string) => void;
 }
 export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>()(
   persist<WorkoutPlanState & WorkoutPlanAction>(
@@ -31,7 +31,7 @@ export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>(
             item.localId === localId ? { ...item, ...data } : item
           ),
         })),
-      delete: (localId: string) =>
+      remove: (localId: string) =>
         set((prevState) => ({ plans: prevState.plans.filter((item) => item.localId !== localId) })),
     }),
     { name: 'planStorage', storage: createJSONStorage(() => mmkvStorage) }

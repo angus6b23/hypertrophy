@@ -4,9 +4,9 @@ const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
 
 /** @type {import('expo/metro-config').MetroConfig} */
- 
+
 const projectRoot = __dirname;
-const monorepoRoot = path.resolve(projectRoot, '../..');
+const monorepoRoot = path.resolve(projectRoot, './..');
 const config = getDefaultConfig(projectRoot);
 config.watchFolders = [monorepoRoot];
 config.resolver.nodeModulesPaths = [
