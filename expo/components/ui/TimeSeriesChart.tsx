@@ -62,6 +62,7 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
     });
     return obj;
   }, [innerData, props.yOptions]);
+
   const chartPressState = useChartPressState({
     x: innerData[0][props.xKey],
     y: initYPressState(),
@@ -154,6 +155,7 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
                 {chartPressState.isActive
                   ? props.yOptions.map((item) => (
                       <ToolTip
+                        key={item.key}
                         x={chartPressState.state.x.position}
                         y={chartPressState.state['y'][item.key]['position']}
                       />

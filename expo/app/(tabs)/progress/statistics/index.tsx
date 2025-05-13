@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { YStack } from '~/components/ui/Stacks';
 import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
@@ -24,24 +24,26 @@ export const BodyCompositionChart = () => {
   const { t } = useTranslation();
   const measurements = useMeasurementStore((state) => state.data);
   return (
-    <YStack padding="none">
+    <YStack>
       <Text className="text-lg font-bold">{t('stat.body_composition')}</Text>
-      <TimeSeriesChart
-        data={measurements}
-        xKey="date"
-        yOptions={[
-          {
-            key: 'weight',
-            configDomain: 10,
-            type: 'bar',
-          },
-          {
-            key: 'bodyFat',
-            configDomain: 5,
-            type: 'line',
-          },
-        ]}
-      />
+      {measurements.length > 0 && (
+        <TimeSeriesChart
+          data={measurements}
+          xKey="date"
+          yOptions={[
+            {
+              key: 'weight',
+              configDomain: 10,
+              type: 'bar',
+            },
+            {
+              key: 'bodyFat',
+              configDomain: 5,
+              type: 'line',
+            },
+          ]}
+        />
+      )}
     </YStack>
   );
 };

@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { Stack, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -16,7 +16,7 @@ import {
 import { useDebouncedCallback } from 'use-debounce';
 
 import { CheckboxDropdown } from '~/components/ui/CheckboxDropdown';
-import { ExerciseItem } from '~/components/ui/ExerciseItem';
+import { ExerciseItem, ExerciseItemWithCheckbox } from '~/components/ui/ExerciseItem';
 import { RadioDropdown } from '~/components/ui/RadioDropdown';
 import { XStack, YStack } from '~/components/ui/Stacks';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
@@ -45,7 +45,12 @@ const ExerciseContext = createContext<{
   exercises: [],
 });
 
-const ExerciseListPage = () => {
+interface ExerciseListProps {
+  inner?: boolean;
+  useCheckList?: boolean;
+}
+
+export const ExerciseList = ({ inner, useCheckList }: ExerciseListProps) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
@@ -53,8 +58,10 @@ const ExerciseListPage = () => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      console.log(params);
       setFilter(params);
     });
+
     return unsubscribe;
   }, [params]);
 
@@ -89,21 +96,43 @@ const ExerciseListPage = () => {
   }, 300);
 
   useEffect(deboucnedFilterFn, [exfilter]);
+
   return (
     <>
       <ExerciseContext.Provider value={{ filter: exfilter, setFilter, exercises: displayEx }}>
-        <Stack.Screen options={{ title: t('common.exercises'), headerShown: true }} />
+        {!inner && <Stack.Screen options={{ title: t('common.exercises'), headerShown: true }} />}
         <ExerciseFilterControl />
-        <ExerciseList />
+        {useCheckList ? <ExListWithCheckbox /> : <ExList />}
       </ExerciseContext.Provider>
     </>
   );
+};
+
+const ExerciseListPage = () => {
+  return <ExerciseList inner={false} />;
 };
 export default ExerciseListPage;
 
 const ExerciseFilterControl = () => {
   const { filter, setFilter } = useContext(ExerciseContext);
   const { t } = useTranslation();
+
+  const changeHandler = useCallback(
+    (key: keyof ExerciseFilter) => (val: ExerciseFilter[typeof key]) => {
+      setFilter((prevState) =>
+        prevState[key] === val
+          ? {
+              ...prevState,
+              [key]: undefined,
+            }
+          : {
+              ...prevState,
+              [key]: val,
+            }
+      );
+    },
+    []
+  );
 
   return (
     <>
@@ -112,7 +141,7 @@ const ExerciseFilterControl = () => {
           <Input
             placeholder={t('exercise.search_with_exercise_name')}
             value={filter.searchTerm}
-            onChangeText={(text) => setFilter((prevState) => ({ ...prevState, searchTerm: text }))}
+            onChangeText={changeHandler('searchTerm')}
             className="flex-1"
           />
           <Button onPress={() => setFilter({})} variant="ghost">
@@ -125,7 +154,7 @@ const ExerciseFilterControl = () => {
               buttonText={t('exercise.primary_muscle')}
               items={enumToObject(Muscle)}
               currentItem={filter.primaryMuscle}
-              callback={(m) => setFilter((prevState) => ({ ...prevState, primaryMuscle: m }))}
+              callback={changeHandler('primaryMuscle')}
             />
             <CheckboxDropdown
               buttonText={t('exercise.secondary_muscle')}
@@ -153,25 +182,25 @@ const ExerciseFilterControl = () => {
               buttonText={t('exercise.force')}
               items={enumToObject(Force)}
               currentItem={filter.force}
-              callback={(f) => setFilter((prevState) => ({ ...prevState, force: f }))}
+              callback={changeHandler('force')}
             />
             <RadioDropdown
               buttonText={t('exercise.mechanic')}
               items={enumToObject(Mechanic)}
               currentItem={filter.mechanic}
-              callback={(m) => setFilter((prevState) => ({ ...prevState, mechanic: m }))}
+              callback={changeHandler('mechanic')}
             />
             <RadioDropdown
               buttonText={t('exercise.equipment')}
               items={enumToObject(Equipment)}
               currentItem={filter.equipment}
-              callback={(e) => setFilter((prevState) => ({ ...prevState, equipment: e }))}
+              callback={changeHandler('equipment')}
             />
             <RadioDropdown
               buttonText={t('exercise.category')}
               items={enumToObject(Category)}
               currentItem={filter.category}
-              callback={(c) => setFilter((prevState) => ({ ...prevState, category: c }))}
+              callback={changeHandler('category')}
             />
           </XStack>
         </ScrollView>
@@ -180,7 +209,7 @@ const ExerciseFilterControl = () => {
   );
 };
 
-const ExerciseList = () => {
+const ExList = () => {
   const { exercises, filter } = useContext(ExerciseContext);
   const [innerData, infinityScroll] = useInfinityScroll(exercises);
   const listRef = useRef(null);
@@ -196,6 +225,30 @@ const ExerciseList = () => {
         contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8 }}
         ItemSeparatorComponent={() => <View className="h-4" />}
         renderItem={(item) => <ExerciseItem exercise={item.item} />}
+        estimatedItemSize={200}
+        onEndReached={infinityScroll}
+        onEndReachedThreshold={1}
+      />
+    </>
+  );
+};
+
+const ExListWithCheckbox = () => {
+  const { exercises, filter } = useContext(ExerciseContext);
+  const [innerData, infinityScroll] = useInfinityScroll(exercises);
+  const listRef = useRef(null);
+  useEffect(() => {
+    listRef.current?.scrollToIndex({ index: 0 });
+  }, [filter]);
+  return (
+    <>
+      <FlashList
+        data={innerData}
+        ref={listRef}
+        keyExtractor={(item) => item.id!.toString()}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8 }}
+        ItemSeparatorComponent={() => <View className="h-4" />}
+        renderItem={(item) => <ExerciseItemWithCheckbox exercise={item.item} />}
         estimatedItemSize={200}
         onEndReached={infinityScroll}
         onEndReachedThreshold={1}

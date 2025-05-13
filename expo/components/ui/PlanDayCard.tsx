@@ -17,6 +17,7 @@ import { PlanDayContext } from '~/app/(tabs)/workout';
 import { TouchableNativeFeedback } from 'react-native';
 import { RenderItemParams } from 'react-native-draggable-flatlist';
 import { Item } from 'react-native-picker-select';
+import { useRouter } from 'expo-router';
 
 export const PlanDayCard = ({
   day,
@@ -27,8 +28,11 @@ export const PlanDayCard = ({
   idx: number;
   drag: RenderItemParams<Item>['drag'];
 }) => {
+  const router = useRouter();
   return (
-    <TouchableNativeFeedback onLongPress={drag}>
+    <TouchableNativeFeedback
+      onLongPress={drag}
+      onPress={() => router.push(`/(tabs)/workout/day/${idx}`)}>
       <Card className="w-full border-0 bg-muted text-foreground">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>

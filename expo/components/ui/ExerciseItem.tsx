@@ -1,11 +1,14 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Exercise } from 'share/exercises/types/exercise';
 
 import { XStack } from './Stacks';
 
 import { Text } from '~/components/ui/text';
+import { TouchableOpacity, View } from 'react-native';
+import { Checkbox } from './checkbox';
+import { AddExerciseContext } from '~/app/(zShare)/exercise/add';
 
 export const ExerciseItem = ({ exercise }: { exercise: Exercise }) => {
   const [img, setImg] = useState<any>();
@@ -27,6 +30,49 @@ export const ExerciseItem = ({ exercise }: { exercise: Exercise }) => {
           <Text className="text-lg font-bold">{exercise.name}</Text>
         </XStack>
       </Link>
+    </>
+  );
+};
+
+export const ExerciseItemWithCheckbox = ({ exercise }: { exercise: Exercise }) => {
+  const { exSet, setExSet } = useContext(AddExerciseContext);
+  const [img, setImg] = useState<any>();
+
+  useEffect(() => {
+    const image = require.context(`../../../share/exercises/exercises/`, true, /.*jpg/);
+    const id = `./${exercise.path}/images/0.jpg`;
+    const targetImg = image(id);
+    setImg(targetImg);
+  }, [exercise]);
+  const handleToggle = () => {
+    console.log('trigger', exercise.id);
+    setExSet((prevState) => {
+      if (prevState.includes(exercise.id!)) {
+        return prevState.filter((id) => id !== exercise.id!);
+      } else {
+        return [...prevState, exercise.id!];
+      }
+    });
+  };
+  return (
+    <>
+      <TouchableOpacity onPress={handleToggle}>
+        <XStack padding="none" fill={true} justify="between" align="center" className="w-full">
+          <XStack padding="none" fill={false} align="center">
+            <Image
+              source={img}
+              style={{ height: 64, width: 64, borderRadius: 8 }}
+              contentFit="cover"
+            />
+            <Text className="max-w-80 text-lg font-bold" numberOfLines={2}>
+              {exercise.name}
+            </Text>
+          </XStack>
+          <View>
+            <Checkbox checked={exSet.includes(exercise.id!)} onCheckedChange={handleToggle} />
+          </View>
+        </XStack>
+      </TouchableOpacity>
     </>
   );
 };

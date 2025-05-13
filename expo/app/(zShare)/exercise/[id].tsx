@@ -4,7 +4,8 @@ import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { t } from 'i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import exerciseDb from 'share/exercises/exercises.json';
 import { Exercise } from 'share/exercises/types/exercise';
@@ -42,8 +43,8 @@ const ExerciseDetailPage = () => {
                 <TabsTrigger value="log" className="flex-1">
                   <Text>{t('common.log')}</Text>
                 </TabsTrigger>
-                <TabsTrigger value="progress" className="flex-1">
-                  <Text>{t('common.progress')}</Text>
+                <TabsTrigger value="history" className="flex-1">
+                  <Text>{t('common.history')}</Text>
                 </TabsTrigger>
                 <TabsTrigger value="details" className="flex-1">
                   <Text>{t('common.details')}</Text>
@@ -54,8 +55,8 @@ const ExerciseDetailPage = () => {
                 <Text>Log</Text>
               </TabsContent>
               {/* TODO: Implement record viewing */}
-              <TabsContent value="record">
-                <Text>Record</Text>
+              <TabsContent value="history">
+                <Text>History</Text>
               </TabsContent>
               <TabsContent value="details" asChild>
                 <ExerciseDetails ex={exerciseRef.current! as Exercise} />
@@ -108,6 +109,7 @@ const BannerImage = ({ path }: { path: string }) => {
 
 const ExerciseDetails = ({ ex }: { ex: Exercise }) => {
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <YStack padding="none" className="py-4" fill={false}>
@@ -118,26 +120,27 @@ const ExerciseDetails = ({ ex }: { ex: Exercise }) => {
         {t(`exercise.${ex.level}`)}
         {ex.mechanic && '・' + t(`exercise.${ex.mechanic}`)}・{t(`exercise.${ex.category}`)}
       </Text>
-      <View className="flex flex-col justify-start gap-2">
+      <YStack fill={false} padding="none">
         {/* TODO: Fix Badge size, link not working for some reason */}
-        <Link href={`/exercise/list?primaryMuscles=${ex.primaryMuscles}`}>
-          <Badge variant="default" className="w-fit flex-none">
-            <Text className="text-lg">{t(`exercise.${ex.primaryMuscles}`)}</Text>
+        <Pressable
+          onTouchEnd={() => router.push(`/exercise/list?primaryMuscle=${ex.primaryMuscles}`)}>
+          <Badge variant="default" className="w-fit flex-none" onTouchEnd={(e) => console.log(e)}>
+            <Text className="text-md">{t(`exercise.${ex.primaryMuscles}`)}</Text>
           </Badge>
-        </Link>
+        </Pressable>
         <XStack padding="none" fill={false} className="flex-wrap">
           {ex.secondaryMuscles.map((mm, i) => (
-            <Link href={`/exercise/list?primaryMuscles=${ex.primaryMuscles}`} key={i}>
+            <Pressable onTouchEnd={() => router.push(`/exercise/list?primaryMuscle=${mm}`)} key={i}>
               <Badge variant="secondary">
-                <Text className="text-lg">{t(`exercise.${mm}`)}</Text>
+                <Text className="text-md">{t(`exercise.${mm}`)}</Text>
               </Badge>
-            </Link>
+            </Pressable>
           ))}
         </XStack>
 
         <Link href={`/exercise/list?equipment=${ex.equipment}`}>
           <Badge variant="outline" className="flex-none">
-            <Text className="text-lg">{t(`exercise.${ex.equipment}`)}</Text>
+            <Text className="text-md">{t(`exercise.${ex.equipment}`)}</Text>
           </Badge>
         </Link>
         <YStack fill={false} padding="none" className="w-full">
@@ -149,7 +152,7 @@ const ExerciseDetails = ({ ex }: { ex: Exercise }) => {
             </XStack>
           ))}
         </YStack>
-      </View>
+      </YStack>
     </YStack>
   );
 };

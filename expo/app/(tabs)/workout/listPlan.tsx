@@ -1,6 +1,6 @@
 import { Label } from '@rn-primitives/dropdown-menu';
 import { FlashList } from '@shopify/flash-list';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { t } from 'i18next';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
@@ -98,13 +98,18 @@ const MyPlans = () => {
 const PlanDialog = () => {
   const ctx = useContext(MyPlansContext);
   const workoutPlanStore = useWorkoutPlanStore();
+  const router = useRouter();
+  // Initial state for adding or editing plan dialog
   const initState = {
     name: '',
     description: '',
     isWeekday: true,
     isPublic: true,
   };
+  // State for saving form state
   const [state, setState] = useState<Omit<Plan, 'localId' | 'days'>>(initState);
+
+  // Listen to context planId, set form state to selected plan when planId is not empty
   useEffect(() => {
     if (ctx.planId) {
       const currentPlan = workoutPlanStore.plans.find((plan) => plan.localId === ctx.planId);
@@ -118,6 +123,7 @@ const PlanDialog = () => {
 
   const handleSubmit = useCallback(() => {
     let localId;
+    // Add plan if current plan does not exist
     if (!ctx.planId) {
       localId = nanoid(10);
       const days: PlanDay[] = [];
@@ -125,6 +131,7 @@ const PlanDialog = () => {
       workoutPlanStore.add(newPlan);
       toast.success(t('plan.plan_added'));
     } else {
+      // Edit plan if current plan exist
       localId = ctx.planId;
       const currentPlan = workoutPlanStore.plans.find(
         (plan) => plan.localId === ctx.planId
@@ -132,8 +139,10 @@ const PlanDialog = () => {
       workoutPlanStore.update(ctx.planId, { ...currentPlan, ...state });
       toast.success(t('plan.plan_modified'));
     }
+    // Automatically set the current plan to new plan and redirect user back to workout page if no plan exists before
     if (!workoutPlanStore.currentPlan) {
       workoutPlanStore.change(localId);
+      router.push('/(tabs)/workout');
     }
     ctx.setShowDialog(false);
     ctx.setPlanId('');
