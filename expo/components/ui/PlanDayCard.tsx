@@ -18,6 +18,8 @@ import { TouchableNativeFeedback } from 'react-native';
 import { RenderItemParams } from 'react-native-draggable-flatlist';
 import { Item } from 'react-native-picker-select';
 import { useRouter } from 'expo-router';
+import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
+import { useWeekday } from '~/utils/hooks/use-weekday';
 
 export const PlanDayCard = ({
   day,
@@ -29,6 +31,10 @@ export const PlanDayCard = ({
   drag: RenderItemParams<Item>['drag'];
 }) => {
   const router = useRouter();
+  const currentPlan = useCurrentPlan();
+  const weekday = useWeekday(day.day);
+  const { t } = useTranslation();
+
   return (
     <TouchableNativeFeedback
       onLongPress={drag}
@@ -37,11 +43,17 @@ export const PlanDayCard = ({
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
             <Text className="text-lg">{day.name}</Text>
+            <Text className="text-lg text-muted-foreground">
+              {' '}
+              - {currentPlan.isWeekday ? weekday : `${t('common.day')} ${day.day + 1}`}
+            </Text>
           </CardTitle>
           <CardDropDown idx={idx} />
         </CardHeader>
         <CardContent>
-          <Text className="text-muted-foreground">{day.day}</Text>
+          <Text className="text-muted-foreground">
+            {day.exercises.length} {t('common.exercises')}
+          </Text>
         </CardContent>
       </Card>
     </TouchableNativeFeedback>

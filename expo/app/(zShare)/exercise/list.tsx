@@ -58,7 +58,6 @@ export const ExerciseList = ({ inner, useCheckList }: ExerciseListProps) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log(params);
       setFilter(params);
     });
 

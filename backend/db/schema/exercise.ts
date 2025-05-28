@@ -42,7 +42,7 @@ export const recordTypeEnum = pgEnum("record_type_enum", [
   "reps_with_weight",
   "reps",
   "time",
-  "distance",
+  "cardio",
 ]);
 
 export const exerciseLevelEnum = pgEnum("exercise_level_enum", [

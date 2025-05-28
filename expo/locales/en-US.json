@@ -9,6 +9,7 @@
     "are_you_sure_to_delete_this_measurement": "Are you sure to delete this measurement",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "add_exercise": "Add exercise",
     "sunday": "Sunday",
     "monday": "Monday",
     "tuesday": "Tuesday",
@@ -17,11 +18,13 @@
     "friday": "Friday",
     "saturday": "Saturday",
     "name": "Name",
+    "are_you_sure_to_delete_this_workout_day": "Are you sure to delete this workout day",
     "description": "Description",
     "add": "Add",
     "edit": "Edit",
     "are_you_sure_to_delete_this_workout_plan": "Are you sure to delete this workout plan",
     "log": "Log",
+    "history": "History",
     "details": "Details",
     "exercises": "Exercises",
     "update": "Update",
@@ -34,6 +37,7 @@
     "dark": "Dark",
     "language": "Language",
     "delete": "Delete",
+    "day": "Day",
     "date": "Date"
   },
   "stat": {
@@ -59,7 +63,8 @@
   },
   "workout": {
     "add_workout_day": "Add workout day",
-    "workout_day": "Workout day"
+    "workout_day": "Workout day",
+    "add_exercise": "Add exercise"
   },
   "exercise": {
     "instruction": "Instruction",

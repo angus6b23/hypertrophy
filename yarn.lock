@@ -10645,6 +10645,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-linear-gradient@npm:~14.0.2":
+  version: 14.0.2
+  resolution: "expo-linear-gradient@npm:14.0.2"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/0c8c6af9d2f686315b67217bab3f601b260e470097399b5e86f10266e1a7ba26445993a45554da3440ed952b4efc53a4fd1a2e0d70d7f02053f81942c2a2c7f1
+  languageName: node
+  linkType: hard
+
 "expo-linking@npm:7":
   version: 7.0.5
   resolution: "expo-linking@npm:7.0.5"
@@ -11953,6 +11964,7 @@ __metadata:
     expo-document-picker: "npm:~13.0.3"
     expo-file-system: "npm:~18.0.12"
     expo-image: "npm:~2.0.7"
+    expo-linear-gradient: "npm:~14.0.2"
     expo-linking: "npm:7"
     expo-localization: "npm:~16.0.1"
     expo-router: "npm:~4.0.21"
@@ -11976,11 +11988,14 @@ __metadata:
     react-native-gesture-handler: "npm:~2.20.2"
     react-native-material-tabs: "npm:^4.2.0"
     react-native-mmkv: "npm:^3.2.0"
+    react-native-pager-view: "npm:6.5.1"
     react-native-picker-select: "npm:^9.3.1"
     react-native-reanimated: "npm:3.16.2"
     react-native-safe-area-context: "npm:4.12.0"
     react-native-screens: "npm:4.4"
     react-native-svg: "npm:15.8.0"
+    react-native-swipe-gesture-handler: "npm:^1.0.6"
+    react-native-tab-view: "npm:^4.1.0"
     react-native-web: "npm:~0.19.10"
     sonner-native: "npm:^0.17.0"
     tailwind-merge: "npm:^3.0.2"
@@ -16580,6 +16595,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-pager-view@npm:6.5.1":
+  version: 6.5.1
+  resolution: "react-native-pager-view@npm:6.5.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/2c6a1cdd30151252f7ee31ce039246c59308ddd4ff6d4dbf44b0d64387338e51cfc432a68795cd80f2f7a1c77617c259462de48c2f4cd24d98805290d70ec02f
+  languageName: node
+  linkType: hard
+
 "react-native-picker-select@npm:^9.3.1":
   version: 9.3.1
   resolution: "react-native-picker-select@npm:9.3.1"
@@ -16649,6 +16674,29 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/03d2cb19c799da6ba41dea0dc414338d01a55549ea4e4a370315c8ec34e1c6de430a62b538f099423060edc8bea6df134f765bde862770059404617c3c296af8
+  languageName: node
+  linkType: hard
+
+"react-native-swipe-gesture-handler@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "react-native-swipe-gesture-handler@npm:1.0.6"
+  peerDependencies:
+    react: ^18.0.0
+    react-native: ^0.69.0
+  checksum: 10c0/30dd8b997be8e7bf40c5f65d4b470cf86663ce9ad110ef4ea0dd3b5a1f42e2648c36a95560474eb5003653b51567be629bb4b592ac1f27bf0b6b751ec5ff30da
+  languageName: node
+  linkType: hard
+
+"react-native-tab-view@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "react-native-tab-view@npm:4.1.0"
+  dependencies:
+    use-latest-callback: "npm:^0.2.3"
+  peerDependencies:
+    react: ">= 18.2.0"
+    react-native: "*"
+    react-native-pager-view: ">= 6.0.0"
+  checksum: 10c0/6dfddec4724312c354eb0d89e440aead21df641c8f1c3d1bb384a2c2fd7833647d063f321a21468cd857d75773439acc4ccc615d5b977d849ffa4309b8be4336
   languageName: node
   linkType: hard
 
@@ -19388,7 +19436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-latest-callback@npm:^0.2.1":
+"use-latest-callback@npm:^0.2.1, use-latest-callback@npm:^0.2.3":
   version: 0.2.3
   resolution: "use-latest-callback@npm:0.2.3"
   peerDependencies:

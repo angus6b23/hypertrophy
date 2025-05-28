@@ -3,7 +3,7 @@ import { useColorScheme as useColorSchemeBase } from 'react-native';
 
 import { useOptionStore } from '../stores/option-store';
 
-type ColorSchemeName = 'dark' | 'light' | 'system';
+type ColorSchemeName = 'dark' | 'light';
 export function useColorScheme() {
   const { colorScheme, setColorScheme, toggleColorScheme } = useNativewindColorScheme();
   let storedTheme: string = useOptionStore((state) => state.theme);

@@ -1,3 +1,4 @@
+/*eslint import/namespace: ['error', { allowComputed: true }]*/
 import { icons } from 'lucide-react-native';
 
 import { useColors } from '~/utils/rn-reusables/useColors';

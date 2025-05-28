@@ -1,10 +1,11 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { clsx } from 'clsx';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { t } from 'i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import exerciseDb from 'share/exercises/exercises.json';
@@ -83,7 +84,7 @@ const FloatingButton = () => {
   );
 };
 
-const BannerImage = ({ path }: { path: string }) => {
+export const BannerImage = ({ path, name }: { path: string; name?: string }) => {
   const [imgs, setImgs] = useState<any[]>([]);
   const [imgIdx, setImgIdx] = useState(0);
   useEffect(() => {
@@ -104,7 +105,14 @@ const BannerImage = ({ path }: { path: string }) => {
     }
     return () => clearInterval(interval);
   }, [imgs]);
-  return <Image source={imgs[imgIdx]} style={{ width: '100%', height: 256 }} contentFit="cover" />;
+  return (
+    <Image
+      source={imgs[imgIdx]}
+      style={{ width: '100%', height: 256 }}
+      contentFit="cover"
+      className="absolute left-0 top-0"
+    />
+  );
 };
 
 const ExerciseDetails = ({ ex }: { ex: Exercise }) => {

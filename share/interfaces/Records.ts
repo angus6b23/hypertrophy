@@ -1,20 +1,26 @@
+import { RecordType } from "../exercises/types/exercise";
+
 export interface Workout {
   startTime: Date;
   endTime?: Date;
-  RPE: number;
+  RPE?: number;
   localId: string;
   remoteId?: number;
   exercises: ExerciseRecord[];
   remarks?: string;
+  lastSetTime?: Date;
 }
 
 export interface ExerciseRecord {
-  exercisdId: number;
+  exerciseId: number;
+  exercisePlanId: string;
   remarks?: string;
-  record: RepRecord[] | CardioRecord | RepWeightRecord[];
+  finished: boolean;
+  type: RecordType;
+  record: RepRecord[] | CardioRecord | RepWeightRecord[] | TimeRecord[];
 }
 
-enum SetType {
+export enum SetType {
   normal,
   warmup,
   dropset,
@@ -34,4 +40,8 @@ export interface CardioRecord {
   speed?: number;
   time?: number;
   targetHR?: number;
+}
+
+export interface TimeRecord {
+  time: number;
 }

@@ -1,6 +1,6 @@
 import RNPickerSelect, { Item } from 'react-native-picker-select';
 import { Link, Redirect, Stack } from 'expo-router';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import { XStack, YStack } from '~/components/ui/Stacks';
 import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
 import { Text } from '~/components/ui/text';
@@ -26,7 +26,6 @@ import { toast } from 'sonner-native';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
-import { nanoid } from 'nanoid/non-secure';
 
 export const PlanDayContext = createContext({
   show: false,

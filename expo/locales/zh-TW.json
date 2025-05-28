@@ -9,6 +9,7 @@
     "are_you_sure_to_delete_this_measurement": "確認您是否要刪除此測量",
     "confirm": "確認",
     "cancel": "取消",
+    "add_exercise": "",
     "sunday": "",
     "monday": "",
     "tuesday": "",
@@ -17,11 +18,13 @@
     "friday": "",
     "saturday": "",
     "name": "",
+    "are_you_sure_to_delete_this_workout_day": "",
     "description": "",
     "add": "新增",
     "edit": "編輯",
     "are_you_sure_to_delete_this_workout_plan": "",
     "log": "",
+    "history": "",
     "details": "",
     "exercises": "",
     "update": "更新",
@@ -34,6 +37,7 @@
     "dark": "深色",
     "language": "語言",
     "delete": "刪除",
+    "day": "",
     "date": ""
   },
   "stat": {
@@ -59,7 +63,8 @@
   },
   "workout": {
     "add_workout_day": "",
-    "workout_day": ""
+    "workout_day": "",
+    "add_exercise": ""
   },
   "exercise": {
     "instruction": "",

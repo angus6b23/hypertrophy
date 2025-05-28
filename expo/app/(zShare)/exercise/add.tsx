@@ -7,6 +7,7 @@ import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
 import { PlanExercise } from 'share/interfaces/Workout';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
+import { nanoid } from 'nanoid/non-secure';
 
 export const AddExerciseContext = createContext<{
   exSet: number[];
@@ -29,6 +30,7 @@ const AddExercisePage = () => {
     const addEx = exSet.map(
       (val) =>
         ({
+          localId: nanoid(),
           exerciseId: val,
           targetReps: 10,
           targetSets: 3,
@@ -40,7 +42,7 @@ const AddExercisePage = () => {
       days: currentPlan.days.map((d, i) => (i === idx ? { ...d, exercises: newEx } : d)),
     });
     setExSet([]);
-    router.replace(`/(tabs)/workout/day/${idx}`);
+    router.dismiss();
   }, [exSet, currentPlan]);
 
   const AddButton = () => {

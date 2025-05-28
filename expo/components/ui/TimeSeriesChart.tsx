@@ -71,7 +71,6 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
   const generateLabel = useCallback(
     (i: SharedValue<number>) => {
       const data = innerData[i.value];
-      console.log(chartPressState.state.x);
       const xData = [
         {
           label: t('common.date'),
@@ -232,9 +231,7 @@ const TextTooltip = ({
   const generateText = (key: string) => `${key}: ${state.y[key].value.get()}`;
   // FIXME: Labels of text not syncing when drag
 
-  useEffect(() => {
-    console.log('changed');
-  }, [state.y.weight.value]);
+  useEffect(() => {}, [state.y.weight.value]);
   return (
     <>
       <RoundedRect
