@@ -1,6 +1,7 @@
 {
   "common": {
-    "units": "Units"
+    "units": "Units",
+    "reps": "Reps"
   },
   "measurement": {
     "bodyFat": "BodyFat"

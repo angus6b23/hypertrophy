@@ -64,7 +64,14 @@
   "workout": {
     "add_workout_day": "",
     "workout_day": "",
-    "add_exercise": ""
+    "add_exercise": "",
+    "reps": "",
+    "add_set": "",
+    "seconds": "",
+    "warmup_set": "",
+    "normal_set": "",
+    "drop_set": "",
+    "super_set": ""
   },
   "exercise": {
     "instruction": "",

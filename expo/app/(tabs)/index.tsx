@@ -13,10 +13,13 @@ export default function Home() {
       <View style={styles.container}>
         <ScreenContent path="app/(tabs)/index.tsx" title="Tab One" />
         <Button variant="secondary" size="lg" onPress={() => router.push('/login')}>
-          <Text>Button</Text>
+          <Text>Login</Text>
         </Button>
         <Button variant="secondary" size="lg" onPress={() => router.push('/exercise/list')}>
           <Text>Exercise</Text>
+        </Button>
+        <Button variant="secondary" size="lg" onPress={() => router.push('/(zShare)/debug')}>
+          <Text>Debug</Text>
         </Button>
       </View>
     </>

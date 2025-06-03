@@ -11,11 +11,13 @@ import { BannerImage } from './[id]';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SwipeGesture } from 'react-native-swipe-gesture-handler';
 import Animated, { FadeInDown, FadeInUp, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
-import { Button } from '~/components/ui/button';
-import { useTranslation } from 'react-i18next';
 import { useExerciseHistory } from '~/utils/hooks/use-exercise-history';
-import { RepWithWeightRecordForm } from '~/components/ui/ExerciseLogForms';
-import { RepWeightRecord } from 'share/interfaces/Records';
+import {
+  RepRecordForm,
+  RepWithWeightRecordForm,
+  TimeRecordForm,
+} from '~/components/ui/ExerciseLogForms';
+import { RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
 
 interface LogContextType {
   showImg: boolean;
@@ -37,9 +39,10 @@ const ExerciseLogs = () => {
   const [tab, setTab] = useState(ex);
   const colors = useColors();
 
-  const exercises = currDay.exercises.map(
-    (planEx) => exerciseDb.exercises.find((ex) => ex.id === planEx.exerciseId)!
-  );
+  const exercises = currDay.exercises.map((planEx) => ({
+    ...exerciseDb.exercises.find((ex) => ex.id === planEx.exerciseId)!,
+    exercisePlanId: planEx.localId!,
+  }));
 
   useEffect(() => {
     setCurrDay(currentPlan.days[day]);
@@ -54,13 +57,16 @@ const ExerciseLogs = () => {
         navigationState={{
           index: tab,
           routes: exercises.map((ex, i) => ({
-            key: `${i.toString()}-${ex.id}`,
+            key: `${i.toString()}-${ex.exercisePlanId}`,
             title: ex.name,
           })),
         }}
         style={{ padding: 0 }}
         renderScene={({ route }) => (
-          <LogTab exercise={exercises[Number(route.key.split('-')[0])] as Exercise} />
+          <LogTab
+            exercise={exercises[Number(route.key.split('-')[0])] as Exercise}
+            exPlanId={route.key.split('-')[1] as string}
+          />
         )}
         onIndexChange={setTab}
         initialLayout={{ width: Dimensions.get('window').width }}
@@ -80,9 +86,8 @@ const ExerciseLogs = () => {
   );
 };
 
-const LogTab = ({ exercise }: { exercise: Exercise }) => {
+const LogTab = ({ exercise, exPlanId }: { exercise: Exercise; exPlanId: string }) => {
   const history = useExerciseHistory(exercise.id!);
-  const { exercisePlanId } = useLocalSearchParams();
   const { setShowImg } = useContext(LogContext);
 
   return (
@@ -97,15 +102,29 @@ const LogTab = ({ exercise }: { exercise: Exercise }) => {
       <View className="relative flex h-full w-full pb-24">
         <LogBanner exercise={exercise} />
         <ScrollView className="m-4">
-          {history.type === 'reps_with_weight' && (
+          {history.type === 'reps_with_weight' ? (
             <RepWithWeightRecordForm
               prefill={history.record as RepWeightRecord[]}
-              exercisePlanId={exercisePlanId as string}
+              exercisePlanId={exPlanId}
+              exId={exercise.id!}
             />
+          ) : history.type === 'reps' ? (
+            <RepRecordForm
+              prefill={history.record as RepRecord[]}
+              exercisePlanId={exPlanId}
+              exId={exercise.id!}
+            />
+          ) : history.type === 'time' ? (
+            <TimeRecordForm
+              prefill={history.record as TimeRecord[]}
+              exercisePlanId={exPlanId}
+              exId={exercise.id!}
+            />
+          ) : (
+            <></>
           )}
           <View className="h-2 w-2 bg-green-400" />
         </ScrollView>
-        <LogButton />
       </View>
     </SwipeGesture>
   );
@@ -136,14 +155,4 @@ const LogBanner = ({ exercise }: { exercise: Exercise }) => {
   );
 };
 
-const LogButton = () => {
-  const { t } = useTranslation();
-  return (
-    <View className="absolute bottom-16 left-0 w-full px-4">
-      <Button>
-        <Text>{t('common.log')}</Text>
-      </Button>
-    </View>
-  );
-};
 export default ExerciseLogs;

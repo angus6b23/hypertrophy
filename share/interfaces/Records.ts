@@ -10,14 +10,18 @@ export interface Workout {
   remarks?: string;
   lastSetTime?: Date;
 }
-
+export type AnyRecord =
+  | RepRecord[]
+  | CardioRecord
+  | RepWeightRecord[]
+  | TimeRecord[];
 export interface ExerciseRecord {
   exerciseId: number;
   exercisePlanId: string;
   remarks?: string;
   finished: boolean;
   type: RecordType;
-  record: RepRecord[] | CardioRecord | RepWeightRecord[] | TimeRecord[];
+  record: AnyRecord;
 }
 
 export enum SetType {

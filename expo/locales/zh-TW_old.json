@@ -1,6 +1,7 @@
 {
   "common": {
-    "units": "單位"
+    "units": "單位",
+    "reps": ""
   },
   "measurement": {
     "bodyFat": "體脂"

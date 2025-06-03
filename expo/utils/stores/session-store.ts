@@ -11,7 +11,7 @@ interface WorkoutState {
 }
 interface WorkoutAction {
   start: () => void;
-  end: (rpe: number) => void;
+  end: (rpe?: number) => void;
   log: (data: Partial<Workout>) => void;
   update: (localId: string, data: Partial<Workout>) => void;
   remove: (localId: string) => void;
@@ -31,23 +31,29 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
           },
         });
       },
-      end: (rpe: number) => {
-        set((prevState) => ({
-          ...prevState,
-          workouts: [
-            ...prevState.workouts,
-            {
-              ...prevState.current,
-              endTime: new Date(
-                Math.min(Date.now(), prevState.current!.startTime.getTime() + 4 * 3600 * 1000)
-              ),
-              RPE: rpe,
-            } as Workout,
-          ],
-          current: null,
-        }));
+      end: (rpe?: number) => {
+        set((prevState) => {
+          if (!prevState.current) return prevState;
+          return {
+            ...prevState,
+            workouts: [
+              ...prevState.workouts,
+              {
+                ...prevState.current,
+                endTime: new Date(
+                  Math.min(
+                    Date.now(),
+                    new Date(prevState.current!.startTime as string).getTime() + 4 * 3600 * 1000
+                  )
+                ),
+                RPE: rpe,
+              } as Workout,
+            ],
+            current: null,
+          };
+        });
       },
-      log: (data) => {
+      log: (data: Partial<Workout>) => {
         set((prevState) => ({
           ...prevState,
           current: { ...prevState.current!, ...data },
