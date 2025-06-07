@@ -15,6 +15,7 @@ export type AnyRecord =
   | CardioRecord
   | RepWeightRecord[]
   | TimeRecord[];
+
 export interface ExerciseRecord {
   exerciseId: number;
   exercisePlanId: string;

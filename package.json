@@ -3,7 +3,8 @@
   "packageManager": "yarn@4.7.0",
   "workspaces": [
     "backend",
-    "expo"
+    "expo",
+    "share/exercises"
   ],
   "scripts": {
     "dev:all": "yarn workspace backend start-db && concurrently --kill-others \"yarn workspace backend dev\" \"yarn workspace hypertrophy-app dev\"",

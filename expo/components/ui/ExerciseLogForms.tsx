@@ -12,7 +12,7 @@ import { Input } from './input';
 import { Text } from './text';
 import { Button } from './button';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { ThemedIcon } from './ThemedIcon';
 import {
   DropdownMenu,
@@ -151,54 +151,58 @@ export const RepWithWeightRecordForm = ({
 
   return (
     <>
-      {pf.map((row, i) => {
-        return (
-          <XStack key={i} fill={false} className="w-full" justify="between" align="center">
-            <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
-              {i < pointer ? (
-                <ThemedIcon size={28} name="Check" />
-              ) : i === pointer ? (
-                <ThemedIcon size={28} name="ChevronRight" />
+      <ScrollView className="m-4 mb-8">
+        {pf.map((row, i) => {
+          return (
+            <XStack key={i} fill={false} className="w-full" justify="between" align="center">
+              <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
+                {i < pointer ? (
+                  <ThemedIcon size={28} name="Check" />
+                ) : i === pointer ? (
+                  <ThemedIcon size={28} name="ChevronRight" />
+                ) : (
+                  <></>
+                )}
+              </View>
+              <Text className="text-lg">{i + 1}</Text>
+              <Input
+                className="w-20 text-center"
+                placeholder={row.weight.toString()}
+                editable={i <= pointer}
+                value={form[i]?.weight}
+                onChangeText={(value) => handleWeightChange(i, value)}
+              />
+              {preferredUnit === WeightUnit.lbs ? (
+                <Text className="text-lg uppercase">{t('unit.lbs')}</Text>
               ) : (
-                <></>
+                <Text className="text-lg uppercase">{t('unit.kg')}</Text>
               )}
-            </View>
-            <Text className="text-lg">{i + 1}</Text>
-            <Input
-              className="w-20 text-center"
-              placeholder={row.weight.toString()}
-              editable={i <= pointer}
-              value={form[i]?.weight}
-              onChangeText={(value) => handleWeightChange(i, value)}
-            />
-            {preferredUnit === WeightUnit.lbs ? (
-              <Text className="text-lg uppercase">{t('unit.lbs')}</Text>
-            ) : (
-              <Text className="text-lg uppercase">{t('unit.kg')}</Text>
-            )}
-            <Text className="text-lg">x</Text>
-            <Input
-              className="w-20 text-center"
-              placeholder={row.reps.toString()}
-              editable={i <= pointer}
-              value={form[i]?.reps}
-              onChangeText={(value) => handleRepChange(i, value)}
-            />
-            <Text className="text-lg uppercase">{t('workout.reps')}</Text>
-            <SetTypeButton
-              state={form[i]?.type !== undefined ? form[i]?.type! : row.type}
-              onChange={handleTypeChange(i)}
-              disabled={i > pointer}
-            />
-          </XStack>
-        );
-      })}
-      <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
-        <Text>{t('workout.add_set')}</Text>
-      </Button>
-      <Button onPress={handleLog}>
-        <Text>{t('common.log')}</Text>
-      </Button>
+              <Text className="text-lg">x</Text>
+              <Input
+                className="w-20 text-center"
+                placeholder={row.reps.toString()}
+                editable={i <= pointer}
+                value={form[i]?.reps}
+                onChangeText={(value) => handleRepChange(i, value)}
+              />
+              <Text className="text-lg uppercase">{t('workout.reps')}</Text>
+              <SetTypeButton
+                state={form[i]?.type !== undefined ? form[i]?.type! : row.type}
+                onChange={handleTypeChange(i)}
+                disabled={i > pointer}
+              />
+            </XStack>
+          );
+        })}
+        <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
+          <Text>{t('workout.add_set')}</Text>
+        </Button>
+      </ScrollView>
+      <View className="absolute bottom-16 w-full px-4">
+        <Button onPress={handleLog} className="w-full">
+          <Text>{t('common.log')}</Text>
+        </Button>
+      </View>
     </>
   );
 };
@@ -301,42 +305,46 @@ export const RepRecordForm = ({
   }, [pf, form, pointer, workoutStore]);
   return (
     <>
-      {pf.map((row, i) => {
-        return (
-          <XStack key={i} fill={false} className="w-full" justify="between" align="center">
-            <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
-              {i < pointer ? (
-                <ThemedIcon size={28} name="Check" />
-              ) : i === pointer ? (
-                <ThemedIcon size={28} name="ChevronRight" />
-              ) : (
-                <></>
-              )}
-            </View>
-            <Text className="text-lg">{i + 1}</Text>
-            <Input
-              className="mx-4 w-20 flex-1 text-center"
-              placeholder={row.reps.toString()}
-              editable={i <= pointer}
-              value={form[i]?.reps?.toString()}
-              onChangeText={(s) => handleRepChange(i, s)}
-              keyboardType="numeric"
-            />
-            <Text className="text-lg uppercase">{t('workout.reps')}</Text>
-            <SetTypeButton
-              state={form[i]?.type !== undefined ? form[i]?.type! : row.type}
-              onChange={handleTypeChange(i)}
-              disabled={i > pointer}
-            />
-          </XStack>
-        );
-      })}
-      <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
-        <Text>{t('workout.add_set')}</Text>
-      </Button>
-      <Button onPress={handleLog}>
-        <Text>{t('common.log')}</Text>
-      </Button>
+      <ScrollView className="m-4 mb-6">
+        {pf.map((row, i) => {
+          return (
+            <XStack key={i} fill={false} className="w-full" justify="between" align="center">
+              <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
+                {i < pointer ? (
+                  <ThemedIcon size={28} name="Check" />
+                ) : i === pointer ? (
+                  <ThemedIcon size={28} name="ChevronRight" />
+                ) : (
+                  <></>
+                )}
+              </View>
+              <Text className="text-lg">{i + 1}</Text>
+              <Input
+                className="mx-4 w-20 flex-1 text-center"
+                placeholder={row.reps.toString()}
+                editable={i <= pointer}
+                value={form[i]?.reps?.toString()}
+                onChangeText={(s) => handleRepChange(i, s)}
+                keyboardType="numeric"
+              />
+              <Text className="text-lg uppercase">{t('workout.reps')}</Text>
+              <SetTypeButton
+                state={form[i]?.type !== undefined ? form[i]?.type! : row.type}
+                onChange={handleTypeChange(i)}
+                disabled={i > pointer}
+              />
+            </XStack>
+          );
+        })}
+        <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
+          <Text>{t('workout.add_set')}</Text>
+        </Button>
+      </ScrollView>
+      <View className="absolute bottom-16 w-full px-4">
+        <Button onPress={handleLog} className="w-full">
+          <Text>{t('common.log')}</Text>
+        </Button>
+      </View>
     </>
   );
 };
@@ -429,35 +437,39 @@ export const TimeRecordForm = ({
 
   return (
     <>
-      {pf.map((row, i) => (
-        <XStack key={i} fill={false} className="w-full" justify="between" align="center">
-          <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
-            {i < pointer ? (
-              <ThemedIcon size={28} name="Check" />
-            ) : i === pointer ? (
-              <ThemedIcon size={28} name="ChevronRight" />
-            ) : (
-              <></>
-            )}
-          </View>
-          <Text className="text-lg">{i + 1}</Text>
-          <Input
-            className="mx-4 w-20 flex-1 text-center"
-            placeholder={row.time.toString()}
-            editable={i <= pointer}
-            value={form[i]?.time?.toString()}
-            onChangeText={(s) => handleTimeChange(i, s)}
-            keyboardType="numeric"
-          />
-          <Text className="text-lg uppercase">{t('workout.seconds')}</Text>
-        </XStack>
-      ))}
-      <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
-        <Text>{t('workout.add_set')}</Text>
-      </Button>
-      <Button onPress={handleLog}>
-        <Text>{t('common.log')}</Text>
-      </Button>
+      <ScrollView className="m-4 mb-6">
+        {pf.map((row, i) => (
+          <XStack key={i} fill={false} className="w-full" justify="between" align="center">
+            <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
+              {i < pointer ? (
+                <ThemedIcon size={28} name="Check" />
+              ) : i === pointer ? (
+                <ThemedIcon size={28} name="ChevronRight" />
+              ) : (
+                <></>
+              )}
+            </View>
+            <Text className="text-lg">{i + 1}</Text>
+            <Input
+              className="mx-4 w-20 flex-1 text-center"
+              placeholder={row.time.toString()}
+              editable={i <= pointer}
+              value={form[i]?.time?.toString() || ''}
+              onChangeText={(s) => handleTimeChange(i, s)}
+              keyboardType="numeric"
+            />
+            <Text className="text-lg uppercase">{t('workout.seconds')}</Text>
+          </XStack>
+        ))}
+        <Button variant="secondary" onPress={() => setPf([...pf, prefill[prefill.length - 1]])}>
+          <Text>{t('workout.add_set')}</Text>
+        </Button>
+      </ScrollView>
+      <View className="absolute bottom-16 w-full px-4">
+        <Button onPress={handleLog} className="w-full">
+          <Text>{t('common.log')}</Text>
+        </Button>
+      </View>
       );
     </>
   );

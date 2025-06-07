@@ -11,34 +11,34 @@ import { Checkbox } from './checkbox';
 import { AddExerciseContext } from '~/app/(zShare)/exercise/add';
 import { RenderItemParams } from 'react-native-draggable-flatlist';
 import { PlanExercise } from 'share/interfaces/Workout';
+import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
 
 export const ExerciseItem = ({
   exercise,
   drag,
   href,
+  className,
+  size = 64,
 }: {
   exercise: Exercise;
   drag?: RenderItemParams<PlanExercise>['drag'];
   href?: Href;
+  className?: string;
+  size?: number;
 }) => {
-  const [img, setImg] = useState<any>();
+  const img = useExerciseImage(exercise.path, { animate: false });
   const router = useRouter();
-  useEffect(() => {
-    const image = require.context(`../../../share/exercises/exercises/`, true, /.*jpg/);
-    const id = `./${exercise.path}/images/0.jpg`;
-    const targetImg = image(id);
-    setImg(targetImg);
-  }, [exercise]);
 
   return (
     <>
       <TouchableOpacity
+        className={className}
         onPress={() => router.push(href || `/exercise/${exercise.id!}`)}
         onLongPress={drag}>
-        <XStack padding="none" fill={false} align="center">
+        <XStack padding="none" fill={false} align="center" className={className}>
           <Image
             source={img}
-            style={{ height: 64, width: 64, borderRadius: 8 }}
+            style={{ height: size, width: size, borderRadius: 8 }}
             contentFit="cover"
           />
           <Text className="text-lg font-bold">{exercise.name}</Text>
@@ -50,14 +50,8 @@ export const ExerciseItem = ({
 
 export const ExerciseItemWithCheckbox = ({ exercise }: { exercise: Exercise }) => {
   const { exSet, setExSet } = useContext(AddExerciseContext);
-  const [img, setImg] = useState<any>();
+  const img = useExerciseImage(exercise.path, { animate: false });
 
-  useEffect(() => {
-    const image = require.context(`../../../share/exercises/exercises/`, true, /.*jpg/);
-    const id = `./${exercise.path}/images/0.jpg`;
-    const targetImg = image(id);
-    setImg(targetImg);
-  }, [exercise]);
   const handleToggle = () => {
     setExSet((prevState) => {
       if (prevState.includes(exercise.id!)) {

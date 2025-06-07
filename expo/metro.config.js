@@ -14,4 +14,10 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
+const monorepoPackages = {
+  share: path.resolve(monorepoRoot, 'share'),
+  backend: path.resolve(monorepoRoot, 'backend'),
+};
+config.resolver.extraNodeModules = monorepoPackages;
+
 module.exports = withNativeWind(config, { input: './global.css' });

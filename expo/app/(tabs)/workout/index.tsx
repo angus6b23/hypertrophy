@@ -173,7 +173,7 @@ const AddDayDialog = () => {
         </DialogHeader>
         <YStack padding="none" fill={false} className="w-full">
           <View className="w-full">
-            <Label>{t('common.name')}</Label>
+            <Label className="text-foreground">{t('common.name')}</Label>
             <Input
               className="w-full"
               placeholder={t('plan.name_of_workout_day')}
@@ -182,7 +182,7 @@ const AddDayDialog = () => {
             />
           </View>
           <View className="flex w-full flex-col">
-            <Label>{t('workout.workout_day')}</Label>
+            <Label className="text-foreground">{t('workout.workout_day')}</Label>
             <DayDropdown
               value={state.day}
               valueChange={(d) => setState((prevState) => ({ ...prevState, day: d }))}

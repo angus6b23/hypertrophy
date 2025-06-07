@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "81cdbd6d-c1bd-4722-9a2e-984506f33fe8"
+      }
+    },
+    "android": {
+      "package": "com.sumeragik.hypertrophy"
+    }
+  }
+}

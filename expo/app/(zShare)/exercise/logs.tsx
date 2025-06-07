@@ -101,30 +101,27 @@ const LogTab = ({ exercise, exPlanId }: { exercise: Exercise; exPlanId: string }
       }}>
       <View className="relative flex h-full w-full pb-24">
         <LogBanner exercise={exercise} />
-        <ScrollView className="m-4">
-          {history.type === 'reps_with_weight' ? (
-            <RepWithWeightRecordForm
-              prefill={history.record as RepWeightRecord[]}
-              exercisePlanId={exPlanId}
-              exId={exercise.id!}
-            />
-          ) : history.type === 'reps' ? (
-            <RepRecordForm
-              prefill={history.record as RepRecord[]}
-              exercisePlanId={exPlanId}
-              exId={exercise.id!}
-            />
-          ) : history.type === 'time' ? (
-            <TimeRecordForm
-              prefill={history.record as TimeRecord[]}
-              exercisePlanId={exPlanId}
-              exId={exercise.id!}
-            />
-          ) : (
-            <></>
-          )}
-          <View className="h-2 w-2 bg-green-400" />
-        </ScrollView>
+        {history.type === 'reps_with_weight' ? (
+          <RepWithWeightRecordForm
+            prefill={history.record as RepWeightRecord[]}
+            exercisePlanId={exPlanId}
+            exId={exercise.id!}
+          />
+        ) : history.type === 'reps' ? (
+          <RepRecordForm
+            prefill={history.record as RepRecord[]}
+            exercisePlanId={exPlanId}
+            exId={exercise.id!}
+          />
+        ) : history.type === 'time' ? (
+          <TimeRecordForm
+            prefill={history.record as TimeRecord[]}
+            exercisePlanId={exPlanId}
+            exId={exercise.id!}
+          />
+        ) : (
+          <></>
+        )}
       </View>
     </SwipeGesture>
   );

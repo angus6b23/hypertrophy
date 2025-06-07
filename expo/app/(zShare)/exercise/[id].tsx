@@ -17,6 +17,7 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Text } from '~/components/ui/text';
+import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
 
 const ExerciseDetailPage = () => {
   const local = useLocalSearchParams();
@@ -85,29 +86,30 @@ const FloatingButton = () => {
 };
 
 export const BannerImage = ({ path, name }: { path: string; name?: string }) => {
-  const [imgs, setImgs] = useState<any[]>([]);
-  const [imgIdx, setImgIdx] = useState(0);
-  useEffect(() => {
-    const image = require.context(`../../../../share/exercises/exercises/`, true, /.*jpg/);
-    const id1 = `./${path}/images/0.jpg`;
-    const id2 = `./${path}/images/1.jpg`;
-    const img1 = image(id1);
-    const img2 = image(id2);
-    setImgs([img1, img2]);
-  }, []);
-
-  useEffect(() => {
-    let interval: any;
-    if (imgs.length > 0) {
-      interval = setInterval(() => {
-        setImgIdx((prev) => (prev + 1 >= imgs.length ? 0 : prev + 1));
-      }, 800);
-    }
-    return () => clearInterval(interval);
-  }, [imgs]);
+  const img = useExerciseImage(path);
+  // const [imgs, setImgs] = useState<any[]>([]);
+  // const [imgIdx, setImgIdx] = useState(0);
+  // useEffect(() => {
+  //   const image = require.context(`../../../../share/exercises/exercises/`, true, /.*jpg/);
+  //   const id1 = `./${path}/images/0.jpg`;
+  //   const id2 = `./${path}/images/1.jpg`;
+  //   const img1 = image(id1);
+  //   const img2 = image(id2);
+  //   setImgs([img1, img2]);
+  // }, []);
+  //
+  // useEffect(() => {
+  //   let interval: any;
+  //   if (imgs.length > 0) {
+  //     interval = setInterval(() => {
+  //       setImgIdx((prev) => (prev + 1 >= imgs.length ? 0 : prev + 1));
+  //     }, 800);
+  //   }
+  //   return () => clearInterval(interval);
+  // }, [imgs]);
   return (
     <Image
-      source={imgs[imgIdx]}
+      source={img}
       style={{ width: '100%', height: 256 }}
       contentFit="cover"
       className="absolute left-0 top-0"
