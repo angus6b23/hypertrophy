@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 
 import { YStack } from '~/components/ui/Stacks';
 import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';

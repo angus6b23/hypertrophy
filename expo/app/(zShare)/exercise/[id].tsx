@@ -18,13 +18,20 @@ import { Button } from '~/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Text } from '~/components/ui/text';
 import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
+import { useWorkoutStore } from '~/utils/stores/session-store';
+import { AnyRecord, ExerciseRecord } from 'share/interfaces/Records';
+import { FlashList } from '@shopify/flash-list';
+import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
+import session from '../session';
+import { useColors } from '~/utils/rn-reusables/useColors';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ExerciseDetailPage = () => {
   const local = useLocalSearchParams();
   const exerciseRef = useRef(
     exerciseDb.exercises.find((ex) => ex.id === Number(local.id as string))
   );
-  const [tab, setTab] = useState('log');
+  const [tab, setTab] = useState('history');
   const [displayBanner, setDisplayBanner] = useState(true);
   const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (e.nativeEvent.contentOffset.y > 50) {
@@ -42,9 +49,6 @@ const ExerciseDetailPage = () => {
             <Text className="text-2xl font-bold">{exerciseRef.current!.name}</Text>
             <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="w-full flex-row">
-                <TabsTrigger value="log" className="flex-1">
-                  <Text>{t('common.log')}</Text>
-                </TabsTrigger>
                 <TabsTrigger value="history" className="flex-1">
                   <Text>{t('common.history')}</Text>
                 </TabsTrigger>
@@ -52,13 +56,8 @@ const ExerciseDetailPage = () => {
                   <Text>{t('common.details')}</Text>
                 </TabsTrigger>
               </TabsList>
-              {/* TODO:Implement log function */}
-              <TabsContent value="log">
-                <Text>Log</Text>
-              </TabsContent>
-              {/* TODO: Implement record viewing */}
               <TabsContent value="history">
-                <Text>History</Text>
+                <ExerciseHistory id={Number(local.id)} />
               </TabsContent>
               <TabsContent value="details" asChild>
                 <ExerciseDetails ex={exerciseRef.current! as Exercise} />
@@ -163,6 +162,65 @@ const ExerciseDetails = ({ ex }: { ex: Exercise }) => {
           ))}
         </YStack>
       </YStack>
+    </YStack>
+  );
+};
+
+interface ExerciseRecordWithDate extends ExerciseRecord {
+  date: string;
+}
+const ExerciseHistory = ({ id }: { id: number }) => {
+  const workouts = useWorkoutStore((state) => state.workouts);
+  const [displayCount, setDisplayCount] = useState(10);
+
+  const getLogs = useCallback(() => {
+    const res: ExerciseRecordWithDate[] = [];
+    for (let i = workouts.length - 1; i >= 0; i--) {
+      const session = workouts[i];
+      const logs = session.exercises;
+      for (const log of logs) {
+        if (log.exerciseId === id) {
+          res.push({ ...log, date: session.startTime as unknown as string });
+        }
+        if (res.length >= displayCount) break;
+      }
+      if (res.length >= displayCount) break;
+    }
+    return res;
+  }, [displayCount]);
+
+  const append = useDebouncedCallback(() => {
+    setDisplayCount((prev) => prev + 10);
+  }, 200);
+  return (
+    <FlashList
+      data={getLogs()}
+      keyExtractor={(_item, i) => i.toString()}
+      contentContainerStyle={{ paddingHorizontal: 0, paddingTop: 8, paddingBottom: 100 }}
+      ItemSeparatorComponent={() => <View className="h-4" />}
+      renderItem={(item) => (
+        <ExerciseRecordItem
+          record={item.item}
+          date={item.item.date}
+          options={{ showDate: true, showName: false, showImg: false }}
+        />
+      )}
+      ListEmptyComponent={() => <NoHistory />}
+      estimatedItemSize={10}
+      onEndReached={append}
+      onEndReachedThreshold={1}
+    />
+  );
+};
+
+const NoHistory = () => {
+  const { t } = useTranslation();
+  const colors = useColors();
+  return (
+    <YStack fill={true} padding="none" justify="center" align="center" className="h-96 w-full">
+      <ThemedIcon name="ListFilterPlus" size={96} color={colors.neutral} />
+      <Text className="text-md text-muted-foreground">{t('workout.no_history_found')}</Text>
+      <Text className="text-md text-muted-foreground">{t('workout.do_some_workout')}</Text>
     </YStack>
   );
 };

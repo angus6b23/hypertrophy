@@ -43,7 +43,9 @@ export const ExerciseRecordItem = ({
 
   return (
     <XStack fill={false} className="rounded-lg bg-muted" align="center">
-      <Image source={img} style={{ width: 96, height: 96, borderRadius: 8 }} contentFit="cover" />
+      {options.showImg && (
+        <Image source={img} style={{ width: 96, height: 96, borderRadius: 8 }} contentFit="cover" />
+      )}
       <YStack fill={false} className="w-full bg-transparent pl-4" padding="none">
         {options.showDate && (
           <Text className="text-lg font-bold">{new Date(date).toLocaleDateString(lang)}</Text>

@@ -211,10 +211,12 @@ const ExerciseFilterControl = () => {
 const ExList = () => {
   const { exercises, filter } = useContext(ExerciseContext);
   const [innerData, infinityScroll] = useInfinityScroll(exercises);
-  const listRef = useRef(null);
+  const listRef = useRef<FlashList<Exercise>>(null);
+
   useEffect(() => {
     listRef.current?.scrollToIndex({ index: 0 });
   }, [filter]);
+
   return (
     <>
       <FlashList
@@ -235,7 +237,7 @@ const ExList = () => {
 const ExListWithCheckbox = () => {
   const { exercises, filter } = useContext(ExerciseContext);
   const [innerData, infinityScroll] = useInfinityScroll(exercises);
-  const listRef = useRef(null);
+  const listRef = useRef<FlashList<Exercise>>(null);
   useEffect(() => {
     listRef.current?.scrollToIndex({ index: 0 });
   }, [filter]);

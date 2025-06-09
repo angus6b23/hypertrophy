@@ -13,6 +13,7 @@ import { XStack } from '~/components/ui/Stacks';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useColors } from '~/utils/rn-reusables/useColors';
+import { ProgressWorkoutPage } from './workout';
 
 function ProgresPage() {
   const { t } = useTranslation();
@@ -45,7 +46,7 @@ function ProgresPage() {
           activeTextColor={colors.text}
           inactiveTextColor={colors.text}
         />
-        {tab === 0 && <View />}
+        {tab === 0 && <ProgressWorkoutPage />}
         {tab === 1 && <MeasurementPage />}
         {tab === 2 && <StatisticsPage />}
       </SafeAreaView>
