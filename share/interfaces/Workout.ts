@@ -20,7 +20,7 @@ export interface PlanDay {
 
 export interface PlanExercise {
   id?: number;
-  localId?: string;
+  localId: string;
   dayId?: number;
   exerciseId: number;
   targetReps?: number | null;

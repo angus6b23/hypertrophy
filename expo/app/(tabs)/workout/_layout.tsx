@@ -3,7 +3,7 @@ import { useWorkoutStore } from '~/utils/stores/session-store';
 import { View } from 'react-native';
 import { Workout } from 'share/interfaces/Records';
 import { Text } from '~/components/ui/text';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { minutesPassed } from '~/utils/misc/time';
 import { XStack } from '~/components/ui/Stacks';
 import { useTranslation } from 'react-i18next';
@@ -22,18 +22,27 @@ export default function Layout() {
 const FloatingWidget = ({ workout }: { workout: Workout }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const end = useWorkoutStore((s) => s.end);
+
   const [minute, setMinute] = useState(
     minutesPassed(new Date(workout?.startTime as unknown as string))
   );
 
   useFocusEffect(() => {
     const interval = setInterval(() => {
-      setMinute(minutesPassed(new Date(workout?.startTime as unknown as string)));
+      const minPassed = minutesPassed(new Date(workout?.startTime as unknown as string));
+      setMinute(minPassed);
     }, 1000 * 10);
     return () => {
       clearInterval(interval);
     };
   });
+
+  useEffect(() => {
+    if (minute > 60 * 4) {
+      end();
+    }
+  }, [minute]);
 
   return (
     <View className="absolute bottom-2 left-2 rounded-lg bg-secondary">

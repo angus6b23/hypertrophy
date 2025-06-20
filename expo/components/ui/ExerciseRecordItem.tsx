@@ -14,6 +14,7 @@ import { useOptionStore } from '~/utils/stores/option-store';
 import { useTranslation } from 'react-i18next';
 import { WeightUnit } from '~/types/units';
 import { round } from '~/utils/misc/round-numbers';
+import { RecordType } from 'share/exercises/types/exercise';
 
 interface ExerciseRecordOption {
   showImg?: boolean;
@@ -35,6 +36,8 @@ export const ExerciseRecordItem = ({
   date: string;
   options?: ExerciseRecordOption;
 }) => {
+  const { t } = useTranslation();
+  console.log(record);
   options = { ...defaultExRecOption, ...options };
 
   const ex = exercises.find((ex) => ex.id === record.exerciseId)!;
@@ -46,16 +49,25 @@ export const ExerciseRecordItem = ({
       {options.showImg && (
         <Image source={img} style={{ width: 96, height: 96, borderRadius: 8 }} contentFit="cover" />
       )}
-      <YStack fill={false} className="w-full bg-transparent pl-4" padding="none">
+      <YStack fill={false} className="bg-transparent pl-4" padding="none">
         {options.showDate && (
-          <Text className="text-lg font-bold">{new Date(date).toLocaleDateString(lang)}</Text>
+          <Text className="wrap text-lg font-bold">{new Date(date).toLocaleDateString(lang)}</Text>
         )}
-        {options.showName && <Text className="text-lg font-bold">{ex.name}</Text>}
-        {record.type === 'reps_with_weight' && (
+        {options.showName && (
+          <Text numberOfLines={2} className="wrap w-full text-lg font-bold">
+            {ex.name}
+          </Text>
+        )}
+        {record.type === RecordType.reps_with_weight && (
           <RepWeightDisplay logs={record.record as RepWeightRecord[]} />
         )}
-        {record.type === 'reps' && <RepDisplay logs={record.record as RepRecord[]} />}
-        {record.type === 'time' && <TimeDisplay logs={record.record as TimeRecord[]} />}
+        {record.type === RecordType.reps && <RepDisplay logs={record.record as RepRecord[]} />}
+        {record.type === RecordType.time && <TimeDisplay logs={record.record as TimeRecord[]} />}
+        {record.remarks && (
+          <Text className="text-lg">
+            {t('common.remarks')}: {record.remarks}
+          </Text>
+        )}
       </YStack>
     </XStack>
   );

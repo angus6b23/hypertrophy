@@ -24,6 +24,7 @@ import { RecordType } from 'share/exercises/types/exercise';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { WeightUnit } from '~/types/units';
 import { round } from '~/utils/misc/round-numbers';
+import { PlanExercise } from 'share/interfaces/Workout';
 
 interface LogRepWeightRecord extends Omit<RepWeightRecord, 'reps' | 'weight' | 'type'> {
   reps?: string;
@@ -32,13 +33,18 @@ interface LogRepWeightRecord extends Omit<RepWeightRecord, 'reps' | 'weight' | '
 }
 export const RepWithWeightRecordForm = ({
   prefill,
-  exercisePlanId,
+  planExercise,
   exId,
+  nextTab,
+  logEx,
 }: {
   prefill: RepWeightRecord[];
-  exercisePlanId: string;
+  planExercise: PlanExercise;
   exId: number;
+  nextTab: () => void;
+  logEx: (arg0: number) => void;
 }) => {
+  const { localId } = planExercise;
   const { t } = useTranslation();
   const [pf, setPf] = useState(prefill);
   const [form, setForm] = useState<LogRepWeightRecord[]>([]);
@@ -48,9 +54,7 @@ export const RepWithWeightRecordForm = ({
 
   useEffect(() => {
     if (!workoutStore.current) return;
-    const record = workoutStore.current.exercises.find(
-      (ex) => ex.exercisePlanId === exercisePlanId
-    );
+    const record = workoutStore.current.exercises.find((ex) => ex.exercisePlanId === localId);
     if (!record) return;
     const logs = record.record as RepWeightRecord[];
     setForm(
@@ -62,7 +66,7 @@ export const RepWithWeightRecordForm = ({
       }))
     );
     setPointer(logs.length);
-  }, [workoutStore.current, exercisePlanId]);
+  }, [workoutStore.current, localId]);
 
   const handleRepChange = useCallback(
     (index: number, value: string) => {
@@ -116,7 +120,7 @@ export const RepWithWeightRecordForm = ({
       workoutStore.log({
         exercises: [
           {
-            exercisePlanId,
+            exercisePlanId: localId,
             exerciseId: exId,
             record: merged,
             type: RecordType.reps_with_weight,
@@ -124,10 +128,9 @@ export const RepWithWeightRecordForm = ({
           },
         ],
       });
-      return;
     } else {
       const curr = workoutStore.current!;
-      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === exercisePlanId);
+      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === localId);
       let newRecords: ExerciseRecord[];
       if (currEx !== -1) {
         newRecords = curr.exercises.map((ex, i) =>
@@ -138,16 +141,19 @@ export const RepWithWeightRecordForm = ({
           ...curr.exercises,
           {
             exerciseId: exId,
-            exercisePlanId,
+            exercisePlanId: localId,
             record: merged,
             type: RecordType.reps_with_weight,
             finished,
           },
         ];
       }
+
       workoutStore.log({ exercises: newRecords });
+      if (finished) nextTab();
+      logEx(planExercise.restTime || 60);
     }
-  }, [pf, form, pointer, workoutStore]);
+  }, [pf, form, pointer, workoutStore, planExercise]);
 
   return (
     <>
@@ -157,9 +163,9 @@ export const RepWithWeightRecordForm = ({
             <XStack key={i} fill={false} className="w-full" justify="between" align="center">
               <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
                 {i < pointer ? (
-                  <ThemedIcon size={28} name="Check" />
+                  <ThemedIcon size={24} name="Check" />
                 ) : i === pointer ? (
-                  <ThemedIcon size={28} name="ChevronRight" />
+                  <ThemedIcon size={24} name="ChevronRight" />
                 ) : (
                   <></>
                 )}
@@ -213,13 +219,18 @@ interface LogRepRecord extends Partial<Omit<RepRecord, 'reps'>> {
 
 export const RepRecordForm = ({
   prefill,
-  exercisePlanId,
+  planExercise,
   exId,
+  nextTab,
+  logEx,
 }: {
   prefill: RepRecord[];
-  exercisePlanId: string;
+  planExercise: PlanExercise;
   exId: number;
+  nextTab: () => void;
+  logEx: (arg0: number) => void;
 }) => {
+  const { localId } = planExercise;
   const { t } = useTranslation();
   const [pf, setPf] = useState(prefill);
   const [form, setForm] = useState<LogRepRecord[]>([]);
@@ -228,9 +239,7 @@ export const RepRecordForm = ({
 
   useEffect(() => {
     if (!workoutStore.current) return;
-    const record = workoutStore.current.exercises.find(
-      (ex) => ex.exercisePlanId === exercisePlanId
-    );
+    const record = workoutStore.current.exercises.find((ex) => ex.exercisePlanId === localId);
     if (!record) return;
     const logs = record.record as RepRecord[];
     setForm(logs.map((r) => ({ ...r, reps: r.reps.toString() })));
@@ -271,7 +280,7 @@ export const RepRecordForm = ({
       workoutStore.log({
         exercises: [
           {
-            exercisePlanId,
+            exercisePlanId: localId,
             exerciseId: exId,
             record: merged,
             type: RecordType.reps,
@@ -279,10 +288,9 @@ export const RepRecordForm = ({
           },
         ],
       });
-      return;
     } else {
       const curr = workoutStore.current!;
-      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === exercisePlanId);
+      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === localId);
       let newRecords: ExerciseRecord[];
       if (currEx !== -1) {
         newRecords = curr.exercises.map((ex, i) =>
@@ -293,14 +301,17 @@ export const RepRecordForm = ({
           ...curr.exercises,
           {
             exerciseId: exId,
-            exercisePlanId,
+            exercisePlanId: localId,
             record: merged,
             type: RecordType.reps,
             finished,
           },
         ];
       }
+
       workoutStore.log({ exercises: newRecords });
+      logEx(planExercise.restTime || 60);
+      if (finished) nextTab();
     }
   }, [pf, form, pointer, workoutStore]);
   return (
@@ -311,9 +322,9 @@ export const RepRecordForm = ({
             <XStack key={i} fill={false} className="w-full" justify="between" align="center">
               <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
                 {i < pointer ? (
-                  <ThemedIcon size={28} name="Check" />
+                  <ThemedIcon size={24} name="Check" />
                 ) : i === pointer ? (
-                  <ThemedIcon size={28} name="ChevronRight" />
+                  <ThemedIcon size={24} name="ChevronRight" />
                 ) : (
                   <></>
                 )}
@@ -355,13 +366,18 @@ interface LogTimeRecord extends Partial<Omit<TimeRecord, 'time'>> {
 
 export const TimeRecordForm = ({
   prefill,
-  exercisePlanId,
+  planExercise,
   exId,
+  nextTab,
+  logEx,
 }: {
   prefill: TimeRecord[];
-  exercisePlanId: string;
+  planExercise: PlanExercise;
   exId: number;
+  nextTab: () => void;
+  logEx: (arg0: number) => void;
 }) => {
+  const { localId } = planExercise;
   const { t } = useTranslation();
   const [pf, setPf] = useState(prefill);
   const [form, setForm] = useState<LogTimeRecord[]>([]);
@@ -370,9 +386,7 @@ export const TimeRecordForm = ({
 
   useEffect(() => {
     if (!workoutStore.current) return;
-    const record = workoutStore.current.exercises.find(
-      (ex) => ex.exercisePlanId === exercisePlanId
-    );
+    const record = workoutStore.current.exercises.find((ex) => ex.exercisePlanId === localId);
     if (!record) return;
     const logs = record.record as TimeRecord[];
     setForm(logs.map((r) => ({ time: r.time.toString() })));
@@ -402,7 +416,7 @@ export const TimeRecordForm = ({
       workoutStore.log({
         exercises: [
           {
-            exercisePlanId,
+            exercisePlanId: localId,
             exerciseId: exId,
             record: merged,
             type: RecordType.time,
@@ -410,10 +424,9 @@ export const TimeRecordForm = ({
           },
         ],
       });
-      return;
     } else {
       const curr = workoutStore.current!;
-      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === exercisePlanId);
+      const currEx = curr.exercises.findIndex((ex) => ex.exercisePlanId === localId);
       let newRecords: ExerciseRecord[];
       if (currEx !== -1) {
         newRecords = curr.exercises.map((ex, i) =>
@@ -424,15 +437,18 @@ export const TimeRecordForm = ({
           ...curr.exercises,
           {
             exerciseId: exId,
-            exercisePlanId,
+            exercisePlanId: localId,
             record: merged,
             type: RecordType.time,
             finished,
           },
         ];
       }
+
       workoutStore.log({ exercises: newRecords });
     }
+    if (finished) nextTab();
+    logEx(planExercise.restTime || 60);
   }, [pf, form, pointer, workoutStore]);
 
   return (
@@ -442,9 +458,9 @@ export const TimeRecordForm = ({
           <XStack key={i} fill={false} className="w-full" justify="between" align="center">
             <View className="-ml-4 -mr-2 w-6 p-0 pl-0">
               {i < pointer ? (
-                <ThemedIcon size={28} name="Check" />
+                <ThemedIcon size={24} name="Check" />
               ) : i === pointer ? (
-                <ThemedIcon size={28} name="ChevronRight" />
+                <ThemedIcon size={24} name="ChevronRight" />
               ) : (
                 <></>
               )}

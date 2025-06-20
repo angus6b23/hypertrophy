@@ -28,16 +28,18 @@ import { Input } from '~/components/ui/input';
 import { FlashList } from '@shopify/flash-list';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
 import { toast } from 'sonner-native';
+import { AbandonDialog } from './AbandonSessionDialog';
 
 const SessionPage = () => {
   const { t } = useTranslation();
+  const colors = useColors();
   const router = useRouter();
   const session = useWorkoutStore((s) => s.current);
   const endSession = useWorkoutStore((s) => s.end);
   const preferredUnit = useOptionStore((s) => s.unit.workoutWeight);
-  const colors = useColors();
 
   const [remark, setRemark] = useState(false);
+  const [abandonDiag, setAbandonDiag] = useState(false);
   if (!session) {
     router.dismiss();
   }
@@ -60,11 +62,15 @@ const SessionPage = () => {
         options={{
           title: t('workout.session_details'),
           headerShown: true,
+          headerRight: () => (
+            <Button onPress={() => setAbandonDiag(true)} variant="ghost">
+              <ThemedIcon name="Trash" color={colors.text} size={20} />
+            </Button>
+          ),
         }}
       />
       <View className="relative flex h-full w-full flex-col">
         <YStack fill={false} className="w-full" align="center">
-          <ThemedIcon name="Smile" size={72} color={colors.text} />
           <XStack
             gap="none"
             padding="none"
@@ -90,7 +96,7 @@ const SessionPage = () => {
             </YStack>
           </XStack>
         </YStack>
-        <View></View>
+        <View />
         <FlashList
           data={session!.exercises}
           keyExtractor={(item) => item.exercisePlanId}
@@ -121,6 +127,7 @@ const SessionPage = () => {
           </XStack>
         </View>
       </View>
+      <AbandonDialog abdDiag={abandonDiag} setAbdDiag={setAbandonDiag} />
     </>
   );
 };

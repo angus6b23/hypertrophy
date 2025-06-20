@@ -1,11 +1,12 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
 import { TabBar, TabView } from 'react-native-tab-view';
 import exerciseDb from 'share/exercises/exercises.json';
-import { Exercise } from 'share/exercises/types/exercise';
+import { Exercise, RecordType } from 'share/exercises/types/exercise';
 import { Text } from '~/components/ui/text';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { Button } from '~/components/ui/button';
+import { Dimensions, View } from 'react-native';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { BannerImage } from './[id]';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,21 +18,52 @@ import {
   RepWithWeightRecordForm,
   TimeRecordForm,
 } from '~/components/ui/ExerciseLogForms';
-import { RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
+import { AnyRecord, RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
+import { PlanExercise } from 'share/interfaces/Workout';
+import { XStack } from '~/components/ui/Stacks';
+import { useTranslation } from 'react-i18next';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { t } from 'i18next';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import { useWorkoutStore } from '~/utils/stores/session-store';
 
 interface LogContextType {
   showImg: boolean;
   setShowImg: React.Dispatch<React.SetStateAction<boolean>>;
+  nextTab: () => void;
+  logEx: (t: number) => void;
 }
 const LogContext = createContext<LogContextType>({
   showImg: true,
   setShowImg: () => {},
+  nextTab: () => {},
+  logEx: () => {},
 });
 
 const ExerciseLogs = () => {
+  const { t } = useTranslation();
   const localParams = useLocalSearchParams();
+  const router = useRouter();
+
+  // Index of day of current plan
   const day: number = Number(localParams.day);
+  // Index of exercise of the day of current plan
   const ex: number = Number(localParams.exercise);
+
+  // For displaying rest timer
+  const [restTime, setResttime] = useState(0);
+  const [lastLog, setLastLog] = useState(new Date());
+  const [remainingRest, setRemainingRest] = useState(0);
 
   const currentPlan = useCurrentPlan();
   const [currDay, setCurrDay] = useState(currentPlan.days[day]);
@@ -44,12 +76,43 @@ const ExerciseLogs = () => {
     exercisePlanId: planEx.localId!,
   }));
 
+  const nextTab = useCallback(() => {
+    const exCount = currDay.exercises.length;
+    if (tab === exCount - 1) {
+      router.dismiss();
+    } else {
+      setTab((prev) => prev + 1);
+    }
+  }, [currDay, tab, setTab]);
+
   useEffect(() => {
     setCurrDay(currentPlan.days[day]);
   }, [currentPlan, day]);
 
+  const getRemainingRestTime = useCallback(() => {
+    return Math.round((restTime * 1000 - (Date.now() - lastLog.getTime())) / 1000);
+  }, [lastLog, restTime]);
+
+  useFocusEffect(() => {
+    const interval = setInterval(() => {
+      const res = getRemainingRestTime();
+      if (res > -1) {
+        setRemainingRest(res);
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  });
+
+  const logEx = useCallback(
+    (restTime: number) => {
+      setLastLog(new Date());
+      setResttime(restTime);
+    },
+    [setLastLog, setResttime]
+  );
+
   return (
-    <LogContext.Provider value={{ showImg, setShowImg }}>
+    <LogContext.Provider value={{ showImg, setShowImg, nextTab, logEx }}>
       <Stack.Screen
         options={{ title: `${currDay.name}`, headerShown: true, headerShadowVisible: false }}
       />
@@ -65,7 +128,7 @@ const ExerciseLogs = () => {
         renderScene={({ route }) => (
           <LogTab
             exercise={exercises[Number(route.key.split('-')[0])] as Exercise}
-            exPlanId={route.key.split('-')[1] as string}
+            planExercise={currDay.exercises[Number(route.key.split('-')[0])] as PlanExercise}
           />
         )}
         onIndexChange={setTab}
@@ -82,13 +145,19 @@ const ExerciseLogs = () => {
         )}
         swipeEnabled={true}
       />
+      {remainingRest > 0 && (
+        <XStack fill={false} className="absolute bottom-32 left-4 rounded bg-secondary py-2">
+          <Text className="text-lg uppercase">{t('workout.rest')}:</Text>
+          <Text className="text-lg">{remainingRest}</Text>
+        </XStack>
+      )}
     </LogContext.Provider>
   );
 };
 
-const LogTab = ({ exercise, exPlanId }: { exercise: Exercise; exPlanId: string }) => {
-  const history = useExerciseHistory(exercise.id!);
-  const { setShowImg } = useContext(LogContext);
+const LogTab = ({ exercise, planExercise }: { exercise: Exercise; planExercise: PlanExercise }) => {
+  const history = useExerciseHistory(planExercise);
+  const { setShowImg, nextTab, logEx } = useContext(LogContext);
 
   return (
     <SwipeGesture
@@ -101,23 +170,30 @@ const LogTab = ({ exercise, exPlanId }: { exercise: Exercise; exPlanId: string }
       }}>
       <View className="relative flex h-full w-full pb-24">
         <LogBanner exercise={exercise} />
+        <Toolbar exercise={exercise} planExercise={planExercise} />
         {history.type === 'reps_with_weight' ? (
           <RepWithWeightRecordForm
             prefill={history.record as RepWeightRecord[]}
-            exercisePlanId={exPlanId}
+            planExercise={planExercise}
             exId={exercise.id!}
+            nextTab={nextTab}
+            logEx={logEx}
           />
         ) : history.type === 'reps' ? (
           <RepRecordForm
             prefill={history.record as RepRecord[]}
-            exercisePlanId={exPlanId}
+            planExercise={planExercise}
             exId={exercise.id!}
+            nextTab={nextTab}
+            logEx={logEx}
           />
         ) : history.type === 'time' ? (
           <TimeRecordForm
             prefill={history.record as TimeRecord[]}
-            exercisePlanId={exPlanId}
+            planExercise={planExercise}
             exId={exercise.id!}
+            nextTab={nextTab}
+            logEx={logEx}
           />
         ) : (
           <></>
@@ -149,6 +225,107 @@ const LogBanner = ({ exercise }: { exercise: Exercise }) => {
         </Animated.Text>
       )}
     </View>
+  );
+};
+
+const Toolbar = ({
+  exercise,
+  planExercise,
+}: {
+  exercise: Exercise;
+  planExercise: PlanExercise;
+}) => {
+  const router = useRouter();
+  const colors = useColors();
+  const log = useWorkoutStore((s) => s.log);
+  const session = useWorkoutStore((s) => s.current);
+  const start = useWorkoutStore((s) => s.start);
+
+  const getRemarks = useCallback(() => {
+    return (
+      session?.exercises.find((ex) => ex.exercisePlanId === planExercise.localId)?.remarks || ''
+    );
+  }, [session]);
+
+  const [remarks, setRemarks] = useState(getRemarks());
+
+  useEffect(() => {
+    setRemarks(getRemarks());
+  }, [session]);
+
+  const handleLog = () => {
+    if (!session) {
+      start();
+      log({
+        exercises: [
+          {
+            exercisePlanId: planExercise.localId,
+            exerciseId: exercise.id as number,
+            record: (exercise.record_type === RecordType.cardio ? {} : []) as AnyRecord,
+            type: exercise.record_type,
+            finished: false,
+          },
+        ],
+      });
+    } else {
+      const ex = session.exercises;
+      let found = false;
+      for (const e of ex) {
+        if (e.exercisePlanId === planExercise.localId) {
+          e.remarks = remarks;
+          found = true;
+        }
+      }
+      if (!found) {
+        ex.push({
+          exercisePlanId: planExercise.localId,
+          exerciseId: exercise.id as number,
+          record: (exercise.record_type === RecordType.cardio ? {} : []) as AnyRecord,
+          type: exercise.record_type,
+          finished: false,
+        });
+      }
+      log({ exercises: ex });
+    }
+  };
+
+  return (
+    <XStack fill={false} justify="end" padding="none" gap="sm" className="py-0">
+      <Button
+        variant="ghost"
+        onPress={() => {
+          router.push(`/(zShare)/exercise/${exercise.id}`);
+        }}>
+        <ThemedIcon name="ChartColumn" color={colors.text} size={20} />
+      </Button>
+      <Dialog onOpenChange={handleLog}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" className="p-0">
+            <ThemedIcon name="NotebookPen" size={20} />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="min-w-96">
+          <DialogHeader>
+            <DialogTitle>{t('commont.remarks')}</DialogTitle>
+            <DialogDescription>
+              <Input
+                className="min-h-96 w-full"
+                placeholder={t('workout.enter_remark')}
+                value={remarks}
+                onChangeText={(s) => setRemarks(s)}
+              />
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button>
+                <Text>{t('common.finish')}</Text>
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </XStack>
   );
 };
 

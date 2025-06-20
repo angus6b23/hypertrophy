@@ -15,6 +15,7 @@ interface WorkoutAction {
   log: (data: Partial<Workout>) => void;
   update: (localId: string, data: Partial<Workout>) => void;
   remove: (localId: string) => void;
+  abandon: () => void;
 }
 export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
   persist<WorkoutState & WorkoutAction>(
@@ -69,6 +70,9 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
         set((prevState) => ({
           workouts: prevState.workouts.filter((item) => item.localId !== localId),
         })),
+      abandon: () => {
+        set({ current: null });
+      },
     }),
     { name: 'workoutStorage', storage: createJSONStorage(() => mmkvStorage) }
   )
