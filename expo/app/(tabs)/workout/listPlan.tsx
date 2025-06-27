@@ -97,22 +97,26 @@ const MyPlans = () => {
 
 const PlanDialog = () => {
   const ctx = useContext(MyPlansContext);
-  const workoutPlanStore = useWorkoutPlanStore();
+  const plans = useWorkoutPlanStore((state) => state.plans);
+  const add = useWorkoutPlanStore((state) => state.add);
+  const change = useWorkoutPlanStore((state) => state.change);
+  const update = useWorkoutPlanStore((state) => state.update);
+  const currentPlanId = useWorkoutPlanStore((state) => state.currentPlan);
   const router = useRouter();
   // Initial state for adding or editing plan dialog
-  const initState = {
+  const initState: Omit<Plan, 'localId' | 'days' | 'lastUpdate'> = {
     name: '',
     description: '',
     isWeekday: true,
     isPublic: true,
   };
   // State for saving form state
-  const [state, setState] = useState<Omit<Plan, 'localId' | 'days'>>(initState);
+  const [state, setState] = useState(initState);
 
   // Listen to context planId, set form state to selected plan when planId is not empty
   useEffect(() => {
     if (ctx.planId) {
-      const currentPlan = workoutPlanStore.plans.find((plan) => plan.localId === ctx.planId);
+      const currentPlan = plans.find((plan) => plan.localId === ctx.planId);
       if (currentPlan) {
         setState(currentPlan);
       } else {
@@ -127,27 +131,25 @@ const PlanDialog = () => {
     if (!ctx.planId) {
       localId = nanoid(10);
       const days: PlanDay[] = [];
-      const newPlan = { ...state, localId, days } as Plan;
-      workoutPlanStore.add(newPlan);
+      const newPlan = { ...state, localId, days, lastUpdate: new Date().toISOString() };
+      add(newPlan);
       toast.success(t('plan.plan_added'));
     } else {
       // Edit plan if current plan exist
       localId = ctx.planId;
-      const currentPlan = workoutPlanStore.plans.find(
-        (plan) => plan.localId === ctx.planId
-      ) as Plan;
-      workoutPlanStore.update(ctx.planId, { ...currentPlan, ...state });
+      const currentPlan = plans.find((plan) => plan.localId === ctx.planId) as Plan;
+      update(ctx.planId, { ...currentPlan, ...state });
       toast.success(t('plan.plan_modified'));
     }
     // Automatically set the current plan to new plan and redirect user back to workout page if no plan exists before
-    if (!workoutPlanStore.currentPlan) {
-      workoutPlanStore.change(localId);
+    if (!currentPlanId) {
+      change(localId);
       router.push('/(tabs)/workout');
     }
     ctx.setShowDialog(false);
     ctx.setPlanId('');
     setState(initState);
-  }, [ctx, state, workoutPlanStore]);
+  }, [ctx, state, plans]);
 
   return (
     <Dialog

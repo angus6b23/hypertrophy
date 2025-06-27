@@ -171,7 +171,7 @@ const LogTab = ({ exercise, planExercise }: { exercise: Exercise; planExercise: 
       <View className="relative flex h-full w-full pb-24">
         <LogBanner exercise={exercise} />
         <Toolbar exercise={exercise} planExercise={planExercise} />
-        {history.type === 'reps_with_weight' ? (
+        {history.type === RecordType.reps_with_weight ? (
           <RepWithWeightRecordForm
             prefill={history.record as RepWeightRecord[]}
             planExercise={planExercise}
@@ -179,7 +179,7 @@ const LogTab = ({ exercise, planExercise }: { exercise: Exercise; planExercise: 
             nextTab={nextTab}
             logEx={logEx}
           />
-        ) : history.type === 'reps' ? (
+        ) : history.type === RecordType.reps ? (
           <RepRecordForm
             prefill={history.record as RepRecord[]}
             planExercise={planExercise}
@@ -187,7 +187,7 @@ const LogTab = ({ exercise, planExercise }: { exercise: Exercise; planExercise: 
             nextTab={nextTab}
             logEx={logEx}
           />
-        ) : history.type === 'time' ? (
+        ) : history.type === RecordType.time ? (
           <TimeRecordForm
             prefill={history.record as TimeRecord[]}
             planExercise={planExercise}
@@ -203,7 +203,7 @@ const LogTab = ({ exercise, planExercise }: { exercise: Exercise; planExercise: 
   );
 };
 
-const LogBanner = ({ exercise }: { exercise: Exercise }) => {
+export const LogBanner = ({ exercise }: { exercise: Exercise }) => {
   const { showImg } = useContext(LogContext);
   return (
     <View className="relative">
@@ -228,7 +228,7 @@ const LogBanner = ({ exercise }: { exercise: Exercise }) => {
   );
 };
 
-const Toolbar = ({
+export const Toolbar = ({
   exercise,
   planExercise,
 }: {

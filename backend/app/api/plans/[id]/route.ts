@@ -1,7 +1,9 @@
 import {
+  deletePlanController,
   getPlanDetailsController,
   putPlanController,
 } from "@/controllers/plans";
 
 export const GET = getPlanDetailsController;
 export const PUT = putPlanController;
+export const DELETE = deletePlanController;

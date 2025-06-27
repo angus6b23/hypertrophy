@@ -10,7 +10,6 @@ const DebugPage = () => {
       <Stack.Screen options={{ headerShown: true }} />
       <Button
         onPress={() => {
-          console.log(workoutStore.workouts);
           workoutStore.end();
         }}>
         <Text>End Session</Text>

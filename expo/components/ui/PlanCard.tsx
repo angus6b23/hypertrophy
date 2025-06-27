@@ -20,7 +20,9 @@ import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
 import { useRouter } from 'expo-router';
 
 export const PlanCard = ({ plan }: { plan: Plan }) => {
-  const workoutPlanStore = useWorkoutPlanStore();
+  const currentPlan = useWorkoutPlanStore((s) => s.currentPlan);
+  const change = useWorkoutPlanStore((s) => s.change);
+
   const router = useRouter();
   const { t } = useTranslation();
   return (
@@ -35,15 +37,13 @@ export const PlanCard = ({ plan }: { plan: Plan }) => {
         <Text className="text-muted-foreground">{plan.description}</Text>
         <Button
           onPress={() => {
-            workoutPlanStore.change(plan.localId);
+            change(plan.localId);
             router.replace('/(tabs)/workout');
           }}
           className="mt-2 w-full"
-          disabled={workoutPlanStore.currentPlan === plan.localId}>
+          disabled={currentPlan === plan.localId}>
           <Text>
-            {workoutPlanStore.currentPlan === plan.localId
-              ? t('plan.current_plan')
-              : t('plan.set_as_current_plan')}
+            {currentPlan === plan.localId ? t('plan.current_plan') : t('plan.set_as_current_plan')}
           </Text>
         </Button>
       </CardContent>
@@ -55,7 +55,7 @@ export const CardDropDown = (props: { id: string }) => {
   const { t } = useTranslation();
   const colors = useColors();
   const ctx = useContext(MyPlansContext);
-  const workoutPlanStore = useWorkoutPlanStore();
+  const currentPlan = useWorkoutPlanStore((s) => s.currentPlan);
 
   return (
     <DropdownMenu>
@@ -79,7 +79,7 @@ export const CardDropDown = (props: { id: string }) => {
             <Text>{t('common.edit')}</Text>
           </XStack>
         </DropdownMenuItem>
-        {props.id !== workoutPlanStore.currentPlan && (
+        {props.id !== currentPlan && (
           <DropdownMenuItem
             onPress={() => {
               ctx.setPlanId(props.id);

@@ -1,14 +1,15 @@
 import { RecordType } from "../exercises/types/exercise";
 
 export interface Workout {
+  id?: number;
   startTime: Date;
   endTime?: Date;
   RPE?: number;
   localId: string;
-  remoteId?: number;
   exercises: ExerciseRecord[];
   remarks?: string;
   lastSetTime?: Date;
+  public?: boolean;
 }
 export type AnyRecord =
   | RepRecord[]

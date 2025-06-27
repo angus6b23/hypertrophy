@@ -5,9 +5,12 @@ import TabBarIcon from '../../components/TabBarIcon';
 
 import { NAV_THEME } from '~/utils/rn-reusables/constants';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -18,8 +21,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="workout"
         options={{
-          title: 'Workout',
+          title: t('common.workout'),
           tabBarIcon: ({ color }) => <TabBarIcon name="Dumbbell" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="exercise/index"
+        options={{
+          title: t('common.exercise'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="CalendarDays" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -38,14 +48,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="progress/index"
         options={{
-          title: 'Progress',
+          title: t('common.progress'),
           tabBarIcon: ({ color }) => <TabBarIcon name="CalendarDays" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="workout/listPlan"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

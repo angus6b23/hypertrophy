@@ -39,7 +39,7 @@ export const PlanDayContext = createContext({
 const WorkoutPage = () => {
   const { t } = useTranslation();
   const currentPlan = useCurrentPlan();
-  const { update } = useWorkoutPlanStore();
+  const update = useWorkoutPlanStore((s) => s.update);
   const [show, setShow] = useState(false);
   const [idx, setIdx] = useState(-1);
   const [showDelete, setShowDelete] = useState(false);
@@ -103,7 +103,9 @@ const WorkoutPage = () => {
 
 const AddDayDialog = () => {
   const { show, setShow, idx, setIdx } = useContext(PlanDayContext);
-  const workoutPlanStore = useWorkoutPlanStore();
+  const currentPlanId = useWorkoutPlanStore((s) => s.currentPlan);
+  const update = useWorkoutPlanStore((s) => s.update);
+
   const { t } = useTranslation();
   const currentPlan = useCurrentPlan();
 
@@ -128,7 +130,7 @@ const AddDayDialog = () => {
       return;
     }
     if (idx === -1) {
-      workoutPlanStore.update(workoutPlanStore.currentPlan, {
+      update(currentPlanId, {
         ...currentPlan,
         days: [...currentPlan.days, state],
       });
@@ -136,7 +138,7 @@ const AddDayDialog = () => {
     } else {
       const currentDays = currentPlan.days;
       const newDays = currentDays.map((day, i) => (i === idx ? state : day));
-      workoutPlanStore.update(workoutPlanStore.currentPlan, {
+      update(currentPlanId, {
         ...currentPlan,
         days: newDays,
       });
@@ -242,13 +244,14 @@ const DayDropdown = ({
 const DeleteConfirmDialog = () => {
   const { t } = useTranslation();
   const { idx, setIdx, setShowDelete, showDelete } = useContext(PlanDayContext);
-  const { update, currentPlan: storeCurrentPlan } = useWorkoutPlanStore();
-  const { isLoggedIn } = useAccountStore();
+  const update = useWorkoutPlanStore((s) => s.update);
+  const currentPlanId = useWorkoutPlanStore((s) => s.currentPlan);
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
   const currentPlan = useCurrentPlan();
 
   const handleDelete = useCallback(async () => {
     const newDays = currentPlan.days.filter((_day, i) => i !== idx);
-    update(storeCurrentPlan, { ...currentPlan, days: newDays });
+    update(currentPlanId, { ...currentPlan, days: newDays });
     if (isLoggedIn) {
       try {
         // TODO: Add plan workout remove to backend

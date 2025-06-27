@@ -1,11 +1,9 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { clsx } from 'clsx';
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { t } from 'i18next';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import exerciseDb from 'share/exercises/exercises.json';
@@ -19,10 +17,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Text } from '~/components/ui/text';
 import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
 import { useWorkoutStore } from '~/utils/stores/session-store';
-import { AnyRecord, ExerciseRecord } from 'share/interfaces/Records';
+import { ExerciseRecord } from 'share/interfaces/Records';
 import { FlashList } from '@shopify/flash-list';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
-import session from '../session';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -32,20 +29,14 @@ const ExerciseDetailPage = () => {
     exerciseDb.exercises.find((ex) => ex.id === Number(local.id as string))
   );
   const [tab, setTab] = useState('history');
-  const [displayBanner, setDisplayBanner] = useState(true);
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (e.nativeEvent.contentOffset.y > 50) {
-      setDisplayBanner(false);
-    }
-  }, []);
 
   return (
     <>
       <SafeAreaView className="relative flex-1">
         <Stack.Screen />
-        <ScrollView className="h-full w-full" onScroll={handleScroll} persistentScrollbar>
-          {displayBanner && <BannerImage path={exerciseRef.current!.path} />}
-          <YStack className={clsx({ 'mt-16': !displayBanner })}>
+        <ScrollView className="h-full w-full">
+          <BannerImage path={exerciseRef.current!.path} />
+          <YStack>
             <Text className="text-2xl font-bold">{exerciseRef.current!.name}</Text>
             <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="w-full flex-row">
@@ -73,14 +64,25 @@ const ExerciseDetailPage = () => {
 
 const FloatingButton = () => {
   const router = useRouter();
+  const colors = useColors();
+  const { id } = useLocalSearchParams();
+
   return (
-    <Button
-      variant="secondary"
-      size="floating"
-      onPress={() => router.back()}
-      className="absolute left-4 top-16 aspect-square rounded-full bg-foreground/60">
-      <ThemedIcon name="ChevronLeft" size={24} inverted />
-    </Button>
+    <>
+      <Button
+        variant="secondary"
+        size="floating"
+        onPress={() => router.back()}
+        className="absolute left-4 top-16 aspect-square rounded-full bg-foreground/60">
+        <ThemedIcon name="ChevronLeft" size={24} inverted />
+      </Button>
+      <Button
+        className="absolute bottom-4 right-4"
+        size="floating"
+        onPress={() => router.push(`/(zShare)/exercise/adhoc?id=${id as string}`)}>
+        <ThemedIcon name="Plus" color={colors.background} size={28} />
+      </Button>
+    </>
   );
 };
 
@@ -133,7 +135,7 @@ const ExerciseDetails = ({ ex }: { ex: Exercise }) => {
         {/* TODO: Fix Badge size, link not working for some reason */}
         <Pressable
           onTouchEnd={() => router.push(`/exercise/list?primaryMuscle=${ex.primaryMuscles}`)}>
-          <Badge variant="default" className="w-fit flex-none" onTouchEnd={(e) => console.log(e)}>
+          <Badge variant="default" className="w-fit flex-none">
             <Text className="text-md">{t(`exercise.${ex.primaryMuscles}`)}</Text>
           </Badge>
         </Pressable>
@@ -193,23 +195,25 @@ const ExerciseHistory = ({ id }: { id: number }) => {
     setDisplayCount((prev) => prev + 10);
   }, 200);
   return (
-    <FlashList
-      data={getLogs()}
-      keyExtractor={(_item, i) => i.toString()}
-      contentContainerStyle={{ paddingHorizontal: 0, paddingTop: 8, paddingBottom: 100 }}
-      ItemSeparatorComponent={() => <View className="h-4" />}
-      renderItem={(item) => (
-        <ExerciseRecordItem
-          record={item.item}
-          date={item.item.date}
-          options={{ showDate: true, showName: false, showImg: false }}
-        />
-      )}
-      ListEmptyComponent={() => <NoHistory />}
-      estimatedItemSize={10}
-      onEndReached={append}
-      onEndReachedThreshold={1}
-    />
+    <>
+      <FlashList
+        data={getLogs()}
+        keyExtractor={(_item, i) => i.toString()}
+        contentContainerStyle={{ paddingHorizontal: 0, paddingTop: 8, paddingBottom: 100 }}
+        ItemSeparatorComponent={() => <View className="h-4" />}
+        renderItem={(item) => (
+          <ExerciseRecordItem
+            record={item.item}
+            date={item.item.date}
+            options={{ showDate: true, showName: false, showImg: false }}
+          />
+        )}
+        ListEmptyComponent={() => <NoHistory />}
+        estimatedItemSize={10}
+        onEndReached={append}
+        onEndReachedThreshold={1}
+      />
+    </>
   );
 };
 

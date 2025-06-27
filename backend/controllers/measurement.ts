@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleError } from "../utils/handleError";
+import { handleError, handleSuccess } from "../utils/handleError";
 import {
   deleteMeasurement,
   getMeasurements,
@@ -24,7 +24,7 @@ export const getMeasurementsController = async (req: NextRequest) => {
       ? new Date(searchParams.get("to") as string)
       : currentDate;
     const records = await getMeasurements({ from, to, id });
-    return NextResponse.json({ status: "success", data: records });
+    return handleSuccess(records);
   } catch (err) {
     return handleError(err);
   }
@@ -50,8 +50,8 @@ export const postMeasurementsController = async (req: NextRequest) => {
     ) {
       throw new CustomError(MeasurementErrors.all_fields_empty, 400);
     }
-    const returnData = await insertMeasurement(data);
-    return NextResponse.json({ status: "success", data: returnData });
+    const res = await insertMeasurement(data);
+    return handleSuccess(res);
   } catch (err) {
     console.error(err);
     return handleError(err);
@@ -72,7 +72,7 @@ export const putMeasurementsController = async (
       throw new CustomError(MeasurementErrors.id_not_found, 400);
     }
     await updateMeasurement(data);
-    return NextResponse.json({ status: "success" });
+    return handleSuccess();
   } catch (err) {
     return handleError(err);
   }
@@ -86,7 +86,7 @@ export const deleteMeasurementsController = async (
     const ownerId = req.headers.get("x-user-id")!;
     const id = Number((await params).id);
     await deleteMeasurement(id, ownerId);
-    return NextResponse.json({ status: "success" });
+    return handleSuccess();
   } catch (err) {
     return handleError(err);
   }

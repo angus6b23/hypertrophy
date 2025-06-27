@@ -26,11 +26,12 @@
     "add": "新增",
     "edit": "編輯",
     "are_you_sure_to_delete_this_workout_plan": "",
-    "log": "",
     "history": "",
     "details": "",
     "exercises": "",
+    "finish": "",
     "update": "更新",
+    "abandon": "",
     "login": "",
     "options": "選項",
     "UI": "使用者介面",
@@ -39,6 +40,8 @@
     "light": "淺色",
     "dark": "深色",
     "language": "語言",
+    "log": "",
+    "remarks": "",
     "delete": "刪除",
     "day": "",
     "date": ""
@@ -67,11 +70,19 @@
   "workout": {
     "add_workout_day": "",
     "workout_day": "",
+    "no_history_found": "",
+    "do_some_workout": "",
     "add_exercise": "",
+    "rest": "",
+    "enter_remark": "",
+    "abondon_session": "",
+    "all_records_in_current_session_will_be_removed": "",
+    "are_you_sure_you_would_like_to_abandon_current_workout_session": "",
     "session_details": "",
     "duration": "",
     "exercises": "",
     "volume": "",
+    "session_completed": "",
     "end_session": "",
     "nothing": "",
     "very_easy": "",
@@ -84,13 +95,15 @@
     "extremely_hard": "",
     "maximal": "",
     "rpe": "",
+    "session_summary": "",
     "reps": "",
     "add_set": "",
     "seconds": "",
     "warmup_set": "",
     "normal_set": "",
     "drop_set": "",
-    "super_set": ""
+    "super_set": "",
+    "predicted_1rm": ""
   },
   "exercise": {
     "instruction": "",
@@ -101,6 +114,9 @@
     "mechanic": "",
     "equipment": "",
     "category": ""
+  },
+  "commont": {
+    "remarks": ""
   },
   "message": {
     "no_field_entered": "未輸入任何欄位",

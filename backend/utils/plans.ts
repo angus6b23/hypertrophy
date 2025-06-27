@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { db } from "@/db";
 import {
   Plan,
@@ -17,6 +19,7 @@ import {
   PlanDay as PlanDayType,
   PlanExercise,
 } from "share/interfaces/Workout";
+import z from "zod";
 
 export const getUserPlan = async (userId: string) => {
   const userPlans = await db
@@ -96,13 +99,8 @@ export const insertPlanDay = async (planDay: PlanDay) => {
   return newPlanDay;
 };
 
-export const insertPlanExercise = async (planExercise: PlanExercises) => {
-  const newPlanExercise = await db
-    .insert(planExercises)
-    .values(planExercise)
-    .returning()
-    .then(single);
-  return newPlanExercise;
+export const insertPlanExercises = async (planExercise: PlanExercises[]) => {
+  await db.insert(planExercises).values(planExercise);
 };
 
 export const deletePlan = async (id: number) => {
@@ -116,27 +114,39 @@ export const updatePlan = async (id: number, plan: Plan) => {
 };
 
 export const insertPlanPayload = async (payload: PlanType) => {
+  // Deconstruct day property from Plan
   const { days, ...rest }: { days: PlanDayType[]; rest: Omit<Plan, "days"> } =
     payload;
+  // Parse Plan and insert to db
   const plan = insertPlanSchema.parse(rest);
   const { id: planId } = await insertPlan(plan);
+
+  // Iterate through days
   for (const day of days) {
-    const dayWithPlanId = { ...day, planId };
     const {
       exercises,
       ...rest
-    }: { exercises: PlanExercise[]; rest: Omit<PlanDay, "exercises"> } =
-      dayWithPlanId;
-    const parsedDay = insertPlanDaysSchema.parse(rest);
-    const { id: dayId } = await insertPlanDay(parsedDay);
-    for (const exercise of exercises) {
-      const exerciseWithPlanDayId = { ...exercise, dayId };
-      const parsedExercise = insertPlanExercisesSchema.parse(
-        exerciseWithPlanDayId,
-      );
-      await insertPlanExercise(parsedExercise);
+    }: { exercises: PlanExercise[]; rest: Omit<PlanDay, "exercises"> } = {
+      ...day,
+      planId: planId,
+    };
+
+    const parsedDay = insertPlanDaysSchema.safeParse(rest);
+    if (!parsedDay.success) {
+      await deletePlan(planId);
+      throw new Error(parsedDay.error.message);
     }
+    const { id: dayId } = await insertPlanDay(parsedDay.data);
+    const parsedExercises = z
+      .array(insertPlanExercisesSchema)
+      .safeParse(exercises.map((e) => ({ ...e, dayId })));
+    if (!parsedExercises.success) {
+      await deletePlan(planId);
+      throw new Error(parsedExercises.error.message);
+    }
+    await insertPlanExercises(parsedExercises.data);
   }
+  return planId;
 };
 
 export const clearPlan = async (id: number) => {

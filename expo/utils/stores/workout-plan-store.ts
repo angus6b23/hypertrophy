@@ -28,7 +28,9 @@ export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>(
       update: (localId: string, data: Partial<Plan>) =>
         set((prevState) => ({
           plans: prevState.plans.map((item) =>
-            item.localId === localId ? { ...item, ...data } : item
+            item.localId === localId
+              ? { ...item, ...data, lastUpdate: new Date().toISOString() }
+              : item
           ),
         })),
       remove: (localId: string) =>

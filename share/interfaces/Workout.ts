@@ -8,6 +8,7 @@ export interface Plan {
   days: PlanDay[];
   isPublic: boolean;
   isWeekday: boolean;
+  lastUpdate: Date | string;
 }
 
 export interface PlanDay {

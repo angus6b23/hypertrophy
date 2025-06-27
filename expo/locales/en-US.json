@@ -26,11 +26,12 @@
     "add": "Add",
     "edit": "Edit",
     "are_you_sure_to_delete_this_workout_plan": "Are you sure to delete this workout plan",
-    "log": "Log",
     "history": "History",
     "details": "Details",
     "exercises": "Exercises",
+    "finish": "Finish",
     "update": "Update",
+    "abandon": "Abandon",
     "login": "Login",
     "options": "Options",
     "UI": "UI",
@@ -39,6 +40,8 @@
     "light": "Light",
     "dark": "Dark",
     "language": "Language",
+    "log": "Log",
+    "remarks": "Remarks",
     "delete": "Delete",
     "day": "Day",
     "date": "Date"
@@ -67,11 +70,19 @@
   "workout": {
     "add_workout_day": "Add workout day",
     "workout_day": "Workout day",
+    "no_history_found": "No history found",
+    "do_some_workout": "Do some workout",
     "add_exercise": "Add exercise",
+    "rest": "Rest",
+    "enter_remark": "Enter remark",
+    "abondon_session": "Abondon session",
+    "all_records_in_current_session_will_be_removed": "All records in current session will be removed",
+    "are_you_sure_you_would_like_to_abandon_current_workout_session": "Are you sure you would like to abandon current workout session",
     "session_details": "Session details",
     "duration": "Duration",
     "exercises": "Exercises",
     "volume": "Volume",
+    "session_completed": "Session completed",
     "end_session": "End session",
     "nothing": "Nothing",
     "very_easy": "Very easy",
@@ -84,13 +95,15 @@
     "extremely_hard": "Extremely hard",
     "maximal": "Maximal",
     "rpe": "RPE",
+    "session_summary": "Session summary",
     "reps": "Reps",
     "add_set": "Add set",
     "seconds": "Seconds",
     "warmup_set": "Warmup set",
     "normal_set": "Normal set",
     "drop_set": "Drop set",
-    "super_set": "Super set"
+    "super_set": "Super set",
+    "predicted_1rm": "Predicted 1rm"
   },
   "exercise": {
     "instruction": "Instruction",
@@ -101,6 +114,9 @@
     "mechanic": "Mechanic",
     "equipment": "Equipment",
     "category": "Category"
+  },
+  "commont": {
+    "remarks": "Remarks"
   },
   "message": {
     "no_field_entered": "No field entered",

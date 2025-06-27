@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { WeightUnit } from '~/types/units';
 import { round } from '~/utils/misc/round-numbers';
 import { RecordType } from 'share/exercises/types/exercise';
+import { predict1RM } from '~/utils/misc/rm-predict';
 
 interface ExerciseRecordOption {
   showImg?: boolean;
@@ -37,7 +38,6 @@ export const ExerciseRecordItem = ({
   options?: ExerciseRecordOption;
 }) => {
   const { t } = useTranslation();
-  console.log(record);
   options = { ...defaultExRecOption, ...options };
 
   const ex = exercises.find((ex) => ex.id === record.exerciseId)!;
@@ -76,6 +76,7 @@ export const ExerciseRecordItem = ({
 const RepWeightDisplay = ({ logs }: { logs: RepWeightRecord[] }) => {
   const preferredUnit = useOptionStore((s) => s.unit.workoutWeight);
   const { t } = useTranslation();
+  const max1RM = Math.max(...logs.map((log) => predict1RM(log)));
 
   return (
     <YStack fill={false} className="w-full bg-transparent" padding="none">
@@ -95,6 +96,11 @@ const RepWeightDisplay = ({ logs }: { logs: RepWeightRecord[] }) => {
           {log.type === SetType.dropset && <Text className="text-lg text-orange-500">D</Text>}
         </XStack>
       ))}
+      <Text className="text-lg uppercase">
+        {t('workout.predicted_1rm')}:
+        {preferredUnit === WeightUnit.lbs ? round(max1RM * 2.2) : max1RM}{' '}
+        {preferredUnit === WeightUnit.lbs ? t('unit.lbs') : t('unit.kg')}
+      </Text>
     </YStack>
   );
 };

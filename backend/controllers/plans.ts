@@ -1,4 +1,6 @@
-import { handleError } from "@/utils/handleError";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import { handleError, handleSuccess } from "@/utils/handleError";
 import {
   clearPlan,
   deletePlan,
@@ -8,7 +10,7 @@ import {
   getUserPlan,
   insertPlanPayload,
 } from "@/utils/plans";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   AuthErrors,
   CustomError,
@@ -24,10 +26,10 @@ export const getPlansController = async (req: NextRequest) => {
     if (queries.get("public")) {
       const cursor = Number(queries.get("page")) || 0;
       const plans = await getPublicPlans(cursor);
-      return NextResponse.json({ status: "success", data: plans });
+      return handleSuccess<Omit<Plan, "days">[]>(plans);
     } else {
       const plans = await getUserPlan(ownerId);
-      return NextResponse.json({ status: "success", data: plans });
+      return handleSuccess<Omit<Plan, "days">[]>(plans);
     }
   } catch (err) {
     return handleError(err);
@@ -39,8 +41,8 @@ export const postPlansController = async (req: NextRequest) => {
     const ownerId = req.headers.get("x-user-id")!;
     const json = await req.json();
     const data = { ...json, ownerId };
-    await insertPlanPayload(data);
-    return NextResponse.json({ status: "success" });
+    const id = await insertPlanPayload(data);
+    return handleSuccess({ id });
   } catch (err) {
     console.error(err);
     return handleError(err);
@@ -48,7 +50,7 @@ export const postPlansController = async (req: NextRequest) => {
 };
 
 export const deletePlanController = async (
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
@@ -56,7 +58,7 @@ export const deletePlanController = async (
     const numberId = Number(id);
     if (isNaN(numberId)) throw new CustomError(PathErrors.id_invalid, 400);
     await deletePlan(numberId);
-    return NextResponse.json({ status: "success" });
+    return handleSuccess();
   } catch (err) {
     return handleError(err);
   }
@@ -77,10 +79,7 @@ export const getPlanDetailsController = async (
     if (!planDetail.id) throw new CustomError(PathErrors.id_not_found, 404);
     if (planDetail.ownerId !== ownerId || !planDetail.isPublic)
       throw new CustomError(AuthErrors.unauthorized_access, 403);
-    return NextResponse.json({
-      status: "success",
-      data: planDetail,
-    });
+    return handleSuccess<Plan>(planDetail);
   } catch (err) {
     return handleError(err);
   }
@@ -102,11 +101,8 @@ export const putPlanController = async (
       throw new CustomError(AuthErrors.unauthorized_access, 403);
 
     await clearPlan(Number(id));
-    await insertPlanPayload({ ...json, ownerId, id: Number(id) });
-
-    return NextResponse.json({
-      status: "success",
-    });
+    const newId = await insertPlanPayload({ ...json, ownerId, id: Number(id) });
+    return handleSuccess({ id: newId });
   } catch (err) {
     console.error(err);
     return handleError(err);

@@ -40,7 +40,7 @@ export const useExerciseHistory = (
     type: SetType.normal,
   }) as RepRecord[];
 
-  const defaultTimeRecord = new Array().fill({ time: 60 }) as TimeRecord[];
+  const defaultTimeRecord = new Array(exercise.targetSets || 3).fill({ time: 60 }) as TimeRecord[];
 
   const defaultCardioRecord = {
     time: 30 * 60,

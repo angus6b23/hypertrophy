@@ -3,6 +3,7 @@ import axios from 'axios';
 import { backendAuth } from './auth';
 import { backendMeasurement } from './measurement';
 import { instance } from '../stores/account-store';
+import { plans } from './plans';
 
 interface Response<T> {
   success: boolean;
@@ -14,6 +15,7 @@ export class backend {
   static url = instance;
   static auth = backendAuth;
   static measurement = backendMeasurement;
+  static plans = plans;
 
   static getBackendStatus = async (): Promise<Response<unknown>> => {
     try {

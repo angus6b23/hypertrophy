@@ -20,3 +20,10 @@ export const handleError = (err: unknown) => {
     );
   }
 };
+
+export function handleSuccess<T>(payload?: T) {
+  return NextResponse.json({
+    status: "success",
+    ...(payload !== undefined && { data: payload }),
+  });
+}
