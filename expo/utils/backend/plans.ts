@@ -2,7 +2,7 @@ import axios from 'axios';
 import { backendAuth } from './auth';
 import { Plan } from 'share/interfaces/Workout';
 import { BackendResponse } from 'share/interfaces/Backend';
-import { handleRes } from './handleBackendResponse';
+import { unwrapBackend } from './unwrap';
 
 export class plans {
   static getUserPlans = async () => {
@@ -10,7 +10,7 @@ export class plans {
       '/api/plans',
       await backendAuth.axiosOption(true)
     );
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
 
   static getPublicPlans = async () => {
@@ -18,39 +18,39 @@ export class plans {
       ...(await backendAuth.axiosOption()),
       params: { public: true },
     });
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
 
-  static getPlanDetails = async (id: number) => {
+  static getDetails = async (id: number) => {
     const res = await axios.get<BackendResponse<Plan>>(
       `/api/plans/${id}`,
       await backendAuth.axiosOption(true)
     );
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
 
-  static addPlan = async (payload: Plan) => {
-    const res = await axios.post<BackendResponse<never>>(
+  static add = async (payload: Plan) => {
+    const res = await axios.post<BackendResponse<{ id: number }>>(
       'api/plans',
       payload,
       await backendAuth.axiosOption(true)
     );
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
 
-  static updatePlan = async (id: number, payload: Partial<Plan>) => {
+  static update = async (id: number, payload: Partial<Plan>) => {
     const res = await axios.put<BackendResponse<never>>(
       `api/plans/${id}`,
       payload,
       await backendAuth.axiosOption(true)
     );
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
-  static deletePlan = async (id: number) => {
+  static delete = async (id: number) => {
     const res = await axios.delete<BackendResponse<never>>(
       `api/plans/${id}`,
       await backendAuth.axiosOption(true)
     );
-    return handleRes(res.data);
+    return unwrapBackend(res.data);
   };
 }

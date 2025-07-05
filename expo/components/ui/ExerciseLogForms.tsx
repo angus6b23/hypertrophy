@@ -172,6 +172,8 @@ export const RepWithWeightRecordForm = ({
               </View>
               <Text className="text-lg">{i + 1}</Text>
               <Input
+                inputMode="numeric"
+                keyboardType="numeric"
                 className="w-20 text-center"
                 placeholder={row.weight.toString()}
                 editable={i <= pointer}
@@ -185,6 +187,8 @@ export const RepWithWeightRecordForm = ({
               )}
               <Text className="text-lg">x</Text>
               <Input
+                inputMode="numeric"
+                keyboardType="numeric"
                 className="w-20 text-center"
                 placeholder={row.reps.toString()}
                 editable={i <= pointer}
@@ -331,6 +335,7 @@ export const RepRecordForm = ({
               </View>
               <Text className="text-lg">{i + 1}</Text>
               <Input
+                inputMode="numeric"
                 className="mx-4 w-20 flex-1 text-center"
                 placeholder={row.reps.toString()}
                 editable={i <= pointer}
@@ -467,6 +472,7 @@ export const TimeRecordForm = ({
             </View>
             <Text className="text-lg">{i + 1}</Text>
             <Input
+              inputMode="numeric"
               className="mx-4 w-20 flex-1 text-center"
               placeholder={row.time.toString()}
               editable={i <= pointer}

@@ -21,6 +21,9 @@ export default function Home() {
         <Button variant="secondary" size="lg" onPress={() => router.push('/(zShare)/debug')}>
           <Text>Debug</Text>
         </Button>
+        <Button variant="secondary" size="lg" onPress={() => router.push('/(zShare)/sync')}>
+          <Text>Sync</Text>
+        </Button>
       </View>
     </>
   );

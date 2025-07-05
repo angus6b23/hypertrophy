@@ -8,6 +8,10 @@ import { PlanExercise } from 'share/interfaces/Workout';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { nanoid } from 'nanoid/non-secure';
+import { useOptionStore } from '~/utils/stores/option-store';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { toast } from 'sonner-native';
+import { backend } from '~/utils/backend';
 
 export const AddExerciseContext = createContext<{
   exSet: number[];
@@ -24,26 +28,45 @@ const AddExercisePage = () => {
 
   const [exSet, setExSet] = useState<number[]>([]);
   const currentPlan = useCurrentPlan();
-  const workoutPlanStore = useWorkoutPlanStore();
+  const update = useWorkoutPlanStore((s) => s.update);
+  const defaultReps = useOptionStore((s) => s.workout.defaultReps);
+  const defaultSets = useOptionStore((s) => s.workout.defaultSets);
+  const defaultRest = useOptionStore((s) => s.workout.defaultRest);
+  const loggedIn = useAccountStore((s) => s.isLoggedIn);
+
   const router = useRouter();
-  const handleAdd = useCallback(() => {
+
+  const handleAdd = useCallback(async () => {
     const addEx = exSet.map(
       (val) =>
         ({
           localId: nanoid(),
           exerciseId: val,
-          targetReps: 10,
-          targetSets: 3,
+          targetReps: defaultReps,
+          targetSets: defaultSets,
+          restTime: defaultRest,
         }) as PlanExercise
     );
     const newEx = [...currentPlan.days[idx].exercises!, ...addEx];
-    workoutPlanStore.update(currentPlan.localId, {
+    update(currentPlan.localId, {
       ...currentPlan,
       days: currentPlan.days.map((d, i) => (i === idx ? { ...d, exercises: newEx } : d)),
     });
+    if (loggedIn) {
+      try {
+        if (currentPlan.id) {
+          backend.plans.update(currentPlan.id, currentPlan);
+        } else {
+          const res = await backend.plans.add(currentPlan);
+          update(currentPlan.localId, res, false);
+        }
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
+    }
     setExSet([]);
     router.dismiss();
-  }, [exSet, currentPlan]);
+  }, [exSet, currentPlan, loggedIn, defaultReps, defaultSets, defaultRest]);
 
   const AddButton = () => {
     const { t } = useTranslation();

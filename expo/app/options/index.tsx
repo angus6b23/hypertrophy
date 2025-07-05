@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { createContext, useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { toast } from 'sonner-native';
 
 import { OptionListItem } from './option-list-item';
@@ -27,6 +27,7 @@ import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
+import { RepDialog, RestDialog, SetDialogs } from '~/components/ui/OptionDialogs';
 
 const OptionContext = createContext({
   showLogoutDialog: false,
@@ -45,6 +46,7 @@ function OptionPage() {
           <YStack gap="lg">
             <AccountSetting />
             <UISettings />
+            <WorkoutSetting />
             <UnitSettings />
             <DataSettings />
           </YStack>
@@ -265,6 +267,45 @@ const LogoutDialog = () => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const WorkoutSetting = () => {
+  const { t } = useTranslation();
+  const [setDiag, setSetDiag] = useState(false);
+  const [repDiag, setRepDiag] = useState(false);
+  const [restDiag, setRestDiag] = useState(false);
+
+  const workoutSetting = useOptionStore((s) => s.workout);
+  return (
+    <>
+      <Text className="text-xl">{t('option.workout_settings')}</Text>
+      <List>
+        <ListItem
+          icon={<ThemedIcon name="Logs" />}
+          action={() => setSetDiag(true)}
+          select={<Text className="text-right">{workoutSetting.defaultSets}</Text>}>
+          <Text className="text-lg">{t('option.default_sets')}</Text>
+        </ListItem>
+        <ListItem
+          icon={<ThemedIcon name="Tally5" />}
+          action={() => setRepDiag(true)}
+          select={<Text className="text-right">{workoutSetting.defaultReps}</Text>}>
+          <Text className="text-lg">{t('option.default_reps')}</Text>
+        </ListItem>
+        <ListItem
+          icon={<ThemedIcon name="Timer" />}
+          action={() => setRestDiag(true)}
+          select={<Text className="text-right">{workoutSetting.defaultRest}</Text>}>
+          <Text className="text-lg">{t('option.default_rest_time')}</Text>
+        </ListItem>
+      </List>
+      <View className="h-0">
+        <SetDialogs open={setDiag} setOpen={setSetDiag} />
+        <RestDialog open={restDiag} setOpen={setRestDiag} />
+        <RepDialog open={repDiag} setOpen={setRepDiag} />
+      </View>
+    </>
   );
 };
 export default OptionPage;

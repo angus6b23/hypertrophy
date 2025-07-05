@@ -5,16 +5,17 @@ import {
   InsertWorkoutRecordSchema,
   InsertWorkoutSchema,
   SelectWorkoutRecordSchema,
+  SelectWorkoutSchema,
+  UpdateWorkoutSchema,
   workoutRecords,
   workouts,
 } from "@/db/schema/workouts";
 import { eq } from "drizzle-orm";
 import { single } from "./db-helper";
 
-interface WorkoutResposne extends SelectWorkoutRecordSchema {
+interface WorkoutResponse extends SelectWorkoutSchema {
   exercises: Omit<SelectWorkoutRecordSchema, "workoutId">[];
 }
-
 export const getUserWorkouts = async (ownerId: string) => {
   const res = await db
     .select()
@@ -29,7 +30,7 @@ export const getUserWorkoutsWithRecords = async (ownerId: string) => {
     .from(workouts)
     .where(eq(workouts.ownerId, ownerId))
     .leftJoin(workoutRecords, eq(workouts.id, workoutRecords.workoutId));
-  const res = rows.reduce<WorkoutResposne[]>((acc, row) => {
+  const res = rows.reduce<WorkoutResponse[]>((acc, row) => {
     const workout = row.workouts;
     const { workoutId, ...exercise } = row[
       "workouts-exercise"
@@ -69,6 +70,22 @@ export const addWorkoutRecord = async (
     .values(data.map((d) => ({ ...d, workoutId })));
 };
 
+export const updateWorkout = async (data: UpdateWorkoutSchema, id: number) => {
+  const { id: _id, ownerId, ...rest } = data;
+  await db
+    .update(workouts)
+    .set(rest)
+    .where(eq(workouts.id, id))
+    .returning()
+    .then(single);
+};
+
 export const deleteWorkout = async (workoutId: number) => {
   await db.delete(workouts).where(eq(workouts.id, workoutId));
+};
+
+export const deleteWorkoutRecords = async (workoutId: number) => {
+  await db
+    .delete(workoutRecords)
+    .where(eq(workoutRecords.workoutId, workoutId));
 };

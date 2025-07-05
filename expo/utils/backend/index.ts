@@ -4,6 +4,7 @@ import { backendAuth } from './auth';
 import { backendMeasurement } from './measurement';
 import { instance } from '../stores/account-store';
 import { plans } from './plans';
+import { workouts } from './workouts';
 
 interface Response<T> {
   success: boolean;
@@ -16,6 +17,7 @@ export class backend {
   static auth = backendAuth;
   static measurement = backendMeasurement;
   static plans = plans;
+  static workouts = workouts;
 
   static getBackendStatus = async (): Promise<Response<unknown>> => {
     try {

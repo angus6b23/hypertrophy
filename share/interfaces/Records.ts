@@ -9,6 +9,7 @@ export interface Workout {
   exercises: ExerciseRecord[];
   remarks?: string;
   lastSetTime?: Date;
+  lastUpdate: Date;
   public?: boolean;
 }
 export type AnyRecord =

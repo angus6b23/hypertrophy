@@ -49,11 +49,13 @@ export const planExercises = pgTable("plan_exercises", {
 });
 
 export const insertPlanSchema = createInsertSchema(plans);
-export type Plan = z.infer<typeof insertPlanSchema>;
+export type InsertPlanSchema = z.infer<typeof insertPlanSchema>;
 export const insertPlanDaysSchema = createInsertSchema(planDays);
-export type PlanDay = z.infer<typeof insertPlanDaysSchema>;
+export type insertPlanDaysSchema = z.infer<typeof insertPlanDaysSchema>;
 export const insertPlanExercisesSchema = createInsertSchema(planExercises);
-export type PlanExercises = z.infer<typeof insertPlanExercisesSchema>;
+export type insertPlanExercisesSchema = z.infer<
+  typeof insertPlanExercisesSchema
+>;
 export const updatePlanSchema = createUpdateSchema(plans);
 export const updatePlanDaysSchema = createUpdateSchema(planDays);
 export const updatePlanExercisesSchema = createUpdateSchema(planExercises);

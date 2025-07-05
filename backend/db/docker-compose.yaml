@@ -14,3 +14,4 @@ services:
     user: 1000:1000
     ports:
       - 5432:5432
+    restart: unless-stopped

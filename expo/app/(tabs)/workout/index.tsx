@@ -26,6 +26,7 @@ import { toast } from 'sonner-native';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
+import { backend } from '~/utils/backend';
 
 export const PlanDayContext = createContext({
   show: false,
@@ -254,13 +255,20 @@ const DeleteConfirmDialog = () => {
     update(currentPlanId, { ...currentPlan, days: newDays });
     if (isLoggedIn) {
       try {
-        // TODO: Add plan workout remove to backend
-      } catch {}
+        if (currentPlan.id) {
+          backend.plans.update(currentPlan.id, currentPlan);
+        } else {
+          const res = await backend.plans.add(currentPlan);
+          update(currentPlanId, res, false);
+        }
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
     }
     setShowDelete(false);
     setIdx(-1);
     toast.success(t('common.delete_success'));
-  }, [idx]);
+  }, [idx, currentPlan, currentPlanId, isLoggedIn]);
 
   return (
     <Dialog

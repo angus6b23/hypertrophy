@@ -11,7 +11,7 @@ interface WorkoutPlanState {
 interface WorkoutPlanAction {
   add: (data: Plan) => void;
   change: (newPlanId: string) => void;
-  update: (localId: string, data: Partial<Plan>) => void;
+  update: (localId: string, data: Partial<Plan>, update?: boolean) => void;
   remove: (localId: string) => void;
 }
 export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>()(
@@ -25,11 +25,15 @@ export const useWorkoutPlanStore = create<WorkoutPlanAction & WorkoutPlanState>(
         set(() => ({
           currentPlan: newPlanId,
         })),
-      update: (localId: string, data: Partial<Plan>) =>
+      update: (localId: string, data: Partial<Plan>, updateTimestamp = true) =>
         set((prevState) => ({
           plans: prevState.plans.map((item) =>
             item.localId === localId
-              ? { ...item, ...data, lastUpdate: new Date().toISOString() }
+              ? {
+                  ...item,
+                  ...data,
+                  ...(updateTimestamp && { lastUpdate: new Date() }),
+                }
               : item
           ),
         })),

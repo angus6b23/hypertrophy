@@ -13,8 +13,9 @@ interface WorkoutAction {
   start: () => void;
   end: (rpe?: number) => void;
   log: (data: Partial<Workout>) => void;
-  update: (localId: string, data: Partial<Workout>) => void;
+  update: (localId: string, data: Partial<Workout>, updateTimeStamp?: boolean) => void;
   remove: (localId: string) => void;
+  add: (data: Workout) => void;
   abandon: () => void;
 }
 export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
@@ -29,6 +30,7 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
             startTime: new Date(),
             localId: nanoid(10),
             exercises: [],
+            lastUpdate: new Date(),
           },
         });
       },
@@ -44,9 +46,10 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
                 endTime: new Date(
                   Math.min(
                     Date.now(),
-                    new Date(prevState.current!.startTime as string).getTime() + 4 * 3600 * 1000
+                    new Date(prevState.current!.startTime).getTime() + 4 * 3600 * 1000
                   )
                 ),
+                lastUpdate: new Date(),
                 RPE: rpe,
               } as Workout,
             ],
@@ -57,19 +60,23 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
       log: (data: Partial<Workout>) => {
         set((prevState) => ({
           ...prevState,
-          current: { ...prevState.current!, ...data },
+          current: { ...prevState.current!, ...data, lastUpdate: new Date() },
         }));
       },
-      update: (localId: string, data: Partial<Workout>) =>
+      update: (localId: string, data: Partial<Workout>, updateTimeStamp = true) =>
         set((prevState) => ({
           workouts: prevState.workouts.map((item) =>
-            item.localId === localId ? { ...item, ...data } : item
+            item.localId === localId
+              ? { ...item, ...data, ...(updateTimeStamp && { lastUpdate: new Date() }) }
+              : item
           ),
         })),
       remove: (localId: string) =>
         set((prevState) => ({
           workouts: prevState.workouts.filter((item) => item.localId !== localId),
         })),
+      add: (workout: Workout) =>
+        set((prevState) => ({ workouts: [...prevState.workouts, workout] })),
       abandon: () => {
         set({ current: null });
       },

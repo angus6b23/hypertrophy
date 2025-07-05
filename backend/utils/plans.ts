@@ -21,6 +21,13 @@ import {
 } from "share/interfaces/Workout";
 import z from "zod";
 
+/**
+ * Get plans created by user from db
+ *
+ * @param userId - id of the user
+ * @returns Plan[]
+ *
+ */
 export const getUserPlan = async (userId: string) => {
   const userPlans = await db
     .select()
@@ -29,6 +36,12 @@ export const getUserPlan = async (userId: string) => {
   return userPlans;
 };
 
+/**
+ * Get plans checked for public from db
+ *
+ * @returns Plan[]
+ *
+ */
 export const getPublicPlans = async (cursor = 0) => {
   const publicPlans = await db
     .select()
@@ -39,6 +52,13 @@ export const getPublicPlans = async (cursor = 0) => {
   return publicPlans;
 };
 
+/**
+ * Get the userid of a given plan id
+ *
+ * @param id - id of a plan
+ * @returns userid: string
+ *
+ */
 export const getPlanOnwer = async (id: number) => {
   const plan = await db
     .select()
@@ -115,10 +135,12 @@ export const updatePlan = async (id: number, plan: Plan) => {
 
 export const insertPlanPayload = async (payload: PlanType) => {
   // Deconstruct day property from Plan
-  const { days, ...rest }: { days: PlanDayType[]; rest: Omit<Plan, "days"> } =
-    payload;
+  const { days, ...rest } = payload;
   // Parse Plan and insert to db
-  const plan = insertPlanSchema.parse(rest);
+  const plan = insertPlanSchema.parse({
+    ...rest,
+    lastUpdate: new Date(rest.lastUpdate),
+  });
   const { id: planId } = await insertPlan(plan);
 
   // Iterate through days

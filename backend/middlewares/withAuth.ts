@@ -3,7 +3,12 @@ import { MiddlewareFactory } from "./stackHandler";
 import { AuthErrors } from "share/interfaces/error-codes";
 import { verifyTokenJose } from "@/utils/jwt";
 
-const PATHS_REQUIRE_AUTH = ["/api/measurement", "/api/me", "/api/plans"];
+const PATHS_REQUIRE_AUTH = [
+  "/api/measurement",
+  "/api/me",
+  "/api/plans",
+  "/api/workouts",
+];
 
 export const withAuth: MiddlewareFactory = (next) => {
   return async (req: NextRequest, _next: NextFetchEvent) => {

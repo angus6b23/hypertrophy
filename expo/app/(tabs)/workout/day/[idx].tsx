@@ -31,6 +31,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from '~/components/ui/dialog';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { backend } from '~/utils/backend';
+import { toast } from 'sonner-native';
 
 const DayCotext = createContext({
   showEdit: false,
@@ -52,13 +55,14 @@ const ExerciseDay = () => {
   const updateWorkout = useWorkoutPlanStore((s) => s.update);
   const currSession = useWorkoutStore((s) => s.current);
   const colors = useColors();
+  const loggedIn = useAccountStore((s) => s.isLoggedIn);
 
   useEffect(() => {
     setCurrentDay(currentPlan.days[idx]);
   }, [idx, currentPlan]);
 
   const handleDrag = useCallback(
-    (d: DragEndParams<PlanExercise>) => {
+    async (d: DragEndParams<PlanExercise>) => {
       updateWorkout(currentPlan.localId, {
         ...currentPlan,
         days: currentPlan.days.map((day, i) =>
@@ -70,12 +74,24 @@ const ExerciseDay = () => {
               }
         ),
       });
+      if (loggedIn) {
+        try {
+          if (currentPlan.id) {
+            backend.plans.update(currentPlan.id, currentPlan);
+          } else {
+            const res = await backend.plans.add(currentPlan);
+            updateWorkout(currentPlan.localId, res, false);
+          }
+        } catch (err) {
+          toast.error((err as Error).message);
+        }
+      }
     },
-    [currentDay, currentPlan, idx]
+    [currentDay, currentPlan, idx, loggedIn]
   );
 
   const handleDelete = useCallback(
-    (id: string) => {
+    async (id: string) => {
       updateWorkout(currentPlan.localId, {
         ...currentPlan,
         days: currentPlan.days.map((day, i) =>
@@ -87,8 +103,21 @@ const ExerciseDay = () => {
               }
         ),
       });
+
+      if (loggedIn) {
+        try {
+          if (currentPlan.id) {
+            backend.plans.update(currentPlan.id, currentPlan);
+          } else {
+            const res = await backend.plans.add(currentPlan);
+            updateWorkout(currentPlan.localId, res, false);
+          }
+        } catch (err) {
+          toast.error((err as Error).message);
+        }
+      }
     },
-    [currentDay, currentPlan, idx]
+    [currentDay, currentPlan, idx, loggedIn]
   );
 
   return (
@@ -118,7 +147,7 @@ const ExerciseDay = () => {
                     drag={item.drag}
                     href={`/(zShare)/exercise/logs?day=${idx}&exercise=${item.getIndex()}&exercisePlanId=${item.item.localId}`}
                     size={96}
-                    className="max-w-64 rounded-lg bg-muted"
+                    className="w-full max-w-96 flex-1 rounded-lg bg-muted"
                   />
                   {currSession &&
                     currSession.exercises.find((ex) => item.item.localId! === ex.exercisePlanId)

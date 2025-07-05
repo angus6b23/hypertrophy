@@ -9,7 +9,7 @@ import {
 } from "backend/utils/auth";
 import { AuthErrors } from "share/interfaces/error-codes";
 import { generateOIDCRedirectURL } from "backend/utils/oidc";
-import { handleError } from "../utils/handleError";
+import { handleError, handleSuccess } from "../utils/handleError";
 
 const loginBodySchema = z.object({
   username: z
@@ -40,7 +40,7 @@ export const loginController = async (req: NextRequest) => {
     const body = loginBodySchema.parse(await req.json());
     const id = await verifyPassword(body.username, body.password);
     const tokens = signJWT(id);
-    return NextResponse.json({ status: "success", data: tokens });
+    return handleSuccess(tokens);
   } catch (err) {
     return handleError(err);
   }
@@ -50,7 +50,7 @@ export const signUpController = async (req: NextRequest) => {
   try {
     const body = signUpBodySchema.parse(await req.json());
     await createUser(body);
-    return NextResponse.json({ status: "success" });
+    return handleSuccess();
   } catch (err) {
     return handleError(err);
   }
@@ -67,7 +67,7 @@ export const refreshTokenController = async (req: NextRequest) => {
       refreshToken: true,
     });
     const tokens = signJWT(id);
-    return NextResponse.json({ status: "success", data: tokens });
+    return handleSuccess(tokens);
   } catch (err) {
     return handleError(err);
   }
@@ -87,7 +87,7 @@ export const meController = async (req: NextRequest) => {
   try {
     const id = req.headers.get("x-user-id")!;
     const user = await getUser(id);
-    return NextResponse.json({ status: "success", data: user });
+    return handleSuccess(user);
   } catch (err) {
     return handleError(err);
   }

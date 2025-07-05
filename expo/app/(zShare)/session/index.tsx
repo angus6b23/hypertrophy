@@ -29,13 +29,18 @@ import { FlashList } from '@shopify/flash-list';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
 import { toast } from 'sonner-native';
 import { AbandonDialog } from './AbandonSessionDialog';
+import { backend } from '~/utils/backend';
+import { useAccountStore } from '~/utils/stores/account-store';
 
 const SessionPage = () => {
   const { t } = useTranslation();
   const colors = useColors();
   const router = useRouter();
   const session = useWorkoutStore((s) => s.current);
-  const endSession = useWorkoutStore((s) => s.end);
+  const workouts = useWorkoutStore((s) => s.workouts);
+  const end = useWorkoutStore((s) => s.end);
+  const update = useWorkoutStore((s) => s.update);
+  const loggedIn = useAccountStore((s) => s.isLoggedIn);
   const preferredUnit = useOptionStore((s) => s.unit.workoutWeight);
 
   const [remark, setRemark] = useState(false);
@@ -45,6 +50,7 @@ const SessionPage = () => {
   }
 
   const [rpe, setRpe] = useState(5);
+
   const getSessionVolume = useCallback(() => {
     const volume = session!.exercises.reduce((acc, ex) => {
       if (ex.type === 'reps_with_weight') {
@@ -55,6 +61,21 @@ const SessionPage = () => {
     }, 0);
     return preferredUnit === WeightUnit.kg ? round(volume) : round(volume / 2);
   }, [session, preferredUnit]);
+
+  const endSession = useCallback(async () => {
+    end(rpe);
+    router.replace('/');
+    toast.success(t('workout.session_completed'));
+    if (loggedIn) {
+      try {
+        const lastSession = workouts[workouts.length - 1];
+        const res = await backend.workouts.add(lastSession);
+        update(lastSession.localId, { id: res.id }, false);
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    }
+  }, [rpe]);
 
   return (
     <>
@@ -114,13 +135,7 @@ const SessionPage = () => {
         <View className="absolute bottom-12 flex w-full flex-col gap-2 bg-background px-4 pb-4 pt-2">
           <RPESlider rpe={rpe} setRpe={setRpe} />
           <XStack fill={false} padding="none">
-            <Button
-              className="flex-1"
-              onPress={() => {
-                endSession(rpe);
-                router.replace('/');
-                toast.success(t('workout.session_completed'));
-              }}>
+            <Button className="flex-1" onPress={endSession}>
               <Text>{t('workout.end_session')}</Text>
             </Button>
             <RemarkDialog remarkDiag={remark} setRemarkDiag={setRemark} />

@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { decodeJwt } from 'jose';
 
 import { backend } from '.';
+import { unwrapBackend } from './unwrap';
 
 export class backendAuth {
   static axiosOption = async (auth = false) => {
@@ -21,11 +22,12 @@ export class backendAuth {
   };
 
   static signUp = async (username: string, password: string, displayName: string) => {
-    await axios.post(
+    const { data } = await axios.post(
       '/api/auth/signup',
       { username, password, displayName },
       await this.axiosOption()
     );
+    return unwrapBackend(data);
   };
 
   static login = async (username: string, password: string) => {
@@ -56,10 +58,15 @@ export class backendAuth {
 
   static me = async () => {
     const res = await axios.get('api/me', await this.axiosOption(true));
-    return {
-      username: res.data.data.username as string,
-      displayName: res.data.data.displayName as string,
-    };
+    return unwrapBackend<{
+      id: string;
+      username: string;
+      displayName: string;
+      createdAt: Date;
+      isOIDC: boolean;
+      oidcEmail?: string;
+      isDiabled: boolean;
+    }>(res.data);
   };
 
   static readAccessToken = async (): Promise<string> => {

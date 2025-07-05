@@ -25,6 +25,7 @@ import {
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
+import { backend } from '~/utils/backend';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
@@ -102,6 +103,8 @@ const PlanDialog = () => {
   const change = useWorkoutPlanStore((state) => state.change);
   const update = useWorkoutPlanStore((state) => state.update);
   const currentPlanId = useWorkoutPlanStore((state) => state.currentPlan);
+  const loggedIn = useAccountStore((state) => state.isLoggedIn);
+
   const router = useRouter();
   // Initial state for adding or editing plan dialog
   const initState: Omit<Plan, 'localId' | 'days' | 'lastUpdate'> = {
@@ -125,7 +128,7 @@ const PlanDialog = () => {
     }
   }, [ctx.planId]);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     let localId;
     // Add plan if current plan does not exist
     if (!ctx.planId) {
@@ -134,6 +137,14 @@ const PlanDialog = () => {
       const newPlan = { ...state, localId, days, lastUpdate: new Date().toISOString() };
       add(newPlan);
       toast.success(t('plan.plan_added'));
+      if (loggedIn) {
+        try {
+          const res = await backend.plans.add(newPlan);
+          update(newPlan.localId, { id: res.id }, false);
+        } catch (error) {
+          toast.error((error as Error).message);
+        }
+      }
     } else {
       // Edit plan if current plan exist
       localId = ctx.planId;
@@ -146,9 +157,9 @@ const PlanDialog = () => {
       change(localId);
       router.push('/(tabs)/workout');
     }
+    setState(initState);
     ctx.setShowDialog(false);
     ctx.setPlanId('');
-    setState(initState);
   }, [ctx, state, plans]);
 
   return (
@@ -218,15 +229,19 @@ const PlanDialog = () => {
 const DeleteConfirmDialog = () => {
   const { t } = useTranslation();
   const ctx = useContext(MyPlansContext);
-  const { remove } = useWorkoutPlanStore();
+  const remove = useWorkoutPlanStore((s) => s.remove);
+  const plans = useWorkoutPlanStore((s) => s.plans);
   const { isLoggedIn } = useAccountStore();
 
   const handleDelete = useCallback(async () => {
+    const id = plans.find((plan) => plan.localId === ctx.planId)!.id as number;
     remove(ctx.planId);
     if (isLoggedIn) {
       try {
-        // TODO: Add plan workout remove to backend
-      } catch {}
+        await backend.plans.delete(id);
+      } catch (err) {
+        toast.error((err as Error).message);
+      }
     }
     ctx.setShowDeleteDialog(false);
     ctx.setPlanId('');

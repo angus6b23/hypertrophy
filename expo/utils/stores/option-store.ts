@@ -8,6 +8,11 @@ import { Locales } from '~/utils/i18next/resources';
 type State = {
   theme: 'light' | 'dark' | 'system';
   language: Locales;
+  workout: {
+    defaultSets: number;
+    defaultRest: number;
+    defaultReps: number;
+  };
   unit: {
     workoutWeight: WeightUnit;
     measurementWeight: WeightUnit;
@@ -19,6 +24,7 @@ type Action = {
   changeTheme: (theme: State['theme']) => void;
   changeLanguage: (lang: State['language']) => void;
   changeUnit: (type: keyof State['unit'], payload: WeightUnit | LengthUnit) => void;
+  modify: (data: Partial<State>) => void;
 };
 
 export const useOptionStore = create<State & Action>()(
@@ -26,6 +32,11 @@ export const useOptionStore = create<State & Action>()(
     (set) => ({
       theme: 'system',
       language: 'en-US',
+      workout: {
+        defaultSets: 3,
+        defaultReps: 10,
+        defaultRest: 60,
+      },
       unit: {
         workoutWeight: WeightUnit.kg,
         measurementWeight: WeightUnit.kg,
@@ -35,6 +46,7 @@ export const useOptionStore = create<State & Action>()(
       changeLanguage: (lang) => set(() => ({ language: lang })),
       changeUnit: (type, payload) =>
         set((prevState) => ({ unit: { ...prevState.unit, [type]: payload } })),
+      modify: (data) => set(() => data),
     }),
     {
       name: 'optionStorage',

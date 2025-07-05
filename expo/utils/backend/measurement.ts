@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Measurement } from 'share/interfaces/Measurements';
 
 import { backend } from '.';
+import { unwrapBackend } from './unwrap';
 
 export class backendMeasurement {
   static add = async (measurement: Measurement) => {
@@ -10,19 +11,24 @@ export class backendMeasurement {
       measurement,
       await backend.auth.axiosOption(true)
     );
-    return res.data.data.id as number;
+    return unwrapBackend<{ id: number }>(res.data);
   };
 
   static delete = async (remoteId: number) => {
-    await axios.delete(`/api/measurement/${remoteId}`, await backend.auth.axiosOption(true));
+    const { data } = await axios.delete(
+      `/api/measurement/${remoteId}`,
+      await backend.auth.axiosOption(true)
+    );
+    return unwrapBackend(data);
   };
 
   static update = async (measurement: Measurement) => {
     if (!measurement.remoteId) return;
-    await axios.put(
+    const { data } = await axios.put(
       `api/measurement/${measurement.remoteId}`,
       measurement,
       await backend.auth.axiosOption(true)
     );
+    return unwrapBackend(data);
   };
 }
