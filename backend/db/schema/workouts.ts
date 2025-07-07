@@ -7,6 +7,7 @@ import {
   boolean,
   json,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { exercises, recordTypeEnum } from "./exercise";
@@ -17,19 +18,25 @@ import {
 } from "drizzle-zod";
 import z from "zod";
 
-export const workouts = pgTable("workouts", {
-  id: serial().primaryKey().unique().notNull(),
-  localId: text().notNull(),
-  startTime: timestamp().notNull(),
-  endTime: timestamp().notNull(),
-  rpe: integer(),
-  remarks: text(),
-  ownerId: uuid()
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  public: boolean().notNull().default(false),
-  lastUpdate: timestamp().defaultNow().notNull(),
-});
+export const workouts = pgTable(
+  "workouts",
+  {
+    id: serial().primaryKey().unique().notNull(),
+    localId: text().notNull(),
+    startTime: timestamp().notNull(),
+    endTime: timestamp().notNull(),
+    rpe: integer(),
+    remarks: text(),
+    ownerId: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    public: boolean().notNull().default(false),
+    lastUpdate: timestamp().defaultNow().notNull(),
+  },
+  (table) => ({
+    uniqueIds: unique("owner_localId_unique").on(table.localId, table.ownerId),
+  }),
+);
 
 export const workoutRecords = pgTable("workouts-exercise", {
   id: serial().primaryKey().unique().notNull(),

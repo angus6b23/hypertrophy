@@ -93,7 +93,12 @@ const checkOwnership = async (id: number, ownerId: string) => {
  */
 export const updateMeasurement = async (data: UpdateMeasurement) => {
   await checkOwnership(data.id!, data.ownerId!);
-  await db.update(measurements).set(data).where(eq(measurements.id, data.id!));
+  return await db
+    .update(measurements)
+    .set(data)
+    .where(eq(measurements.id, data.id!))
+    .returning()
+    .then(single);
 };
 
 export const deleteMeasurement = async (id: number, ownerId: string) => {

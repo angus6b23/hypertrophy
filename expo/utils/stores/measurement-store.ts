@@ -8,7 +8,7 @@ interface State {
 }
 interface Action {
   add: (data: Measurement) => void;
-  update: (localId: string, data: Partial<Measurement>) => void;
+  update: (localId: string, data: Partial<Measurement>, updateTimeStamp?: boolean) => void;
   delete: (localId: string) => void;
 }
 export const useMeasurementStore = create<State & Action>()(
@@ -16,10 +16,12 @@ export const useMeasurementStore = create<State & Action>()(
     (set) => ({
       data: [],
       add: (newData: Measurement) => set((prevState) => ({ data: [newData, ...prevState.data] })),
-      update: (localId: string, data: Partial<Measurement>) =>
+      update: (localId: string, data: Partial<Measurement>, updateTimeStamp = true) =>
         set((prevState) => ({
           data: prevState.data.map((item) =>
-            item.localId === localId ? { ...item, ...data } : item
+            item.localId === localId
+              ? { ...item, ...data, ...(updateTimeStamp && { lastUpdate: new Date() }) }
+              : item
           ),
         })),
       delete: (localId: string) =>

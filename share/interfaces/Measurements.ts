@@ -1,6 +1,6 @@
 export interface Measurement {
   date: Date;
-  remoteId?: number | null;
+  id?: number | null;
   weight?: number | null;
   height?: number | null;
   bodyFat?: number | null;
@@ -8,4 +8,5 @@ export interface Measurement {
   waist?: number | null;
   hip?: number | null;
   localId: string;
+  lastUpdate: Date;
 }

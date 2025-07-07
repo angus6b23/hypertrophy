@@ -17,9 +17,11 @@ export const getMeasurementsController = async (req: NextRequest) => {
     const id = req.headers.get("x-user-id")!;
     const currentDate = new Date();
     const { searchParams } = new URL(req.url);
+    // Default from 1 week
     const from = searchParams.get("from")
       ? new Date(searchParams.get("from") as string)
       : new Date(currentDate.getTime() - 7 * 24 * 3600 * 1000);
+    // Default to current time
     const to = searchParams.get("to")
       ? new Date(searchParams.get("to") as string)
       : currentDate;
@@ -53,7 +55,6 @@ export const postMeasurementsController = async (req: NextRequest) => {
     const res = await insertMeasurement(data);
     return handleSuccess(res);
   } catch (err) {
-    console.error(err);
     return handleError(err);
   }
 };
@@ -71,8 +72,8 @@ export const putMeasurementsController = async (
     if (!data.id) {
       throw new CustomError(MeasurementErrors.id_not_found, 400);
     }
-    await updateMeasurement(data);
-    return handleSuccess();
+    const res = await updateMeasurement(data);
+    return handleSuccess({ id: res.id });
   } catch (err) {
     return handleError(err);
   }

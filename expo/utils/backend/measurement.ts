@@ -23,12 +23,20 @@ export class backendMeasurement {
   };
 
   static update = async (measurement: Measurement) => {
-    if (!measurement.remoteId) return;
+    if (!measurement.id) return;
     const { data } = await axios.put(
-      `api/measurement/${measurement.remoteId}`,
+      `api/measurement/${measurement.id}`,
       measurement,
       await backend.auth.axiosOption(true)
     );
     return unwrapBackend(data);
+  };
+
+  static get = async () => {
+    const res = await axios.get('/api/measurement', {
+      ...(await backend.auth.axiosOption(true)),
+      params: { from: new Date(0) },
+    });
+    return unwrapBackend<Measurement[]>(res.data);
   };
 }

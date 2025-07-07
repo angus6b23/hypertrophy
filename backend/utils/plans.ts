@@ -2,24 +2,22 @@
 
 import { db } from "@/db";
 import {
-  Plan,
-  PlanDay,
-  PlanExercises,
   planDays,
   plans,
   planExercises,
   insertPlanDaysSchema,
   insertPlanExercisesSchema,
   insertPlanSchema,
+  InsertPlanSchema,
+  InsertPlanDaysSchema,
+  InsertPlanExercisesSchema,
+  UpdatePlanSchema,
 } from "@/db/schema/plans";
 import { and, asc, eq, gt } from "drizzle-orm";
 import { single } from "./db-helper";
-import {
-  Plan as PlanType,
-  PlanDay as PlanDayType,
-  PlanExercise,
-} from "share/interfaces/Workout";
+import { Plan, PlanDay, PlanExercise } from "share/interfaces/Workout";
 import z from "zod";
+import { nanoid } from "nanoid";
 
 /**
  * Get plans created by user from db
@@ -74,30 +72,40 @@ export const getPlanDetails = async (id: number) => {
     .select()
     .from(plans)
     .where(eq(plans.id, id))
-    .innerJoin(planDays, eq(plans.id, planDays.planId))
-    .innerJoin(planExercises, eq(planDays.id, planExercises.dayId));
+    .leftJoin(planDays, eq(plans.id, planDays.planId))
+    .leftJoin(planExercises, eq(planDays.id, planExercises.dayId));
   const reducedPlan = plan.reduce((acc, row) => {
-    const day: PlanDayType = {
-      ...row.plan_days,
-      exercises: [row.plan_exercises],
-    };
+    let day: PlanDay | null = null;
+    if (row.plan_days) {
+      day = {
+        ...row.plan_days,
+        exercises: row.plan_exercises
+          ? [{ ...row.plan_exercises, localId: nanoid(5) }]
+          : [],
+      };
+    }
+
+    if (!day) {
+      acc = { ...row.plans, days: [] };
+      return acc;
+    }
 
     if (!acc.id) {
       acc = { ...row.plans, days: [day] };
     } else {
-      const accDay = acc.days.find((d) => d.id === day.id);
+      const accDay = acc.days.find((d) => d.id === day?.id);
       if (!accDay) {
         acc.days.push(day);
-      } else {
-        accDay.exercises.push(row.plan_exercises);
+      } else if (row.plan_exercises) {
+        accDay.exercises.push({ ...row.plan_exercises, localId: nanoid(5) });
       }
     }
     return acc;
-  }, {} as PlanType);
+  }, {} as Plan);
   return reducedPlan;
 };
 
-export const insertPlan = async (plan: Plan) => {
+export const insertPlan = async (plan: InsertPlanSchema) => {
   const newPlan = await db
     .insert(plans)
     .values(plan)
@@ -110,7 +118,7 @@ export const insertPlan = async (plan: Plan) => {
   return newPlan;
 };
 
-export const insertPlanDay = async (planDay: PlanDay) => {
+export const insertPlanDay = async (planDay: InsertPlanDaysSchema) => {
   const newPlanDay = await db
     .insert(planDays)
     .values(planDay)
@@ -119,7 +127,9 @@ export const insertPlanDay = async (planDay: PlanDay) => {
   return newPlanDay;
 };
 
-export const insertPlanExercises = async (planExercise: PlanExercises[]) => {
+export const insertPlanExercises = async (
+  planExercise: InsertPlanExercisesSchema[],
+) => {
   await db.insert(planExercises).values(planExercise);
 };
 
@@ -127,13 +137,13 @@ export const deletePlan = async (id: number) => {
   await db.delete(plans).where(eq(plans.id, id));
 };
 
-export const updatePlan = async (id: number, plan: Plan) => {
+export const updatePlan = async (id: number, plan: UpdatePlanSchema) => {
   // Deconstruct id and ownerId, disallowing chaning of these fields
   const { id: _id, ownerId: _ownerId, ...planData } = plan;
   await db.update(plans).set(planData).where(eq(plans.id, id));
 };
 
-export const insertPlanPayload = async (payload: PlanType) => {
+export const insertPlanPayload = async (payload: Plan) => {
   // Deconstruct day property from Plan
   const { days, ...rest } = payload;
   // Parse Plan and insert to db
@@ -145,12 +155,9 @@ export const insertPlanPayload = async (payload: PlanType) => {
 
   // Iterate through days
   for (const day of days) {
-    const {
-      exercises,
-      ...rest
-    }: { exercises: PlanExercise[]; rest: Omit<PlanDay, "exercises"> } = {
+    const { exercises, ...rest } = {
       ...day,
-      planId: planId,
+      planId,
     };
 
     const parsedDay = insertPlanDaysSchema.safeParse(rest);

@@ -33,6 +33,7 @@ export const measurements = pgTable(
     ownerId: uuid()
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    lastUpdate: timestamp().defaultNow().notNull(),
   },
   (table) => ({
     uniqueIds: unique("owner_localId_unique").on(table.localId, table.ownerId),
@@ -78,4 +79,3 @@ export const UpdateMeasurementSchema = createUpdateSchema(
   measurementConstraints,
 );
 export type UpdateMeasurement = z.infer<typeof UpdateMeasurementSchema>;
-export type Measurement = Omit<SelectMeasurements, "ownerId">;

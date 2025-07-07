@@ -3,7 +3,7 @@ import { Label } from '@rn-primitives/dropdown-menu';
 import { InsertMeasurementSchema } from 'backend/db/schema/measurements';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { nanoid } from 'nanoid/non-secure';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, TouchableOpacity, View, StyleSheet } from 'react-native';
 import RNPickerSelect, { Item } from 'react-native-picker-select';
@@ -25,32 +25,34 @@ import { useOptionStore } from '~/utils/stores/option-store';
 
 export const MeasurementModal = () => {
   const { t } = useTranslation();
-  const measurementStore = useMeasurementStore();
+  // Store states and functions
+  const data = useMeasurementStore((state) => state.data);
+  const add = useMeasurementStore((state) => state.add);
+  const update = useMeasurementStore((state) => state.update);
   const preferredUnit = useOptionStore((state) => state.unit);
-  const { isLoggedIn } = useAccountStore();
-  const { language } = useOptionStore();
-  const router = useRouter();
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
+  const language = useOptionStore((s) => s.language);
 
+  const router = useRouter();
   const { id } = useLocalSearchParams();
-  let record: Measurement | undefined = undefined;
-  if (id) {
-    record = measurementStore.data.find((item) => item.localId === id);
-  }
-  const recordExist = useRef(record !== undefined);
-  const initState: Measurement = recordExist.current
-    ? ({ ...record, date: new Date(record!.date) } as Measurement)
-    : {
-        date: new Date(),
-        remoteId: null,
-        localId: nanoid(10),
-        weight: null,
-        height: null,
-        bodyFat: null,
-        chest: null,
-        waist: null,
-        hip: null,
-      };
-  const [state, setState] = useState(initState);
+
+  // State for form
+  const [state, setState] = useState<Measurement>({
+    date: new Date(),
+    id: null,
+    localId: nanoid(10),
+    weight: null,
+    height: null,
+    bodyFat: null,
+    chest: null,
+    waist: null,
+    hip: null,
+    lastUpdate: new Date(),
+  });
+
+  // State for existing record
+  const [recordExist, setRecordExist] = useState(false);
+  // State for units in form
   const [unit, setUnits] = useState({
     weight: preferredUnit.measurementWeight,
     height: preferredUnit.measurementLength,
@@ -58,7 +60,19 @@ export const MeasurementModal = () => {
     waist: preferredUnit.measurementLength,
     hip: preferredUnit.measurementLength,
   });
+  // State for date picker dispaly
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Search for record and form state when id changes
+  useEffect(() => {
+    if (id) {
+      const record = data.find((item) => item.localId === id);
+      if (record) {
+        setRecordExist(true);
+        setState(record);
+      }
+    }
+  }, [id, data]);
 
   const handleUnitChange = useCallback(
     (type: keyof typeof unit, newUnit: WeightUnit | LengthUnit) => {
@@ -74,6 +88,7 @@ export const MeasurementModal = () => {
     [setState]
   );
   const handleSubmit = useCallback(async () => {
+    // Helper Function for handling conversion of units
     const unitChange = (data: Measurement) => {
       data.weight = data.weight ? toKg(Number(data.weight), unit.weight) : null;
       data.height = data.height ? toCm(Number(data.height), unit.height) : null;
@@ -83,53 +98,60 @@ export const MeasurementModal = () => {
       data.waist = data.waist ? toCm(Number(data.waist), unit.waist) : null;
       return data;
     };
-    const result = InsertMeasurementSchema.extend({ remoteId: z.number().nullable().optional() })
-      .omit({ ownerId: true })
-      .safeParse(unitChange(state));
+    // Parse and validate data
+    const result = InsertMeasurementSchema.omit({ id: true, ownerId: true }).safeParse(
+      unitChange(state)
+    );
+
+    // Throw error if parsing not success
     if (!result.success || !result.data) {
       toast.error(result.error.errors[0].message);
       console.error(result.error);
       return;
     }
+    // Remove null fields from result
     removeNullValues(result.data);
+
     const newRecord = result.data as Measurement;
+    // Check for fields entered (date, localId and any one of the field)
     if (Object.keys(newRecord!).length < 3) {
       toast.error(t('message.no_field_entered'));
       return;
     }
-    if (recordExist.current) {
-      measurementStore.update(newRecord.localId, newRecord);
+
+    // Update records locally and remotely
+    if (recordExist) {
+      update(newRecord.localId, newRecord);
       if (isLoggedIn) {
         try {
-          if (newRecord.remoteId) {
+          if (newRecord.id) {
             await backend.measurement.update(newRecord);
           } else {
-            const remoteId = await backend.measurement.add(newRecord);
-            measurementStore.update(newRecord.localId, { remoteId });
+            const res = await backend.measurement.add(newRecord);
+            update(newRecord.localId, res);
           }
-        } catch {
-          measurementStore.update(newRecord.localId, newRecord);
+        } catch (error) {
+          toast.error((error as Error).message);
         }
-      } else {
-        measurementStore.update(newRecord.localId, newRecord);
       }
       toast.success(t('message.meaasurement_updated'));
       router.back();
     } else {
+      // Add new record locally and remotely
+      add(newRecord);
       if (isLoggedIn) {
         try {
-          const remoteId = await backend.measurement.add(newRecord);
-          measurementStore.add({ ...newRecord, remoteId });
-        } catch {
-          measurementStore.add(newRecord);
+          const res = await backend.measurement.add(newRecord);
+          update(newRecord.localId, res);
+        } catch (err) {
+          toast.error((err as Error).message);
         }
-      } else {
-        measurementStore.add(newRecord);
       }
       toast.success(t('message.measurement_added'));
       router.dismissAll();
     }
   }, [state, unit]);
+
   const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
       width: 100,
@@ -161,7 +183,7 @@ export const MeasurementModal = () => {
         }}
         name={t('measurement.add_measurements')}
       />
-      <YStack padding="lg" justify="between">
+      <YStack padding="lg" justify="between" className="pb-16">
         <ScrollView
           className="w-full "
           contentContainerStyle={{
@@ -172,12 +194,15 @@ export const MeasurementModal = () => {
           <TouchableOpacity
             className="flex w-full flex-col gap-2"
             onPress={() => setShowDatePicker(true)}>
-            <Label className="text-lg font-bold">{t('measurement.date')}</Label>
-            <Label className="text-lg">{state.date.toLocaleDateString(language)}</Label>
+            <Label className="text-lg font-bold text-foreground">{t('measurement.date')}</Label>
+            <Label className="text-lg text-foreground">
+              {state.date.toLocaleDateString(language)}
+            </Label>
             {showDatePicker && (
               <DateTimePicker
                 value={state.date}
                 mode="date"
+                maximumDate={new Date()}
                 onChange={(_e, date) => {
                   setShowDatePicker(false);
                   handleFormChange('date', date || new Date());
@@ -289,7 +314,7 @@ export const MeasurementModal = () => {
         </ScrollView>
         <YStack padding="none" justify="end" fill={false} className="w-full">
           <Button className="w-full" onPress={handleSubmit}>
-            <Text>{recordExist.current ? t('common.update') : t('common.add')} </Text>
+            <Text>{recordExist ? t('common.update') : t('common.add')} </Text>
           </Button>
         </YStack>
       </YStack>

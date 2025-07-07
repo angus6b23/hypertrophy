@@ -84,5 +84,5 @@ export const exercises = pgTable("exercises", {
 
 export const InsertExerciseSchema = createInsertSchema(exercises);
 export type Exercise = z.infer<typeof InsertExerciseSchema>;
-const SelectExerciseSchema = createSelectSchema(exercises);
+export const SelectExerciseSchema = createSelectSchema(exercises);
 export type DbExercise = z.infer<typeof SelectExerciseSchema>;

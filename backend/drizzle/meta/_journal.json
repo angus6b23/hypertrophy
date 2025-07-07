@@ -36,6 +36,13 @@
       "when": 1745610312390,
       "tag": "0004_melted_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1751908632385,
+      "tag": "0005_cool_ricochet",
+      "breakpoints": true
     }
   ]
 }
