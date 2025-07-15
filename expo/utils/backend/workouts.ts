@@ -30,9 +30,9 @@ export class workouts {
     return unwrapBackend(data);
   };
 
-  static update = async (id: number, payload: Partial<Workout>) => {
+  static update = async (localId: string, payload: Partial<Workout>) => {
     const { data } = await axios.put(
-      `/api/workouts/${id}`,
+      `/api/workouts/${localId}`,
       payload,
       await backendAuth.axiosOption(true)
     );

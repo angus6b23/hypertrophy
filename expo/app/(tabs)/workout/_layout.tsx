@@ -3,14 +3,41 @@ import { useWorkoutStore } from '~/utils/stores/session-store';
 import { View } from 'react-native';
 import { Workout } from 'share/interfaces/Records';
 import { Text } from '~/components/ui/text';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { minutesPassed } from '~/utils/misc/time';
 import { XStack } from '~/components/ui/Stacks';
 import { useTranslation } from 'react-i18next';
 import { Button } from '~/components/ui/button';
+import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
+import { backend } from '~/utils/backend';
+import { Plan } from 'share/interfaces/Workout';
+import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
+import { useAccountStore } from '~/utils/stores/account-store';
 
 export default function Layout() {
   const currWorkout = useWorkoutStore((s) => s.current);
+  const currentPlan = useCurrentPlan();
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
+  const planId = useRef(currentPlan.localId);
+  const updatePlan = useWorkoutPlanStore((s) => s.update);
+
+  const addPlan = useCallback(async (plan: Plan) => {
+    const res = await backend.plans.add(plan);
+    updatePlan(plan.localId, res, false);
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (currentPlan.localId !== planId.current) {
+        planId.current = currentPlan.localId;
+      } else if (currentPlan.id) {
+        backend.plans.update(currentPlan.localId, currentPlan);
+      } else {
+        addPlan(currentPlan);
+      }
+    }
+  }, [currentPlan, addPlan]);
+
   return (
     <>
       <Stack screenOptions={{ headerShown: false }} />;

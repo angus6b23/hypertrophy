@@ -4,6 +4,7 @@ import { handleError, handleSuccess } from "@/utils/handleError";
 import {
   clearPlan,
   deletePlan,
+  getPlanByLocalId,
   getPlanDetails,
   getPlanOnwer,
   getPublicPlans,
@@ -50,14 +51,16 @@ export const postPlansController = async (req: NextRequest) => {
 };
 
 export const deletePlanController = async (
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  req: NextRequest,
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
-    const { id } = await params;
-    const numberId = Number(id);
-    if (isNaN(numberId)) throw new CustomError(PathErrors.id_invalid, 400);
-    await deletePlan(numberId);
+    const ownerId = req.headers.get("x-user-id")!;
+    const { localId } = await params;
+
+    if (!localId) throw new CustomError(PathErrors.id_invalid, 400);
+
+    await deletePlan(localId, ownerId);
     return handleSuccess();
   } catch (err) {
     return handleError(err);
@@ -66,15 +69,15 @@ export const deletePlanController = async (
 
 export const getPlanDetailsController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id");
-    const { id } = await params;
+    const { localId } = await params;
     // Check if id is number
-    if (isNaN(Number(id))) throw new CustomError(PathErrors.id_invalid, 400);
+    if (!localId) throw new CustomError(PathErrors.id_invalid, 400);
     // Fetch Plan
-    const planDetail = await getPlanDetails(Number(id));
+    const planDetail = await getPlanDetails(localId, ownerId);
     // Check id exist in plan and plan ownership
     if (!planDetail.id) throw new CustomError(PathErrors.id_not_found, 404);
     if (planDetail.ownerId !== ownerId || !planDetail.isPublic)
@@ -87,18 +90,16 @@ export const getPlanDetailsController = async (
 
 export const putPlanController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
     const json: Plan = await req.json();
     // Check if id is number
-    const { id } = await params;
-    if (isNaN(Number(id))) throw new CustomError(PathErrors.id_invalid, 400);
-    // Check id exist in plan and plan ownership
-    const planOwner = await getPlanOnwer(Number(id));
-    if (planOwner !== ownerId)
-      throw new CustomError(AuthErrors.unauthorized_access, 403);
+    const { localId } = await params;
+    if (!localId) throw new CustomError(PathErrors.id_invalid, 400);
+    const plan = await getPlanByLocalId(localId, ownerId);
+    const { id } = plan;
 
     await clearPlan(Number(id));
     const newId = await insertPlanPayload({ ...json, ownerId, id: Number(id) });

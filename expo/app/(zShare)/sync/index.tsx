@@ -59,8 +59,7 @@ export default function SyncPage() {
         const res = await backend.plans.add(p);
         updatePlan(p.localId, res, false);
       } else if (new Date(rp.lastUpdate).getTime() < new Date(p.lastUpdate).getTime() && p.id) {
-        console.log('updating plan');
-        await backend.plans.update(p.id, p);
+        await backend.plans.update(p.localId, p);
       }
     }
   }, [plans]);
@@ -81,7 +80,7 @@ export default function SyncPage() {
         const res = await backend.workouts.add(w);
         updateWorkout(w.localId, res, false);
       } else if (new Date(rw.lastUpdate).getTime() < new Date(w.lastUpdate).getTime() && w.id) {
-        await backend.workouts.update(w.id, w);
+        await backend.workouts.update(w.localId, w);
       }
     }
   }, [workouts]);

@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextRequest } from "next/server";
 import { handleError, handleSuccess } from "../utils/handleError";
 import {
   deleteMeasurement,
+  getMeasurementByLocalId,
   getMeasurements,
   insertMeasurement,
   updateMeasurement,
@@ -61,18 +63,16 @@ export const postMeasurementsController = async (req: NextRequest) => {
 
 export const putMeasurementsController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
     const json = await req.json();
-    const id = Number((await params).id);
-    const body = { ...json, id, date: new Date(json.date), ownerId };
+    const localId = (await params).localId;
+    const body = { ...json, date: new Date(json.date), ownerId };
     const data = UpdateMeasurementSchema.parse(body);
-    if (!data.id) {
-      throw new CustomError(MeasurementErrors.id_not_found, 400);
-    }
-    const res = await updateMeasurement(data);
+    const record = await getMeasurementByLocalId({ ownerId, localId });
+    const res = await updateMeasurement(record.id, data);
     return handleSuccess({ id: res.id });
   } catch (err) {
     return handleError(err);
@@ -81,12 +81,13 @@ export const putMeasurementsController = async (
 
 export const deleteMeasurementsController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
-    const id = Number((await params).id);
-    await deleteMeasurement(id, ownerId);
+    const localId = (await params).localId;
+    const { id } = await getMeasurementByLocalId({ ownerId, localId });
+    await deleteMeasurement(id);
     return handleSuccess();
   } catch (err) {
     return handleError(err);

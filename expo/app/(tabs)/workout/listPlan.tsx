@@ -83,11 +83,11 @@ const MyPlans = () => {
           data={workoutPlanStore.plans}
           renderItem={(item) => <PlanCard plan={item.item} />}
           ItemSeparatorComponent={() => <View className="h-4" />}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12, paddingBottom: 48 }}
         />
         <Button
           size="floating"
-          className="absolute bottom-6 right-6"
+          className="absolute bottom-16 right-6"
           onPress={() => setShowDialog(true)}>
           <ThemedIcon name="Plus" size={26} inverted />
         </Button>
@@ -230,15 +230,13 @@ const DeleteConfirmDialog = () => {
   const { t } = useTranslation();
   const ctx = useContext(MyPlansContext);
   const remove = useWorkoutPlanStore((s) => s.remove);
-  const plans = useWorkoutPlanStore((s) => s.plans);
   const { isLoggedIn } = useAccountStore();
 
   const handleDelete = useCallback(async () => {
-    const id = plans.find((plan) => plan.localId === ctx.planId)!.id as number;
     remove(ctx.planId);
     if (isLoggedIn) {
       try {
-        await backend.plans.delete(id);
+        await backend.plans.delete(ctx.planId);
       } catch (err) {
         toast.error((err as Error).message);
       }

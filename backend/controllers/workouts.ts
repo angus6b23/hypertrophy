@@ -11,17 +11,13 @@ import {
   addWorkoutRecord,
   deleteWorkout,
   deleteWorkoutRecords,
-  getSingleWorkout,
   getUserWorkouts,
   getUserWorkoutsWithRecords,
+  getWorkoutByLocalId,
   updateWorkout,
 } from "@/utils/workouts";
 import { NextRequest } from "next/server";
-import {
-  AuthErrors,
-  CustomError,
-  PathErrors,
-} from "share/interfaces/error-codes";
+import { CustomError, PathErrors } from "share/interfaces/error-codes";
 import { Workout } from "share/interfaces/Records";
 import z from "zod";
 
@@ -76,15 +72,13 @@ export const addWorkoutController = async (req: NextRequest) => {
 
 export const deleteWorkoutController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
-    const id = Number((await params).id);
-    if (isNaN(id)) throw new CustomError(PathErrors.id_invalid, 400);
-    const row = await getSingleWorkout(id);
-    if (row.ownerId !== ownerId)
-      throw new CustomError(AuthErrors.unauthorized_access, 403);
+    const localId = (await params).localId;
+    if (!localId) throw new CustomError(PathErrors.id_invalid, 400);
+    const { id } = await getWorkoutByLocalId(localId, ownerId);
     await deleteWorkout(id);
     return handleSuccess();
   } catch (error) {
@@ -94,16 +88,15 @@ export const deleteWorkoutController = async (
 
 export const updateWorkoutController = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
-    const id = Number((await params).id);
+    const localId = (await params).localId;
     const body: Partial<Workout> = await req.json();
-    if (isNaN(id)) throw new CustomError(PathErrors.id_invalid, 400);
-    const row = await getSingleWorkout(id);
-    if (row.ownerId !== ownerId)
-      throw new CustomError(AuthErrors.unauthorized_access, 403);
+    if (!localId) throw new CustomError(PathErrors.id_invalid, 400);
+
+    const { id } = await getWorkoutByLocalId(localId, ownerId);
 
     const { exercises, id: _id, ...rest } = body;
 
@@ -114,6 +107,7 @@ export const updateWorkoutController = async (
       const parsedExercises = schema.parse(
         exercises.map((e) => ({ ...e, workoutId: id })),
       );
+
       await deleteWorkoutRecords(id);
       await addWorkoutRecord(id, parsedExercises);
     }

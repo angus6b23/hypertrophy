@@ -83,7 +83,7 @@ export class backendAuth {
 
   static refresh = async () => {
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
-    const res = await axios.post('/api/auth/refrsh', { refreshToken }, await this.axiosOption());
+    const res = await axios.post('/api/auth/refresh', { refreshToken }, await this.axiosOption());
     await SecureStore.setItemAsync('accessToken', res.data.data.accessToken);
     await SecureStore.setItemAsync('refreshToken', res.data.data.refreshToken);
     return res.data.accessToken as string;

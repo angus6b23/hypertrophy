@@ -10,7 +10,7 @@ import {
   workoutRecords,
   workouts,
 } from "@/db/schema/workouts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { single } from "./db-helper";
 
 interface WorkoutResponse extends SelectWorkoutSchema {
@@ -47,6 +47,14 @@ export const getUserWorkoutsWithRecords = async (ownerId: string) => {
   return res;
 };
 
+export const getWorkoutByLocalId = async (localId: string, ownerId: string) => {
+  return db
+    .select()
+    .from(workouts)
+    .where(and(eq(workouts.localId, localId), eq(workouts.ownerId, ownerId)))
+    .limit(1)
+    .then(single);
+};
 export const getSingleWorkout = async (id: number) => {
   return db
     .select()

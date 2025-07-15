@@ -247,28 +247,15 @@ const DeleteConfirmDialog = () => {
   const { idx, setIdx, setShowDelete, showDelete } = useContext(PlanDayContext);
   const update = useWorkoutPlanStore((s) => s.update);
   const currentPlanId = useWorkoutPlanStore((s) => s.currentPlan);
-  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
   const currentPlan = useCurrentPlan();
 
   const handleDelete = useCallback(async () => {
     const newDays = currentPlan.days.filter((_day, i) => i !== idx);
     update(currentPlanId, { ...currentPlan, days: newDays });
-    if (isLoggedIn) {
-      try {
-        if (currentPlan.id) {
-          backend.plans.update(currentPlan.id, currentPlan);
-        } else {
-          const res = await backend.plans.add(currentPlan);
-          update(currentPlanId, res, false);
-        }
-      } catch (err) {
-        toast.error((err as Error).message);
-      }
-    }
     setShowDelete(false);
     setIdx(-1);
     toast.success(t('common.delete_success'));
-  }, [idx, currentPlan, currentPlanId, isLoggedIn]);
+  }, [idx, currentPlan, currentPlanId]);
 
   return (
     <Dialog

@@ -38,17 +38,17 @@ export class plans {
     return unwrapBackend(res.data);
   };
 
-  static update = async (id: number, payload: Partial<Plan>) => {
+  static update = async (localId: string, payload: Partial<Plan>) => {
     const res = await axios.put<BackendResponse<never>>(
-      `api/plans/${id}`,
+      `api/plans/${localId}`,
       payload,
       await backendAuth.axiosOption(true)
     );
     return unwrapBackend(res.data);
   };
-  static delete = async (id: number) => {
+  static delete = async (localId: string) => {
     const res = await axios.delete<BackendResponse<never>>(
-      `api/plans/${id}`,
+      `api/plans/${localId}`,
       await backendAuth.axiosOption(true)
     );
     return unwrapBackend(res.data);

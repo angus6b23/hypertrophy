@@ -10,8 +10,6 @@ import { Text } from '~/components/ui/text';
 import { nanoid } from 'nanoid/non-secure';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { useAccountStore } from '~/utils/stores/account-store';
-import { toast } from 'sonner-native';
-import { backend } from '~/utils/backend';
 
 export const AddExerciseContext = createContext<{
   exSet: number[];
@@ -32,7 +30,6 @@ const AddExercisePage = () => {
   const defaultReps = useOptionStore((s) => s.workout.defaultReps);
   const defaultSets = useOptionStore((s) => s.workout.defaultSets);
   const defaultRest = useOptionStore((s) => s.workout.defaultRest);
-  const loggedIn = useAccountStore((s) => s.isLoggedIn);
 
   const router = useRouter();
 
@@ -52,21 +49,9 @@ const AddExercisePage = () => {
       ...currentPlan,
       days: currentPlan.days.map((d, i) => (i === idx ? { ...d, exercises: newEx } : d)),
     });
-    if (loggedIn) {
-      try {
-        if (currentPlan.id) {
-          backend.plans.update(currentPlan.id, currentPlan);
-        } else {
-          const res = await backend.plans.add(currentPlan);
-          update(currentPlan.localId, res, false);
-        }
-      } catch (err) {
-        toast.error((err as Error).message);
-      }
-    }
     setExSet([]);
     router.dismiss();
-  }, [exSet, currentPlan, loggedIn, defaultReps, defaultSets, defaultRest]);
+  }, [exSet, currentPlan, defaultReps, defaultSets, defaultRest]);
 
   const AddButton = () => {
     const { t } = useTranslation();

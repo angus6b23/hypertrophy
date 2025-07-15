@@ -72,8 +72,8 @@ const DeleteConfirmDialog = () => {
     if (isLoggedIn) {
       try {
         const item = data.find((item) => item.localId === ctx.removeId);
-        if (item && item.remoteId) {
-          await backend.measurement.delete(item.remoteId);
+        if (item && item.id) {
+          await backend.measurement.delete(item.localId);
         }
       } catch {}
     }

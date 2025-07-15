@@ -14,9 +14,9 @@ export class backendMeasurement {
     return unwrapBackend<{ id: number }>(res.data);
   };
 
-  static delete = async (remoteId: number) => {
+  static delete = async (localId: string) => {
     const { data } = await axios.delete(
-      `/api/measurement/${remoteId}`,
+      `/api/measurement/${localId}`,
       await backend.auth.axiosOption(true)
     );
     return unwrapBackend(data);
@@ -25,7 +25,7 @@ export class backendMeasurement {
   static update = async (measurement: Measurement) => {
     if (!measurement.id) return;
     const { data } = await axios.put(
-      `api/measurement/${measurement.id}`,
+      `api/measurement/${measurement.localId}`,
       measurement,
       await backend.auth.axiosOption(true)
     );

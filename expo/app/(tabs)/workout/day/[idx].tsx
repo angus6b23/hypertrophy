@@ -31,9 +31,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '~/components/ui/dialog';
-import { useAccountStore } from '~/utils/stores/account-store';
-import { backend } from '~/utils/backend';
-import { toast } from 'sonner-native';
 
 const DayCotext = createContext({
   showEdit: false,
@@ -55,7 +52,6 @@ const ExerciseDay = () => {
   const updateWorkout = useWorkoutPlanStore((s) => s.update);
   const currSession = useWorkoutStore((s) => s.current);
   const colors = useColors();
-  const loggedIn = useAccountStore((s) => s.isLoggedIn);
 
   useEffect(() => {
     setCurrentDay(currentPlan.days[idx]);
@@ -74,20 +70,8 @@ const ExerciseDay = () => {
               }
         ),
       });
-      if (loggedIn) {
-        try {
-          if (currentPlan.id) {
-            backend.plans.update(currentPlan.id, currentPlan);
-          } else {
-            const res = await backend.plans.add(currentPlan);
-            updateWorkout(currentPlan.localId, res, false);
-          }
-        } catch (err) {
-          toast.error((err as Error).message);
-        }
-      }
     },
-    [currentDay, currentPlan, idx, loggedIn]
+    [currentDay, currentPlan, idx]
   );
 
   const handleDelete = useCallback(
@@ -103,21 +87,8 @@ const ExerciseDay = () => {
               }
         ),
       });
-
-      if (loggedIn) {
-        try {
-          if (currentPlan.id) {
-            backend.plans.update(currentPlan.id, currentPlan);
-          } else {
-            const res = await backend.plans.add(currentPlan);
-            updateWorkout(currentPlan.localId, res, false);
-          }
-        } catch (err) {
-          toast.error((err as Error).message);
-        }
-      }
     },
-    [currentDay, currentPlan, idx, loggedIn]
+    [currentDay, currentPlan, idx]
   );
 
   return (

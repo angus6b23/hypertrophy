@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { eq, and, lte, gte } from "drizzle-orm";
 import { db } from "../db";
 import {
@@ -6,7 +8,6 @@ import {
   UpdateMeasurement,
 } from "../db/schema/measurements";
 import { single } from "./db-helper";
-import { AuthErrors, CustomError } from "share/interfaces/error-codes";
 
 interface GetMeasurementsOption {
   from: Date;
@@ -34,7 +35,6 @@ export const getMeasurements = ({ from, to, id }: GetMeasurementsOption) => {
       waist: measurements.waist,
       chest: measurements.chest,
       hip: measurements.hip,
-      createdAt: measurements.createdAt,
     })
     .from(measurements)
     .where(
@@ -46,6 +46,24 @@ export const getMeasurements = ({ from, to, id }: GetMeasurementsOption) => {
     )
     .orderBy(measurements.date);
   return records;
+};
+
+export const getMeasurementByLocalId = ({
+  ownerId,
+  localId,
+}: {
+  ownerId: string;
+  localId: string;
+}) => {
+  const record = db
+    .select()
+    .from(measurements)
+    .where(
+      and(eq(measurements.ownerId, ownerId), eq(measurements.localId, localId)),
+    )
+    .limit(1)
+    .then(single);
+  return record;
 };
 
 /**
@@ -72,17 +90,6 @@ export const insertMeasurement = async (data: InsertMeasurement) => {
   return record;
 };
 
-const checkOwnership = async (id: number, ownerId: string) => {
-  const existingRecord = await db
-    .select({ ownerId: measurements.ownerId })
-    .from(measurements)
-    .where(eq(measurements.id, id))
-    .limit(1)
-    .then(single);
-  if (existingRecord.ownerId !== ownerId) {
-    throw new CustomError(AuthErrors.unauthorized_access, 403);
-  }
-};
 /**
  * Update measurement from db
  *
@@ -91,17 +98,19 @@ const checkOwnership = async (id: number, ownerId: string) => {
  *
  *
  */
-export const updateMeasurement = async (data: UpdateMeasurement) => {
-  await checkOwnership(data.id!, data.ownerId!);
+export const updateMeasurement = async (
+  id: number,
+  data: UpdateMeasurement,
+) => {
+  const { id: _id, ownerId, ...rest } = data;
   return await db
     .update(measurements)
-    .set(data)
-    .where(eq(measurements.id, data.id!))
+    .set(rest)
+    .where(eq(measurements.id, id))
     .returning()
     .then(single);
 };
 
-export const deleteMeasurement = async (id: number, ownerId: string) => {
-  await checkOwnership(id, ownerId);
+export const deleteMeasurement = async (id: number) => {
   await db.delete(measurements).where(eq(measurements.id, id));
 };

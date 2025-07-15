@@ -67,7 +67,8 @@ export const getPlanOnwer = async (id: number) => {
   return plan.ownerId;
 };
 
-export const getPlanDetails = async (id: number) => {
+export const getPlanDetails = async (localId: string, ownerId: string) => {
+  const { id } = await getPlanByLocalId(localId, ownerId);
   const plan = await db
     .select()
     .from(plans)
@@ -105,6 +106,16 @@ export const getPlanDetails = async (id: number) => {
   return reducedPlan;
 };
 
+export const getPlanByLocalId = async (localId: string, ownerId: string) => {
+  const plan = await db
+    .select()
+    .from(plans)
+    .where(and(eq(plans.localId, localId), eq(plans.ownerId, ownerId)))
+    .limit(1)
+    .then(single);
+  return plan;
+};
+
 export const insertPlan = async (plan: InsertPlanSchema) => {
   const newPlan = await db
     .insert(plans)
@@ -130,11 +141,15 @@ export const insertPlanDay = async (planDay: InsertPlanDaysSchema) => {
 export const insertPlanExercises = async (
   planExercise: InsertPlanExercisesSchema[],
 ) => {
-  await db.insert(planExercises).values(planExercise);
+  if (planExercise.length > 0) {
+    await db.insert(planExercises).values(planExercise);
+  }
 };
 
-export const deletePlan = async (id: number) => {
-  await db.delete(plans).where(eq(plans.id, id));
+export const deletePlan = async (localId: string, ownerId: string) => {
+  await db
+    .delete(plans)
+    .where(and(eq(plans.ownerId, ownerId), eq(plans.localId, localId)));
 };
 
 export const updatePlan = async (id: number, plan: UpdatePlanSchema) => {

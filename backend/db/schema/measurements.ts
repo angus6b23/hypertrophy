@@ -29,7 +29,6 @@ export const measurements = pgTable(
     chest: real(),
     waist: real(),
     hip: real(),
-    createdAt: timestamp().defaultNow().notNull(),
     ownerId: uuid()
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
