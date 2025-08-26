@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { t } from 'i18next';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -17,11 +17,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Text } from '~/components/ui/text';
 import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
 import { useWorkoutStore } from '~/utils/stores/session-store';
-import { ExerciseRecord } from 'share/interfaces/Records';
+import { ExerciseRecord, RepWeightRecord } from 'share/interfaces/Records';
 import { FlashList } from '@shopify/flash-list';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useDebouncedCallback } from 'use-debounce';
+import { predict1RM } from '~/utils/misc/rm-predict';
+import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
 
 const ExerciseDetailPage = () => {
   const local = useLocalSearchParams();
@@ -43,6 +45,11 @@ const ExerciseDetailPage = () => {
                 <TabsTrigger value="history" className="flex-1">
                   <Text>{t('common.history')}</Text>
                 </TabsTrigger>
+                {exerciseRef.current?.record_type === 'reps_with_weight' && (
+                  <TabsTrigger value="graph" className="flex-1">
+                    <Text>{t('common.graph')}</Text>
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="details" className="flex-1">
                   <Text>{t('common.details')}</Text>
                 </TabsTrigger>
@@ -50,19 +57,24 @@ const ExerciseDetailPage = () => {
               <TabsContent value="history">
                 <ExerciseHistory id={Number(local.id)} />
               </TabsContent>
+              {exerciseRef.current?.record_type === 'reps_with_weight' && (
+                <TabsContent value="graph">
+                  <ExerciseGraph id={Number(local.id)} />
+                </TabsContent>
+              )}
               <TabsContent value="details" asChild>
                 <ExerciseDetails ex={exerciseRef.current! as Exercise} />
               </TabsContent>
             </Tabs>
           </YStack>
         </ScrollView>
-        <FloatingButton />
+        <FloatingButton hideAdd={Boolean(local.hide_add_button)} />
       </SafeAreaView>
     </>
   );
 };
 
-const FloatingButton = () => {
+const FloatingButton = ({ hideAdd }: { hideAdd?: boolean }) => {
   const router = useRouter();
   const colors = useColors();
   const { id } = useLocalSearchParams();
@@ -76,12 +88,14 @@ const FloatingButton = () => {
         className="absolute left-4 top-16 aspect-square rounded-full bg-foreground/60">
         <ThemedIcon name="ChevronLeft" size={24} inverted />
       </Button>
-      <Button
-        className="absolute bottom-4 right-4"
-        size="floating"
-        onPress={() => router.push(`/(zShare)/exercise/adhoc?id=${id as string}`)}>
-        <ThemedIcon name="Plus" color={colors.background} size={28} />
-      </Button>
+      {!hideAdd && (
+        <Button
+          className="absolute bottom-4 right-4"
+          size="floating"
+          onPress={() => router.push(`/(zShare)/exercise/adhoc?id=${id as string}`)}>
+          <ThemedIcon name="Plus" color={colors.background} size={28} />
+        </Button>
+      )}
     </>
   );
 };
@@ -226,6 +240,43 @@ const NoHistory = () => {
       <Text className="text-md text-muted-foreground">{t('workout.no_history_found')}</Text>
       <Text className="text-md text-muted-foreground">{t('workout.do_some_workout')}</Text>
     </YStack>
+  );
+};
+
+interface DateRM {
+  date: Date;
+  bestRM: number;
+}
+const ExerciseGraph = ({ id }: { id: number }) => {
+  const workouts = useWorkoutStore((state) => state.workouts);
+  const [rmRecords, setRmRecords] = useState<DateRM[]>([]);
+
+  useEffect(() => {
+    const newRmRecords = [];
+    for (const workout of workouts) {
+      const matchingEx = workout.exercises.find((ex) => ex.exerciseId === id);
+      if (matchingEx) {
+        const record = matchingEx.record as RepWeightRecord[];
+        const bestRM = record.reduce((acc, cur) => Math.max(acc, predict1RM(cur)), 0);
+        newRmRecords.push({ date: new Date(workout.startTime), bestRM });
+      }
+    }
+    setRmRecords(newRmRecords);
+  }, [id, workouts]);
+  return (
+    <>
+      {rmRecords.length > 0 ? (
+        <View className="h-96 bg-green-400">
+          <TimeSeriesChart
+            data={rmRecords}
+            xKey="date"
+            yOptions={[{ key: 'bestRM', type: 'line', configDomain: 1 }]}
+          />
+        </View>
+      ) : (
+        <NoHistory />
+      )}
+    </>
   );
 };
 

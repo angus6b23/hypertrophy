@@ -29,6 +29,20 @@ export default function TabLayout() {
         name="exercise/index"
         options={{
           title: t('common.exercise'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="BicepsFlexed" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="tools"
+        options={{
+          title: t('common.tools'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="Wrench" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="progress/index"
+        options={{
+          title: t('common.progress'),
           tabBarIcon: ({ color }) => <TabBarIcon name="CalendarDays" color={color} />,
         }}
       />
@@ -43,13 +57,6 @@ export default function TabLayout() {
               <HeaderButton />
             </Link>
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="progress/index"
-        options={{
-          title: t('common.progress'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="CalendarDays" color={color} />,
         }}
       />
     </Tabs>

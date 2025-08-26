@@ -231,7 +231,6 @@ const TextTooltip = ({
   const generateText = (key: string) => `${key}: ${state.y[key].value.get()}`;
   // FIXME: Labels of text not syncing when drag
 
-  useEffect(() => {}, [state.y.weight.value]);
   return (
     <>
       <RoundedRect

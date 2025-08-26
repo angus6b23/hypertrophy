@@ -22,20 +22,23 @@ import {
   DropdownMenuItem,
 } from '~/components/ui/dropdown-menu';
 import { t } from 'i18next';
-import { XStack } from '~/components/ui/Stacks';
+import { XStack, YStack } from '~/components/ui/Stacks';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import { Label } from '@rn-primitives/dropdown-menu';
 
 const DayCotext = createContext({
   showEdit: false,
   setShowEdit: (_bool: boolean) => {},
   id: '',
+  dayIdx: 0,
+  setId: (_id: string) => {},
   planExercises: [] as PlanExercise[],
 });
 
@@ -98,7 +101,9 @@ const ExerciseDay = () => {
         value={{
           showEdit,
           setShowEdit,
+          dayIdx: idx,
           id,
+          setId,
           planExercises: currentDay.exercises,
         }}>
         <DraggableFlatList
@@ -192,20 +197,103 @@ const AddExerciseButton = ({ idx }: { idx: number }) => {
 const EditDialog = () => {
   const { t } = useTranslation();
   const ctx = useContext(DayCotext);
+  const currentPlan = useCurrentPlan();
+  const update = useWorkoutPlanStore((s) => s.update);
 
+  const [reps, setReps] = useState(0);
+  const [sets, setSets] = useState(0);
+  const [restTime, setRestTime] = useState(0);
+  const [recordType, setRecordType] = useState('reps_with_weight');
+
+  const handleConfirm = useCallback(() => {
+    const payload: Partial<PlanExercise> =
+      recordType === 'reps' || recordType === 'reps_with_weight'
+        ? {
+            targetReps: reps,
+            targetSets: sets,
+            restTime,
+          }
+        : {
+            targetSets: sets,
+            restTime,
+          };
+    const updatedPlanExercises = currentPlan.days[ctx.dayIdx].exercises.map((ex) =>
+      ex.localId === ctx.id ? { ...ex, ...payload } : ex
+    );
+    update(currentPlan.localId, {
+      days: currentPlan.days.map((d, i) =>
+        i === ctx.dayIdx ? { ...d, exercises: updatedPlanExercises } : d
+      ),
+    });
+    ctx.setShowEdit(false);
+  }, [reps, sets, restTime, recordType, ctx.id, ctx.dayIdx, currentPlan]);
+
+  useEffect(() => {
+    if (ctx.id !== '') {
+      const exercise = ctx.planExercises.find((ex) => ex.localId === ctx.id)!;
+      const recordType = exerciseDb.exercises.find(
+        (ex) => ex.id === exercise.exerciseId
+      )?.record_type;
+      setReps(exercise.targetReps || 0);
+      setSets(exercise.targetSets || 0);
+      setRestTime(exercise.restTime || 0);
+      setRecordType(recordType as string);
+    }
+  }, [ctx.id, ctx.planExercises]);
   return (
-    <Dialog open={ctx.showEdit} onOpenChange={(e) => ctx.setShowEdit(e)}>
+    <Dialog
+      open={ctx.showEdit}
+      onOpenChange={(e) => {
+        ctx.setShowEdit(e);
+        ctx.setId('');
+      }}>
       <DialogContent className="w-96">
         <DialogHeader>
           <DialogTitle>{t('plan.edit_exercise')}</DialogTitle>
-          <DialogDescription>{t('plan.target_reps')}</DialogDescription>
         </DialogHeader>
+        <YStack fill={false} padding="none">
+          <View className="flex w-full flex-col gap-2">
+            <Label className="text-foreground">{t('plan.target_sets')}</Label>
+            <Input
+              className="w-full"
+              value={sets.toString()}
+              inputMode="numeric"
+              onChangeText={(s) => setSets(isNaN(Number(s)) ? 1 : Number(s))}
+            />
+          </View>
+        </YStack>
+        {(recordType === 'reps_with_weight' || recordType === 'reps') && (
+          <>
+            <YStack fill={false} padding="none">
+              <View className="flex w-full flex-col gap-2">
+                <Label className="text-foreground">{t('plan.target_reps')}</Label>
+                <Input
+                  className="w-full"
+                  value={reps.toString()}
+                  inputMode="numeric"
+                  onChangeText={(s) => setReps(isNaN(Number(s)) ? 0 : Number(s))}
+                />
+              </View>
+            </YStack>
+          </>
+        )}
+        <YStack fill={false} padding="none">
+          <View className="flex w-full flex-col gap-2">
+            <Label className="text-foreground">{t('plan.rest_time')}</Label>
+            <Input
+              className="w-full"
+              value={restTime.toString()}
+              inputMode="numeric"
+              onChangeText={(s) => setRestTime(isNaN(Number(s)) ? 0 : Number(s))}
+            />
+          </View>
+        </YStack>
         <DialogFooter>
           <XStack fill={false} padding="none">
-            <Button className="flex-1" variant="destructive">
+            <Button className="flex-1" variant="default" onPress={handleConfirm}>
               <Text>{t('common.confirm')}</Text>
             </Button>
-            <Button className="flex-1" onPress={() => ctx.setShowEdit(false)}>
+            <Button className="flex-1" onPress={() => ctx.setShowEdit(false)} variant="outline">
               <Text>{t('common.cancel')}</Text>
             </Button>
           </XStack>

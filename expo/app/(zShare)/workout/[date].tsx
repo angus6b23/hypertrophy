@@ -11,7 +11,6 @@ import { round } from '~/utils/misc/round-numbers';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { FlashList } from '@shopify/flash-list';
 import { View } from 'react-native';
-import { ExerciseItem } from '~/components/ui/ExerciseItem';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
 
 const WorkoutDayView = () => {
@@ -39,7 +38,7 @@ const WorkoutDayView = () => {
       <FlashList
         data={sessions}
         keyExtractor={(item) => item.localId}
-        contentContainerStyle={{ paddingTop: 8, paddingBottom: 24 }}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 48 }}
         ItemSeparatorComponent={() => <View className="h-8" />}
         renderItem={(item) => (
           <>

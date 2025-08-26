@@ -14,7 +14,8 @@
       "expo-localization",
       "expo-secure-store",
       "expo-document-picker",
-      "expo-asset"
+      "expo-asset",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -28,7 +29,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.hypertrophy"

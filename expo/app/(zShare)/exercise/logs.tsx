@@ -21,7 +21,6 @@ import {
 import { AnyRecord, RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
 import { PlanExercise } from 'share/interfaces/Workout';
 import { XStack } from '~/components/ui/Stacks';
-import { useTranslation } from 'react-i18next';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { t } from 'i18next';
 import {
@@ -36,25 +35,30 @@ import {
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { useWorkoutStore } from '~/utils/stores/session-store';
+import { useAudioPlayer } from 'expo-audio';
 
 interface LogContextType {
   showImg: boolean;
   setShowImg: React.Dispatch<React.SetStateAction<boolean>>;
   nextTab: () => void;
   logEx: (t: number) => void;
+  remainingRest: number;
 }
-const LogContext = createContext<LogContextType>({
+export const LogContext = createContext<LogContextType>({
   showImg: true,
   setShowImg: () => {},
   nextTab: () => {},
   logEx: () => {},
+  remainingRest: 0,
 });
 
+const beep = require('~/assets/audio/beep.wav');
+
 const ExerciseLogs = () => {
-  const { t } = useTranslation();
   const localParams = useLocalSearchParams();
   const router = useRouter();
 
+  const player = useAudioPlayer(beep);
   // Index of day of current plan
   const day: number = Number(localParams.day);
   // Index of exercise of the day of current plan
@@ -98,8 +102,12 @@ const ExerciseLogs = () => {
       const res = getRemainingRestTime();
       if (res > -1) {
         setRemainingRest(res);
+        if (res === 0) {
+          player.seekTo(0);
+          player.play();
+        }
       }
-    }, 200);
+    }, 1000);
     return () => clearInterval(interval);
   });
 
@@ -112,7 +120,7 @@ const ExerciseLogs = () => {
   );
 
   return (
-    <LogContext.Provider value={{ showImg, setShowImg, nextTab, logEx }}>
+    <LogContext.Provider value={{ showImg, setShowImg, nextTab, logEx, remainingRest }}>
       <Stack.Screen
         options={{ title: `${currDay.name}`, headerShown: true, headerShadowVisible: false }}
       />
@@ -145,12 +153,6 @@ const ExerciseLogs = () => {
         )}
         swipeEnabled={true}
       />
-      {remainingRest > 0 && (
-        <XStack fill={false} className="absolute bottom-32 left-4 rounded bg-secondary py-2">
-          <Text className="text-lg uppercase">{t('workout.rest')}:</Text>
-          <Text className="text-lg">{remainingRest}</Text>
-        </XStack>
-      )}
     </LogContext.Provider>
   );
 };
@@ -294,7 +296,7 @@ export const Toolbar = ({
       <Button
         variant="ghost"
         onPress={() => {
-          router.push(`/(zShare)/exercise/${exercise.id}`);
+          router.push(`/(zShare)/exercise/${exercise.id}?hide_add_button=true`);
         }}>
         <ThemedIcon name="ChartColumn" color={colors.text} size={20} />
       </Button>

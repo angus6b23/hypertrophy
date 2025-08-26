@@ -9,7 +9,6 @@ import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { nanoid } from 'nanoid/non-secure';
 import { useOptionStore } from '~/utils/stores/option-store';
-import { useAccountStore } from '~/utils/stores/account-store';
 
 export const AddExerciseContext = createContext<{
   exSet: number[];

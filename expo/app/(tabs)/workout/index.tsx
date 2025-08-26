@@ -23,10 +23,8 @@ import { Input } from '~/components/ui/input';
 import { useColorScheme } from 'nativewind';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { toast } from 'sonner-native';
-import { useAccountStore } from '~/utils/stores/account-store';
 import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
-import { backend } from '~/utils/backend';
 
 export const PlanDayContext = createContext({
   show: false,

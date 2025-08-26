@@ -96,8 +96,8 @@ const RepWeightDisplay = ({ logs }: { logs: RepWeightRecord[] }) => {
           {log.type === SetType.dropset && <Text className="text-lg text-orange-500">D</Text>}
         </XStack>
       ))}
-      <Text className="text-lg uppercase">
-        {t('workout.predicted_1rm')}:
+      <Text className="text-lg">
+        {t('workout.predicted_1rm')}:{' '}
         {preferredUnit === WeightUnit.lbs ? round(max1RM * 2.2) : max1RM}{' '}
         {preferredUnit === WeightUnit.lbs ? t('unit.lbs') : t('unit.kg')}
       </Text>

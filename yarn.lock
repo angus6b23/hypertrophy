@@ -11987,6 +11987,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-audio@npm:~0.3.5":
+  version: 0.3.5
+  resolution: "expo-audio@npm:0.3.5"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/dc8b92c2f41d08ddeee655224dccd2972742954bbf5141c577673bcf06baacf0802be6267600d252eec3cfbb2f0aa471648e5857b5c527914429a7418fe6dcaa
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:17, expo-constants@npm:~17.0.5, expo-constants@npm:~17.0.8":
   version: 17.0.8
   resolution: "expo-constants@npm:17.0.8"
@@ -13799,6 +13810,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.4.0"
     expo: "npm:~52.0.46"
     expo-asset: "npm:~11.0.5"
+    expo-audio: "npm:~0.3.5"
     expo-constants: "npm:17"
     expo-dev-client: "npm:~5.0.20"
     expo-document-picker: "npm:~13.0.3"

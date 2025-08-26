@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import {
   RepRecord,
   RepWeightRecord,
@@ -25,6 +25,7 @@ import { useOptionStore } from '~/utils/stores/option-store';
 import { WeightUnit } from '~/types/units';
 import { round } from '~/utils/misc/round-numbers';
 import { PlanExercise } from 'share/interfaces/Workout';
+import { LogContext } from '~/app/(zShare)/exercise/logs';
 
 interface LogRepWeightRecord extends Omit<RepWeightRecord, 'reps' | 'weight' | 'type'> {
   reps?: string;
@@ -51,6 +52,7 @@ export const RepWithWeightRecordForm = ({
   const [pointer, setPointer] = useState(0);
   const workoutStore = useWorkoutStore();
   const preferredUnit = useOptionStore((os) => os.unit.workoutWeight);
+  const { remainingRest } = useContext(LogContext);
 
   useEffect(() => {
     if (!workoutStore.current) return;
@@ -208,11 +210,18 @@ export const RepWithWeightRecordForm = ({
           <Text>{t('workout.add_set')}</Text>
         </Button>
       </ScrollView>
-      <View className="absolute bottom-16 w-full px-4">
-        <Button onPress={handleLog} className="w-full">
+      <XStack className="absolute bottom-16 w-full px-4" fill={false}>
+        {remainingRest > 0 && (
+          <View className="h-full min-w-24 rounded-md bg-muted p-2">
+            <Text className="text-center text-lg">
+              {t('workout.rest')}: {remainingRest}
+            </Text>
+          </View>
+        )}
+        <Button onPress={handleLog} className="flex-1">
           <Text>{t('common.log')}</Text>
         </Button>
-      </View>
+      </XStack>
     </>
   );
 };
@@ -240,6 +249,7 @@ export const RepRecordForm = ({
   const [form, setForm] = useState<LogRepRecord[]>([]);
   const [pointer, setPointer] = useState(0);
   const workoutStore = useWorkoutStore();
+  const { remainingRest } = useContext(LogContext);
 
   useEffect(() => {
     if (!workoutStore.current) return;
@@ -356,11 +366,18 @@ export const RepRecordForm = ({
           <Text>{t('workout.add_set')}</Text>
         </Button>
       </ScrollView>
-      <View className="absolute bottom-16 w-full px-4">
-        <Button onPress={handleLog} className="w-full">
+      <XStack className="absolute bottom-16 w-full px-4" fill={false}>
+        {remainingRest > 0 && (
+          <View className="h-full min-w-24 rounded-md bg-muted p-2">
+            <Text className="text-center text-lg">
+              {t('workout.rest')}: {remainingRest}
+            </Text>
+          </View>
+        )}
+        <Button onPress={handleLog} className="flex-1">
           <Text>{t('common.log')}</Text>
         </Button>
-      </View>
+      </XStack>
     </>
   );
 };
@@ -388,6 +405,7 @@ export const TimeRecordForm = ({
   const [form, setForm] = useState<LogTimeRecord[]>([]);
   const [pointer, setPointer] = useState(0);
   const workoutStore = useWorkoutStore();
+  const { remainingRest } = useContext(LogContext);
 
   useEffect(() => {
     if (!workoutStore.current) return;
@@ -487,11 +505,18 @@ export const TimeRecordForm = ({
           <Text>{t('workout.add_set')}</Text>
         </Button>
       </ScrollView>
-      <View className="absolute bottom-16 w-full px-4">
-        <Button onPress={handleLog} className="w-full">
+      <XStack className="absolute bottom-16 w-full px-4" fill={false}>
+        {remainingRest > 0 && (
+          <View className="h-full min-w-24 rounded-md bg-muted p-2">
+            <Text className="text-center text-lg">
+              {t('workout.rest')}: {remainingRest}
+            </Text>
+          </View>
+        )}
+        <Button onPress={handleLog} className="flex-1">
           <Text>{t('common.log')}</Text>
         </Button>
-      </View>
+      </XStack>
       );
     </>
   );

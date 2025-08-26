@@ -29,6 +29,7 @@ import { backend } from '~/utils/backend';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
+import { PublicPlans } from '~/components/ui/PublicPlans';
 
 const ListPlanPage = () => {
   const [tab, setTab] = useState(0);

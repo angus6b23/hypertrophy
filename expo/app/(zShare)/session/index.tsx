@@ -123,6 +123,7 @@ const SessionPage = () => {
           keyExtractor={(item) => item.exercisePlanId}
           contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 8, paddingBottom: 200 }}
           ItemSeparatorComponent={() => <View className="h-4" />}
+          // TODO: Add Remove exercise option
           renderItem={(item) => (
             <ExerciseRecordItem
               record={item.item}

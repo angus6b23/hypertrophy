@@ -225,6 +225,7 @@ const AccountSetting = () => {
               <Text className="text-lg">{`${t('option.login_now')} ${accountStore.displayName}`}</Text>
             </ListItem>
           )}
+          {/* TODO: Add auto share workout and profile setting */}
         </List>
       </YStack>
     </>
