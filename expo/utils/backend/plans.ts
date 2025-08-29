@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { backendAuth } from './auth';
-import { Plan } from 'share/interfaces/Workout';
+import { Plan, PublicPlan } from 'share/interfaces/Workout';
 import { BackendResponse } from 'share/interfaces/Backend';
 import { unwrapBackend } from './unwrap';
 
@@ -13,10 +13,10 @@ export class plans {
     return unwrapBackend(res.data);
   };
 
-  static getPublicPlans = async () => {
-    const res = await axios.get<BackendResponse<Omit<Plan, 'days'>[]>>('/api/plans', {
-      ...(await backendAuth.axiosOption()),
-      params: { public: true },
+  static getPublicPlans = async (page = 1) => {
+    const res = await axios.get<BackendResponse<PublicPlan[]>>('/api/plans', {
+      ...(await backendAuth.axiosOption(true)),
+      params: { public: true, page },
     });
     return unwrapBackend(res.data);
   };

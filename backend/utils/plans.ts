@@ -13,11 +13,13 @@ import {
   InsertPlanExercisesSchema,
   UpdatePlanSchema,
 } from "@/db/schema/plans";
-import { and, asc, eq, gt } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
 import { single } from "./db-helper";
-import { Plan, PlanDay, PlanExercise } from "share/interfaces/Workout";
+import { Plan, PlanDay } from "share/interfaces/Workout";
 import z from "zod";
 import { nanoid } from "nanoid";
+import { users } from "@/db/schema/users";
+import { PgColumn } from "drizzle-orm/pg-core";
 
 /**
  * Get plans created by user from db
@@ -40,13 +42,40 @@ export const getUserPlan = async (userId: string) => {
  * @returns Plan[]
  *
  */
-export const getPublicPlans = async (cursor = 0) => {
+export const getPublicPlans = async (
+  query = "",
+  cursor = 1,
+  ascending = false,
+  sort = "update",
+) => {
+  let sortCol: typeof plans.lastUpdate | typeof plans.name = plans.lastUpdate;
+  if (sort === "name") {
+    sortCol = plans.name;
+  }
+
   const publicPlans = await db
-    .select()
+    .select({
+      id: plans.id,
+      name: plans.name,
+      description: plans.description,
+      owner: users.displayName,
+    })
     .from(plans)
+    .innerJoin(users, eq(plans.ownerId, users.id))
     .limit(20)
-    .where(and(eq(plans.isPublic, true), gt(plans.id, cursor)))
-    .orderBy(asc(plans.id));
+    .offset(20 * (cursor - 1))
+    .where(
+      query
+        ? and(
+            eq(plans.isPublic, true),
+            or(
+              ilike(plans.name, `%${query}%`),
+              ilike(plans.description, `%${query}%`),
+            ),
+          )
+        : eq(plans.isPublic, true),
+    )
+    .orderBy(ascending ? asc(sortCol) : desc(sortCol));
   return publicPlans;
 };
 

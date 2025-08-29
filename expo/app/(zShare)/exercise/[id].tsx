@@ -266,11 +266,11 @@ const ExerciseGraph = ({ id }: { id: number }) => {
   return (
     <>
       {rmRecords.length > 0 ? (
-        <View className="h-96 bg-green-400">
+        <View className="h-96">
           <TimeSeriesChart
             data={rmRecords}
             xKey="date"
-            yOptions={[{ key: 'bestRM', type: 'line', configDomain: 1 }]}
+            yOptions={[{ key: 'bestRM', type: 'line', configDomain: [1, 1] }]}
           />
         </View>
       ) : (

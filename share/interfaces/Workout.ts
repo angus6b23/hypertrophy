@@ -11,6 +11,13 @@ export interface Plan {
   lastUpdate: Date | string;
 }
 
+export interface PublicPlan {
+  id: number;
+  name: string;
+  description: string;
+  owner: string;
+}
+
 export interface PlanDay {
   id?: number;
   planId?: number;

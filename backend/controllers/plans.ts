@@ -17,21 +17,30 @@ import {
   CustomError,
   PathErrors,
 } from "share/interfaces/error-codes";
-import { Plan } from "share/interfaces/Workout";
+import { Plan, PublicPlan } from "share/interfaces/Workout";
 
 export const getPlansController = async (req: NextRequest) => {
   try {
     const ownerId = req.headers.get("x-user-id")!;
-    const url = new URL(req.nextUrl);
-    const queries = url.searchParams;
-    if (queries.get("public")) {
-      const cursor = Number(queries.get("page")) || 0;
-      const plans = await getPublicPlans(cursor);
-      return handleSuccess<Omit<Plan, "days">[]>(plans);
-    } else {
-      const plans = await getUserPlan(ownerId);
-      return handleSuccess<Omit<Plan, "days">[]>(plans);
+    const plans = await getUserPlan(ownerId);
+    return handleSuccess<Omit<Plan, "days">[]>(plans);
+  } catch (err) {
+    return handleError(err);
+  }
+};
+
+export const getPublicPlansController = async (req: NextRequest) => {
+  try {
+    const params = new URL(req.nextUrl).searchParams;
+    const page = Number(params.get("page")) || 1;
+    if (isNaN(page)) {
+      throw new Error(PathErrors.param_invalid);
     }
+    const query = params.get("query") || "";
+    const asc = params.get("asc")?.toLowerCase() !== "true" || false;
+    const sort = params.get("sort") || "update";
+    const plans = await getPublicPlans(query, page, Boolean(asc), sort);
+    return handleSuccess<PublicPlan[]>(plans);
   } catch (err) {
     return handleError(err);
   }

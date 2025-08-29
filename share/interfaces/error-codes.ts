@@ -48,4 +48,5 @@ export const MeasurementErrors = {
 export const PathErrors = {
   id_not_found: "Id not found",
   id_invalid: "Id is invalid",
+  param_invalid: "Invalid parameters",
 };

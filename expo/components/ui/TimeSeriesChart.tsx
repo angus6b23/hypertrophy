@@ -1,4 +1,4 @@
-import { Circle, useFont, Text as SkiaText, Rect, RoundedRect } from '@shopify/react-native-skia';
+import { Circle, useFont, Text as SkiaText, RoundedRect } from '@shopify/react-native-skia';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -12,8 +12,8 @@ import inter from '~/assets/fonts/inter.ttf';
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { chartTimeframe, ChartTimeframe, useChartTimeFrame } from '~/utils/hooks/chart-timeframe';
 import { filterByDate } from '~/utils/misc/filter-data';
-import { roundNumbersMinMax } from '~/utils/misc/round-numbers';
 import { useOptionStore } from '~/utils/stores/option-store';
+import { useColors } from '~/utils/rn-reusables/useColors';
 
 interface TimeSeriesChartProps {
   data: any[];
@@ -21,7 +21,6 @@ interface TimeSeriesChartProps {
   yOptions: {
     key: string;
     type: 'line' | 'bar';
-    configDomain?: 5 | 10 | [number, number];
   }[];
 }
 
@@ -32,6 +31,8 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
 
   const [timeframe, setTimeframe] = useChartTimeFrame();
   const [innerData, setInnerData] = useState<any[]>(props.data);
+  const colors = useColors(true);
+
   useEffect(() => {
     setInnerData(
       filterByDate({
@@ -47,14 +48,14 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
       font: interFont,
       axisSide: i === 0 ? 'left' : 'right',
       yKeys: [item.key],
-      domain: roundNumbersMinMax(
-        props.data.map((innerData) => innerData[item.key]),
-        5
-      ),
+      labelColor: colors.text,
+      lineColor: colors.border,
       enableRescaling: true,
     }));
-  }, [props.yOptions, innerData]);
+  }, [props.yOptions, innerData, colors]);
+
   const yKeys = useCallback(() => props.yOptions.map((item) => item.key), [props.yOptions]);
+
   const initYPressState = useCallback(() => {
     const obj = {} as any;
     props.yOptions.forEach((item) => {
@@ -88,6 +89,7 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
     },
     [innerData, props.yOptions, chartPressState]
   );
+
   return (
     <>
       <View className="flex-1 justify-center">
@@ -105,8 +107,8 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
         </Tabs>
         <View className="mt-2 h-[256]">
           <CartesianChart
-            domainPadding={{ left: 50, right: 50, top: 20, bottom: 0 }}
-            padding={{ bottom: 10, left: 20, right: 20 }}
+            domainPadding={{ left: 50, right: 50, top: 20, bottom: 80 }}
+            padding={{ bottom: 0, left: 0, right: 0, top: 0 }}
             data={innerData}
             chartPressState={chartPressState.state}
             xKey={props.xKey}
@@ -121,7 +123,9 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
                       day: 'numeric',
                     })
                   : '',
-              labelPosition: 'outset',
+              labelColor: colors.text,
+              lineColor: colors.border,
+              labelPosition: 'inset',
               labelOffset: 0,
             }}
             yAxis={yAxisOption() as YAxisProps<any, string>[]}>
@@ -135,6 +139,7 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
                       key={item.key}
                       points={points[item.key]}
                       chartBounds={chartBounds}
+                      color={colors.text}
                       roundedCorners={{ topLeft: 10, topRight: 10 }}
                       barWidth={20}
                       animate={{ type: 'timing', duration: 300 }}
@@ -144,6 +149,7 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
                     <Line
                       key={item.key}
                       points={points[item.key]}
+                      color={colors.text}
                       curveType="natural"
                       connectMissingData
                       strokeWidth={3}
@@ -167,25 +173,6 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
                   />
                 )}
               </>
-              // <>
-              //   <Bar
-              //     points={points[props.yOptions[0].key]}
-              //     chartBounds={chartBounds}
-              //     color={colors.text}
-              //     roundedCorners={{ topLeft: 10, topRight: 10 }}
-              //     barWidth={20}
-              //     animate={{ type: 'timing', duration: 300 }}
-              //     labels={{ position: 'right', font: null }}
-              //   />
-              //   <Line
-              //     points={points[props.yKeys[1]]}
-              //     color=""
-              //     curveType="natural"
-              //     connectMissingData
-              //     strokeWidth={3}
-              //     animate={{ type: 'timing', duration: 300 }}
-              //   />
-              // </>
             )}
           </CartesianChart>
         </View>
