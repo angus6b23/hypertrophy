@@ -28,6 +28,7 @@ import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { RepDialog, RestDialog, SetDialogs } from '~/components/ui/OptionDialogs';
+import { Checkbox } from '~/components/ui/checkbox';
 
 const OptionContext = createContext({
   showLogoutDialog: false,
@@ -207,22 +208,46 @@ const DataSettings = () => {
 
 const AccountSetting = () => {
   const { t } = useTranslation();
-  const accountStore = useAccountStore();
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
+  const displayName = useAccountStore((s) => s.displayName);
+  const instance = useAccountStore((s) => s.instance);
+  const profile = useOptionStore((s) => s.profile);
+  const modify = useOptionStore((s) => s.modify);
+
+  const changeDefaultShare = useCallback(() => {
+    modify(
+      profile.defaultShare
+        ? { profile: { defaultShare: false } }
+        : { profile: { defaultShare: true } }
+    );
+  }, [profile.defaultShare]);
+
   const router = useRouter();
+
   const ctx = useContext(OptionContext);
   return (
     <>
       <YStack padding="none">
         <Text className="text-xl">{t('option.account')}</Text>
         <List>
-          {accountStore.isLoggedIn ? (
-            <ListItem icon={<ThemedIcon name="User" />} action={() => ctx.setLogoutDialog(true)}>
-              <Text className="text-lg">{`${t('option.logged_in_as')} ${accountStore.displayName}`}</Text>
-              <Text className="text-muted-foreground">{accountStore.instance}</Text>
-            </ListItem>
+          {isLoggedIn ? (
+            <>
+              <ListItem icon={<ThemedIcon name="User" />} action={() => ctx.setLogoutDialog(true)}>
+                <Text className="text-lg">{`${t('option.logged_in_as')} ${displayName}`}</Text>
+                <Text className="text-muted-foreground">{instance}</Text>
+              </ListItem>
+              <ListItem
+                icon={<ThemedIcon name="Earth" />}
+                select={
+                  <Checkbox checked={profile.defaultShare} onCheckedChange={changeDefaultShare} />
+                }
+                action={changeDefaultShare}>
+                <Text className="text-lg">{t('option.share_workout_by_default')}</Text>
+              </ListItem>
+            </>
           ) : (
             <ListItem icon={<ThemedIcon name="User" />} action={() => router.push('/login')}>
-              <Text className="text-lg">{`${t('option.login_now')} ${accountStore.displayName}`}</Text>
+              <Text className="text-lg">{`${t('option.login_now')} ${displayName}`}</Text>
             </ListItem>
           )}
           {/* TODO: Add auto share workout and profile setting */}

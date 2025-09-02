@@ -31,7 +31,7 @@ export const ListItem = ({
             <View>{icon}</View>
             <View>{children}</View>
           </XStack>
-          <View className="flex-1">{select}</View>
+          <View className="flex flex-1">{select}</View>
         </XStack>
       </Pressable>
       <Separator orientation="horizontal" />

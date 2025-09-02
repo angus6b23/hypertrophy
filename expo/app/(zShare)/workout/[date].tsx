@@ -1,17 +1,27 @@
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { RepWeightRecord, Workout } from 'share/interfaces/Records';
+import { Workout } from 'share/interfaces/Records';
 import { YStack, XStack } from '~/components/ui/Stacks';
 import { Text } from '~/components/ui/text';
 import { WeightUnit } from '~/types/units';
 import { minutesPassed } from '~/utils/misc/time';
 import { useWorkoutStore } from '~/utils/stores/session-store';
 import { useTranslation } from 'react-i18next';
-import { round } from '~/utils/misc/round-numbers';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { FlashList } from '@shopify/flash-list';
 import { View } from 'react-native';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
+import { getSessionVolume } from '~/utils/misc/session-data';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { useColors } from '~/utils/rn-reusables/useColors';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
+import { Button } from '~/components/ui/button';
 
 const WorkoutDayView = () => {
   const router = useRouter();
@@ -30,7 +40,7 @@ const WorkoutDayView = () => {
       return wDate === date.toISOString().split('T')[0];
     });
     setSessions(filtered);
-  }, []);
+  }, [workouts]);
 
   return (
     <>
@@ -67,31 +77,37 @@ const WorkoutDayView = () => {
 const SessionHeader = ({ workout }: { workout: Workout }) => {
   const { t } = useTranslation();
 
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
   const preferredUnit = useOptionStore((s) => s.unit.workoutWeight);
-
-  const getWorkoutVolume = useCallback(
-    (workout: Workout) => {
-      const volume = workout.exercises.reduce((acc, ex) => {
-        if (ex.type === 'reps_with_weight') {
-          const record = ex.record as RepWeightRecord[];
-          record.forEach((r) => (acc += r.weight * r.reps));
-        }
-        return acc;
-      }, 0);
-      return preferredUnit === WeightUnit.kg ? round(volume) : round(volume / 2);
-    },
-    [preferredUnit]
-  );
 
   return (
     <YStack fill={false} className="w-full bg-muted" align="center">
-      <Text className="text-xl font-bold">{t('workout.session_summary')}</Text>
+      <XStack
+        fill={false}
+        className="w-full bg-transparent"
+        justify="between"
+        padding="none"
+        align="center">
+        <Text className="text-xl font-bold">{t('workout.session_summary')}</Text>
+        <XStack fill={false} padding="none" className="bg-transparent" align="center" gap="none">
+          {isLoggedIn && (
+            <XStack fill={false} padding="none" className="bg-transparent" align="end" gap="sm">
+              {/* FIXME: icon color mismatch  */}
+              <ThemedIcon name={workout.public ? 'Earth' : 'EarthLock'} size={20} />
+              <Text className="text-muted-foreground">
+                {workout.public ? t('common.public') : t('common.private')}
+              </Text>
+            </XStack>
+          )}
+          <SessionHeaderDropdown workout={workout} />
+        </XStack>
+      </XStack>
       <XStack
         gap="none"
         padding="none"
         fill={false}
         className="w-full bg-transparent"
-        justify="around">
+        justify="between">
         <YStack gap="none" padding="none" fill={false} className="bg-transparent">
           <Text className="text-xl text-muted-foreground">{t('workout.duration')}</Text>
           <Text className="text-xl">
@@ -107,7 +123,7 @@ const SessionHeader = ({ workout }: { workout: Workout }) => {
         <YStack gap="none" padding="none" fill={false} className="bg-transparent">
           <Text className="text-xl text-muted-foreground">{t('workout.volume')}</Text>
           <Text className="text-xl">
-            {getWorkoutVolume(workout)}{' '}
+            {getSessionVolume(workout, preferredUnit)}{' '}
             {preferredUnit === WeightUnit.kg ? t('unit.kg') : t('unit.lbs')}
           </Text>
         </YStack>
@@ -119,6 +135,80 @@ const SessionHeader = ({ workout }: { workout: Workout }) => {
         )}
       </XStack>
     </YStack>
+  );
+};
+
+const SessionHeaderDropdown = ({ workout }: { workout: Workout }) => {
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
+  const update = useWorkoutStore((s) => s.update);
+  const { t } = useTranslation();
+  const colors = useColors();
+  const setVisibility = useCallback(
+    (pub: boolean) => {
+      update(workout.localId, { public: pub }, false);
+    },
+    //TODO: Implement api call to backend
+    [workout]
+  );
+
+  const copyUrl = useCallback(() => {
+    //TODO: Implement copy backend share url
+  }, [workout]);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          <ThemedIcon size={20} name="EllipsisVertical" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {isLoggedIn && workout.public && (
+          <>
+            <DropdownMenuItem onPress={() => setVisibility(false)}>
+              <XStack
+                fill={false}
+                padding="sm"
+                align="center"
+                justify="between"
+                className="bg-transparent">
+                <ThemedIcon size={16} name="Lock" />
+                <Text>{t('workout.set_as_private')}</Text>
+              </XStack>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="flex-between flex">
+              <XStack
+                fill={false}
+                padding="sm"
+                align="center"
+                justify="between"
+                className="bg-transparent">
+                <ThemedIcon size={16} name="Share2" />
+                <Text>{t('workout.copy_share_url')}</Text>
+              </XStack>
+            </DropdownMenuItem>
+          </>
+        )}
+        {isLoggedIn && !workout.public && (
+          <DropdownMenuItem onPress={() => setVisibility(true)}>
+            <XStack
+              fill={false}
+              padding="sm"
+              align="center"
+              justify="between"
+              className="bg-transparent">
+              <ThemedIcon size={16} name="LockOpen" />
+              <Text>{t('workout.set_as_public')}</Text>
+            </XStack>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem>
+          <XStack padding="sm" align="center" justify="between" className="bg-transparent">
+            <ThemedIcon name="Trash" size={16} color={colors.notification} />
+            <Text className="text-destructive">{t('common.delete')}</Text>
+          </XStack>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

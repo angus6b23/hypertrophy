@@ -6,6 +6,9 @@ import { mmkvStorage } from './persist';
 import { LengthUnit, WeightUnit } from '~/types/units';
 import { Locales } from '~/utils/i18next/resources';
 type State = {
+  profile: {
+    defaultShare: boolean;
+  };
   theme: 'light' | 'dark' | 'system';
   language: Locales;
   workout: {
@@ -30,6 +33,9 @@ type Action = {
 export const useOptionStore = create<State & Action>()(
   persist<State & Action>(
     (set) => ({
+      profile: {
+        defaultShare: true,
+      },
       theme: 'system',
       language: 'en-US',
       workout: {

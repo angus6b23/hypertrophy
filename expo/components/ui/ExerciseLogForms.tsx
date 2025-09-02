@@ -532,7 +532,7 @@ const SetTypeButton = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <DropdownMenu>
+    <DropdownMenu className="w-52">
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" disabled={disabled}>
           {state === SetType.warmup ? (
