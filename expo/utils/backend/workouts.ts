@@ -39,9 +39,9 @@ export class workouts {
     return unwrapBackend<{ id: number }>(data);
   };
 
-  static delete = async (id: number) => {
+  static delete = async (localId: string) => {
     const { data } = await axios.delete<BackendResponse<undefined>>(
-      `/api/workouts/${id}`,
+      `/api/workouts/${localId}`,
       await backendAuth.axiosOption(true)
     );
     return unwrapBackend(data);

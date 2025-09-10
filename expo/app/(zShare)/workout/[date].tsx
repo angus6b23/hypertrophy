@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { Dispatch, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Workout } from 'share/interfaces/Records';
 import { YStack, XStack } from '~/components/ui/Stacks';
 import { Text } from '~/components/ui/text';
@@ -22,12 +22,34 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { Button } from '~/components/ui/button';
+import { t } from 'i18next';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '~/components/ui/dialog';
+import { backend } from '~/utils/backend';
+import { toast } from 'sonner-native';
+
+const WorkoutDayContext = createContext<{
+  id: string;
+  setId: Dispatch<React.SetStateAction<string>>;
+}>({
+  id: '',
+  setId: () => {},
+});
 
 const WorkoutDayView = () => {
   const router = useRouter();
   const { date: paraDate } = useLocalSearchParams();
   const workouts = useWorkoutStore((s) => s.workouts);
   const [sessions, setSessions] = useState<Workout[]>([]);
+  const [id, setId] = useState('');
 
   const date = new Date(paraDate as string);
   if (!date) {
@@ -44,32 +66,35 @@ const WorkoutDayView = () => {
 
   return (
     <>
-      <Stack.Screen options={{ title: date.toLocaleDateString(), headerShown: true }} />
-      <FlashList
-        data={sessions}
-        keyExtractor={(item) => item.localId}
-        contentContainerStyle={{ paddingTop: 8, paddingBottom: 48 }}
-        ItemSeparatorComponent={() => <View className="h-8" />}
-        renderItem={(item) => (
-          <>
-            <SessionHeader workout={item.item} />
-            <FlashList
-              data={item.item.exercises}
-              keyExtractor={(inner, i) => `${item.item.localId}-${inner.exercisePlanId}-${i}`}
-              contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12 }}
-              ItemSeparatorComponent={() => <View className="h-4" />}
-              renderItem={(inner) => (
-                <ExerciseRecordItem
-                  record={inner.item}
-                  date={item.item.startTime as unknown as string}
-                  options={{ showDate: false, showName: true }}
-                />
-              )}
-            />
-          </>
-        )}
-        estimatedItemSize={2}
-      />
+      <WorkoutDayContext.Provider value={{ id, setId }}>
+        <Stack.Screen options={{ title: date.toLocaleDateString(), headerShown: true }} />
+        <FlashList
+          data={sessions}
+          keyExtractor={(item) => item.localId}
+          contentContainerStyle={{ paddingTop: 8, paddingBottom: 48 }}
+          ItemSeparatorComponent={() => <View className="h-8" />}
+          renderItem={(item) => (
+            <>
+              <SessionHeader workout={item.item} />
+              <FlashList
+                data={item.item.exercises}
+                keyExtractor={(inner, i) => `${item.item.localId}-${inner.exercisePlanId}-${i}`}
+                contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12 }}
+                ItemSeparatorComponent={() => <View className="h-4" />}
+                renderItem={(inner) => (
+                  <ExerciseRecordItem
+                    record={inner.item}
+                    date={item.item.startTime as unknown as string}
+                    options={{ showDate: false, showName: true }}
+                  />
+                )}
+              />
+            </>
+          )}
+          estimatedItemSize={2}
+        />
+        <DeleteWorkoutDialog />
+      </WorkoutDayContext.Provider>
     </>
   );
 };
@@ -141,8 +166,11 @@ const SessionHeader = ({ workout }: { workout: Workout }) => {
 const SessionHeaderDropdown = ({ workout }: { workout: Workout }) => {
   const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
   const update = useWorkoutStore((s) => s.update);
+
   const { t } = useTranslation();
   const colors = useColors();
+  const { setId } = useContext(WorkoutDayContext);
+
   const setVisibility = useCallback(
     (pub: boolean) => {
       update(workout.localId, { public: pub }, false);
@@ -201,7 +229,7 @@ const SessionHeaderDropdown = ({ workout }: { workout: Workout }) => {
             </XStack>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem>
+        <DropdownMenuItem onPress={() => setId(workout.localId)}>
           <XStack padding="sm" align="center" justify="between" className="bg-transparent">
             <ThemedIcon name="Trash" size={16} color={colors.notification} />
             <Text className="text-destructive">{t('common.delete')}</Text>
@@ -209,6 +237,61 @@ const SessionHeaderDropdown = ({ workout }: { workout: Workout }) => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+};
+
+const DeleteWorkoutDialog = () => {
+  const { id, setId } = useContext(WorkoutDayContext);
+  const { t } = useTranslation();
+
+  const isLoggedIn = useAccountStore((s) => s.isLoggedIn);
+  const remove = useWorkoutStore((s) => s.remove);
+
+  const handleDelete = useCallback(async () => {
+    try {
+      remove(id);
+      if (isLoggedIn) {
+        await backend.workouts.delete(id);
+      }
+      toast.success(t('workout.workout_deleted'));
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  }, [id]);
+
+  return (
+    <Dialog open={id !== ''} onOpenChange={() => setId('')}>
+      <DialogTrigger asChild>
+        <Button variant="secondary" className="p-0">
+          <ThemedIcon name="NotebookPen" size={24} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="min-w-96">
+        <DialogHeader>
+          <DialogTitle>{t('workout.delete_this_workout?')}</DialogTitle>
+          <DialogDescription>
+            <Text>{t('workout.all_records_in_this_workout_will_be_removed')}</Text>
+            <Text>
+              {t('workout.are_you_sure_you_would_like_to_abandon_current_workout_session')}
+            </Text>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <XStack fill={false} justify="between" padding="none" className="w-full">
+            <DialogClose asChild onPress={handleDelete}>
+              <Button className="flex-1" variant="destructive">
+                <Text>{t('common.delete')}</Text>
+              </Button>
+            </DialogClose>
+            <DialogClose className="flex-1" asChild>
+              <Button variant="ghost" className="text-center">
+                <Text>{t('common.cancel')}</Text>
+              </Button>
+            </DialogClose>
+          </XStack>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

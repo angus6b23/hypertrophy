@@ -55,6 +55,7 @@ export const getWorkoutByLocalId = async (localId: string, ownerId: string) => {
     .limit(1)
     .then(single);
 };
+
 export const getSingleWorkout = async (id: number) => {
   return db
     .select()
