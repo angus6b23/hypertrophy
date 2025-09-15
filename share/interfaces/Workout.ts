@@ -18,6 +18,8 @@ export interface PublicPlan {
   owner: string;
 }
 
+export type PublicPlanDetails = Omit<Plan, "localId" | "remoteId" | "ownerId">;
+
 export interface PlanDay {
   id?: number;
   planId?: number;

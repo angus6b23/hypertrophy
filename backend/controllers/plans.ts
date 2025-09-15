@@ -4,9 +4,9 @@ import { handleError, handleSuccess } from "@/utils/handleError";
 import {
   clearPlan,
   deletePlan,
+  getPlanById,
   getPlanByLocalId,
   getPlanDetails,
-  getPlanOnwer,
   getPublicPlans,
   getUserPlan,
   insertPlanPayload,
@@ -17,7 +17,7 @@ import {
   CustomError,
   PathErrors,
 } from "share/interfaces/error-codes";
-import { Plan, PublicPlan } from "share/interfaces/Workout";
+import { Plan, PublicPlan, PublicPlanDetails } from "share/interfaces/Workout";
 
 export const getPlansController = async (req: NextRequest) => {
   try {
@@ -41,6 +41,28 @@ export const getPublicPlansController = async (req: NextRequest) => {
     const sort = params.get("sort") || "update";
     const plans = await getPublicPlans(query, page, Boolean(asc), sort);
     return handleSuccess<PublicPlan[]>(plans);
+  } catch (err) {
+    return handleError(err);
+  }
+};
+
+export const getPublicPlanDetailsController = async (
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
+  try {
+    const { id } = await params;
+    const numberId = Number(id);
+    if (isNaN(numberId)) {
+      throw new Error(PathErrors.id_invalid);
+    }
+    const plan = await getPlanById(numberId);
+    if (!plan.isPublic) {
+      throw new Error(AuthErrors.unauthorized_access);
+    }
+    const details = await getPlanDetails(plan.localId, plan.ownerId);
+    const { localId, ownerId, ...rest } = details;
+    return handleSuccess<PublicPlanDetails>(rest);
   } catch (err) {
     return handleError(err);
   }
@@ -81,7 +103,7 @@ export const getPlanDetailsController = async (
   { params }: { params: Promise<{ localId: string }> },
 ) => {
   try {
-    const ownerId = req.headers.get("x-user-id");
+    const ownerId = req.headers.get("x-user-id")!;
     const { localId } = await params;
     // Check if id is number
     if (!localId) throw new CustomError(PathErrors.id_invalid, 400);

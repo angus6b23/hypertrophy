@@ -150,7 +150,15 @@ const PlanDialog = () => {
       // Edit plan if current plan exist
       localId = ctx.planId;
       const currentPlan = plans.find((plan) => plan.localId === ctx.planId) as Plan;
-      update(ctx.planId, { ...currentPlan, ...state });
+      const newPlan = { ...currentPlan, ...state };
+      update(ctx.planId, newPlan);
+      if (loggedIn) {
+        try {
+          await backend.plans.update(localId, newPlan);
+        } catch (err) {
+          console.error(err);
+        }
+      }
       toast.success(t('plan.plan_modified'));
     }
     // Automatically set the current plan to new plan and redirect user back to workout page if no plan exists before

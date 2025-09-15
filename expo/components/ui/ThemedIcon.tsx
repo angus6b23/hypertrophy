@@ -1,5 +1,6 @@
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import { icons } from 'lucide-react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 
 import { useColors } from '~/utils/rn-reusables/useColors';
 
@@ -9,6 +10,7 @@ interface ThemedIconProps {
   color?: string;
   inverted?: boolean;
   size?: number;
+  style?: StyleProp<ViewStyle>;
 }
 export const ThemedIcon = (props: ThemedIconProps) => {
   const colors = useColors();
@@ -18,6 +20,7 @@ export const ThemedIcon = (props: ThemedIconProps) => {
     <LucideIcon
       size={size}
       color={props.color ?? (props.inverted ? colors.background : colors.text)}
+      style={props.style}
     />
   );
 };

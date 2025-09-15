@@ -135,6 +135,10 @@ export const getPlanDetails = async (localId: string, ownerId: string) => {
   return reducedPlan;
 };
 
+export const getPlanById = async (id: number) => {
+  return await db.select().from(plans).where(eq(plans.id, id)).then(single);
+};
+
 export const getPlanByLocalId = async (localId: string, ownerId: string) => {
   const plan = await db
     .select()
@@ -206,7 +210,7 @@ export const insertPlanPayload = async (payload: Plan) => {
 
     const parsedDay = insertPlanDaysSchema.safeParse(rest);
     if (!parsedDay.success) {
-      await deletePlan(planId);
+      await deletePlan(plan.localId, plan.ownerId);
       throw new Error(parsedDay.error.message);
     }
     const { id: dayId } = await insertPlanDay(parsedDay.data);
@@ -214,7 +218,7 @@ export const insertPlanPayload = async (payload: Plan) => {
       .array(insertPlanExercisesSchema)
       .safeParse(exercises.map((e) => ({ ...e, dayId })));
     if (!parsedExercises.success) {
-      await deletePlan(planId);
+      await deletePlan(plan.localId, plan.ownerId);
       throw new Error(parsedExercises.error.message);
     }
     await insertPlanExercises(parsedExercises.data);

@@ -1,8 +1,22 @@
 import axios from 'axios';
 import { backendAuth } from './auth';
-import { Plan, PublicPlan } from 'share/interfaces/Workout';
+import { Plan, PublicPlan, PublicPlanDetails } from 'share/interfaces/Workout';
 import { BackendResponse } from 'share/interfaces/Backend';
 import { unwrapBackend } from './unwrap';
+
+interface PublicPlanQuery {
+  query?: string;
+  page?: number;
+  asc?: boolean;
+  sort?: 'name' | 'update';
+}
+
+const defaultQuery: PublicPlanQuery = {
+  query: '',
+  page: 0,
+  asc: false,
+  sort: 'update',
+};
 
 export class plans {
   static getUserPlans = async () => {
@@ -13,10 +27,23 @@ export class plans {
     return unwrapBackend(res.data);
   };
 
-  static getPublicPlans = async (page = 1) => {
-    const res = await axios.get<BackendResponse<PublicPlan[]>>('/api/plans', {
+  static getPublicPlans = async (query: PublicPlanQuery) => {
+    const comQuery = { ...defaultQuery, ...query };
+    const res = await axios.get<BackendResponse<PublicPlan[]>>('/api/public/plans', {
       ...(await backendAuth.axiosOption(true)),
-      params: { public: true, page },
+      params: {
+        query: comQuery.query,
+        page: comQuery.page,
+        asc: comQuery.asc,
+        sort: comQuery.sort,
+      },
+    });
+    return unwrapBackend(res.data);
+  };
+
+  static getPublicPlanDetails = async (id: number) => {
+    const res = await axios.get<BackendResponse<PublicPlanDetails>>(`/api/public/plans/${id}`, {
+      ...(await backendAuth.axiosOption(true)),
     });
     return unwrapBackend(res.data);
   };
