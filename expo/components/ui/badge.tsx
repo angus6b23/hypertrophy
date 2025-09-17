@@ -1,6 +1,6 @@
 import * as Slot from '@rn-primitives/slot';
 import type { SlottableViewProps } from '@rn-primitives/types';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 import { View } from 'react-native';
 
 import { TextClassContext } from '~/components/ui/text';

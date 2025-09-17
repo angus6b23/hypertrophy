@@ -4238,6 +4238,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/primitive@npm:1.1.3":
+  version: 1.1.3
+  resolution: "@radix-ui/primitive@npm:1.1.3"
+  checksum: 10c0/88860165ee7066fa2c179f32ffcd3ee6d527d9dcdc0e8be85e9cb0e2c84834be8e3c1a976c74ba44b193f709544e12f54455d892b28e32f0708d89deda6b9f1d
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-arrow@npm:1.1.2":
   version: 1.1.2
   resolution: "@radix-ui/react-arrow@npm:1.1.2"
@@ -4280,6 +4287,32 @@ __metadata:
     "@types/react-dom":
       optional: true
   checksum: 10c0/bd589957e56da325b73199e4adeae11271ddbb21f9f88b98b8e0870254d746091f7b5c97c41bb03b188ddbf08300c69118ddbe250869bebe35b8eaa20a14f0c2
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-collapsible@npm:^1.1.11":
+  version: 1.1.12
+  resolution: "@radix-ui/react-collapsible@npm:1.1.12"
+  dependencies:
+    "@radix-ui/primitive": "npm:1.1.3"
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-context": "npm:1.1.2"
+    "@radix-ui/react-id": "npm:1.1.1"
+    "@radix-ui/react-presence": "npm:1.1.5"
+    "@radix-ui/react-primitive": "npm:2.1.3"
+    "@radix-ui/react-use-controllable-state": "npm:1.2.2"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/777cced73fbbec9cfafe6325aa5605e90f49d889af2778f4c4a6be101c07cacd69ae817d0b41cc27e3181f49392e2c06db7f32d6b084db047a51805ec70729b3
   languageName: node
   linkType: hard
 
@@ -4510,6 +4543,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-id@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@radix-ui/react-id@npm:1.1.1"
+  dependencies:
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/7d12e76818763d592c331277ef62b197e2e64945307e650bd058f0090e5ae48bbd07691b23b7e9e977901ef4eadcb3e2d5eaeb17a13859083384be83fc1292c7
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-label@npm:^2.1.0":
   version: 2.1.2
   resolution: "@radix-ui/react-label@npm:2.1.2"
@@ -4650,6 +4698,26 @@ __metadata:
     "@types/react-dom":
       optional: true
   checksum: 10c0/8202647139d6f5097b0abcc43dfba471c00b69da95ca336afe3ea23a165e05ca21992f40fc801760fe442f3e064e54e2f2cbcb9ad758c4b07ef6c69a5b6777bd
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-presence@npm:1.1.5":
+  version: 1.1.5
+  resolution: "@radix-ui/react-presence@npm:1.1.5"
+  dependencies:
+    "@radix-ui/react-compose-refs": "npm:1.1.2"
+    "@radix-ui/react-use-layout-effect": "npm:1.1.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/d0e61d314250eeaef5369983cb790701d667f51734bafd98cf759072755562018052c594e6cdc5389789f4543cb0a4d98f03ff4e8f37338d6b5bf51a1700c1d1
   languageName: node
   linkType: hard
 
@@ -5628,6 +5696,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rn-primitives/collapsible@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@rn-primitives/collapsible@npm:1.2.0"
+  dependencies:
+    "@radix-ui/react-collapsible": "npm:^1.1.11"
+    "@rn-primitives/hooks": "npm:1.3.0"
+    "@rn-primitives/slot": "npm:1.2.0"
+    "@rn-primitives/types": "npm:1.2.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-web: "*"
+  peerDependenciesMeta:
+    react-native:
+      optional: true
+    react-native-web:
+      optional: true
+  checksum: 10c0/8015fab4c9ef579475922a0c5439317e7e909fcb25411902389d3326f6019400d983823dfc3de0f31e76116bef14a2016e524fbcd3437d758438daeaecbff3b1
+  languageName: node
+  linkType: hard
+
 "@rn-primitives/dialog@npm:^1.1.0":
   version: 1.1.0
   resolution: "@rn-primitives/dialog@npm:1.1.0"
@@ -5688,6 +5777,24 @@ __metadata:
     react-native-web:
       optional: true
   checksum: 10c0/b1129307bda87183452ea3dba282ab4f27aed8a831bf516e63b24ccccaa1fecd354d619d8291e8179b97b0619c02b944236a204408112ce3bfa238968c4ee40e
+  languageName: node
+  linkType: hard
+
+"@rn-primitives/hooks@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@rn-primitives/hooks@npm:1.3.0"
+  dependencies:
+    "@rn-primitives/types": "npm:1.2.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-web: "*"
+  peerDependenciesMeta:
+    react-native:
+      optional: true
+    react-native-web:
+      optional: true
+  checksum: 10c0/49f5676b97f1adb8a1c39dfe7a976df905aafb7dcec9eaba6bb1aa10f5abda9676fcd972565b0dc9aece39f4d4bda2f7d40e4292ff71d2dabddcbf5d0ec1c473
   languageName: node
   linkType: hard
 
@@ -13801,6 +13908,7 @@ __metadata:
     "@react-native-picker/picker": "npm:2.9.0"
     "@react-navigation/native": "npm:^7.0.3"
     "@rn-primitives/checkbox": "npm:^1.1.0"
+    "@rn-primitives/collapsible": "npm:^1.2.0"
     "@rn-primitives/dialog": "npm:^1.1.0"
     "@rn-primitives/dropdown-menu": "npm:^1.1.0"
     "@rn-primitives/label": "npm:^1.1.0"
@@ -13848,6 +13956,7 @@ __metadata:
     nanoid: "npm:^5.1.5"
     nativewind: "npm:latest"
     prettier: "npm:^3.2.5"
+    prettier-plugin-sort-imports: "npm:^1.8.8"
     prettier-plugin-tailwindcss: "npm:^0.5.11"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
@@ -18978,6 +19087,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-plugin-sort-imports@npm:^1.8.8":
+  version: 1.8.8
+  resolution: "prettier-plugin-sort-imports@npm:1.8.8"
+  dependencies:
+    prettier: "npm:^3.1.1"
+  peerDependencies:
+    typescript: ">4.0.0"
+  checksum: 10c0/5e32eb0e0688a5e5aa14bfb0cc32114b98f0c8cd5cbb51e9a0a9aac9e29193b072bd406aec6e64729ad7edcc80dc293dea8ab88cdc3daffd266bd78b9db4b9c7
+  languageName: node
+  linkType: hard
+
 "prettier-plugin-tailwindcss@npm:^0.5.11":
   version: 0.5.14
   resolution: "prettier-plugin-tailwindcss@npm:0.5.14"
@@ -19039,6 +19159,15 @@ __metadata:
   bin:
     prettier: bin-prettier.js
   checksum: 10c0/463ea8f9a0946cd5b828d8cf27bd8b567345cf02f56562d5ecde198b91f47a76b7ac9eae0facd247ace70e927143af6135e8cf411986b8cb8478784a4d6d724a
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3.1.1":
+  version: 3.6.2
+  resolution: "prettier@npm:3.6.2"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/488cb2f2b99ec13da1e50074912870217c11edaddedeadc649b1244c749d15ba94e846423d062e2c4c9ae683e2d65f754de28889ba06e697ac4f988d44f45812
   languageName: node
   linkType: hard
 

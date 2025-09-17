@@ -16,13 +16,13 @@ import { useWorkoutStore } from '~/utils/stores/session-store';
 import Slider from '@react-native-community/slider';
 import {
   Dialog,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { FlashList } from '@shopify/flash-list';

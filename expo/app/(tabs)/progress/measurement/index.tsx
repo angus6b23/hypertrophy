@@ -12,10 +12,10 @@ import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '~/components/ui/dialog';
 import { Text } from '~/components/ui/text';
 import { backend } from '~/utils/backend';

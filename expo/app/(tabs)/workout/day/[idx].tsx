@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { ExerciseItem } from '~/components/ui/ExerciseItem';
 import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
@@ -17,18 +17,18 @@ import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { t } from 'i18next';
 import { XStack, YStack } from '~/components/ui/Stacks';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { Label } from '@rn-primitives/dropdown-menu';

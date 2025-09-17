@@ -1,10 +1,10 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import {
+  ExerciseRecord,
   RepRecord,
   RepWeightRecord,
   SetType,
   TimeRecord,
-  ExerciseRecord,
 } from 'share/interfaces/Records';
 import { useWorkoutStore } from '~/utils/stores/session-store';
 import { XStack } from './Stacks';

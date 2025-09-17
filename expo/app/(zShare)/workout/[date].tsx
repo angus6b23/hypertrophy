@@ -1,7 +1,7 @@
-import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Dispatch, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Workout } from 'share/interfaces/Records';
-import { YStack, XStack } from '~/components/ui/Stacks';
+import { XStack, YStack } from '~/components/ui/Stacks';
 import { Text } from '~/components/ui/text';
 import { WeightUnit } from '~/types/units';
 import { minutesPassed } from '~/utils/misc/time';
@@ -25,13 +25,13 @@ import { Button } from '~/components/ui/button';
 import { t } from 'i18next';
 import {
   Dialog,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '~/components/ui/dialog';
 import { backend } from '~/utils/backend';
 import { toast } from 'sonner-native';

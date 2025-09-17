@@ -3,12 +3,12 @@ import { XStack, YStack } from './Stacks';
 import { Button } from './button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
 } from './dialog';
 import { Text } from './text';
 import { useOptionStore } from '~/utils/stores/option-store';

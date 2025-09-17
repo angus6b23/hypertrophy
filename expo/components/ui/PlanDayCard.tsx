@@ -1,11 +1,11 @@
 import { PlanDay } from 'share/interfaces/Workout';
-import { Card, CardHeader, CardTitle, CardContent } from './card';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Text } from './text';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from './dropdown-menu';
 import { ThemedIcon } from './ThemedIcon';
 import { useContext } from 'react';

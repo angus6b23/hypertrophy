@@ -9,9 +9,9 @@ import {
   Category,
   Equipment,
   Exercise,
+  Force,
   Mechanic,
   Muscle,
-  Force,
 } from 'share/exercises/types/exercise';
 import { useDebouncedCallback } from 'use-debounce';
 

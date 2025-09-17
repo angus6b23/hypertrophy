@@ -8,9 +8,9 @@ import { Button } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from './dropdown-menu';
 import { Text } from './text';
 

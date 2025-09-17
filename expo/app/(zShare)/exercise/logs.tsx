@@ -25,13 +25,13 @@ import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { t } from 'i18next';
 import {
   Dialog,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { useWorkoutStore } from '~/utils/stores/session-store';

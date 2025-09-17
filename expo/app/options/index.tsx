@@ -13,16 +13,16 @@ import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '~/components/ui/dialog';
 import { Text } from '~/components/ui/text';
 import { LengthUnit, WeightUnit } from '~/types/units';
 import { backend } from '~/utils/backend';
 import { readFile, writeFile } from '~/utils/filesystem';
-import { localeName, Locales, locales } from '~/utils/i18next/resources';
+import { Locales, localeName, locales } from '~/utils/i18next/resources';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';

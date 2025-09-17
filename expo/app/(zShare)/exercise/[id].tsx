@@ -1,29 +1,31 @@
-import { Image } from 'expo-image';
-import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { t } from 'i18next';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import exerciseDb from 'share/exercises/exercises.json';
-import { Exercise } from 'share/exercises/types/exercise';
+import { Pressable } from 'react-native-gesture-handler';
+import { ScrollView, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { t } from 'i18next';
+import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Image } from 'expo-image';
 
-import { XStack, YStack } from '~/components/ui/Stacks';
-import { ThemedIcon } from '~/components/ui/ThemedIcon';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { Text } from '~/components/ui/text';
-import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
-import { useWorkoutStore } from '~/utils/stores/session-store';
-import { ExerciseRecord, RepWeightRecord } from 'share/interfaces/Records';
-import { FlashList } from '@shopify/flash-list';
-import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
-import { useColors } from '~/utils/rn-reusables/useColors';
+import { Exercise } from 'share/exercises/types/exercise';
+import exerciseDb from 'share/exercises/exercises.json';
+
 import { useDebouncedCallback } from 'use-debounce';
+import { FlashList } from '@shopify/flash-list';
+
+import { useWorkoutStore } from '~/utils/stores/session-store';
+import { useColors } from '~/utils/rn-reusables/useColors';
 import { predict1RM } from '~/utils/misc/rm-predict';
+import { useExerciseImage } from '~/utils/hooks/use-exercise-image';
+import { Text } from '~/components/ui/text';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Button } from '~/components/ui/button';
+import { Badge } from '~/components/ui/badge';
 import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { XStack, YStack } from '~/components/ui/Stacks';
+import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
+import { ExerciseRecord, RepWeightRecord } from 'share/interfaces/Records';
 
 const ExerciseDetailPage = () => {
   const local = useLocalSearchParams();

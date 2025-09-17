@@ -18,10 +18,10 @@ import { Checkbox } from '~/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
@@ -29,7 +29,7 @@ import { backend } from '~/utils/backend';
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useAccountStore } from '~/utils/stores/account-store';
 import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
-import { PublicPlans } from '~/components/ui/PublicPlans';
+import { PublicPlans } from '~/views/plans/PublicPlans';
 
 const ListPlanPage = () => {
   const [tab, setTab] = useState(0);

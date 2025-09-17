@@ -1,10 +1,10 @@
 import { SafeAreaView, View } from 'react-native';
 import { SwipeGesture } from 'react-native-swipe-gesture-handler';
 import { Exercise, RecordType } from 'share/exercises/types/exercise';
-import { RepWeightRecord, RepRecord, TimeRecord } from 'share/interfaces/Records';
+import { RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
 import {
-  RepWithWeightRecordForm,
   RepRecordForm,
+  RepWithWeightRecordForm,
   TimeRecordForm,
 } from '~/components/ui/ExerciseLogForms';
 import { LogBanner, Toolbar } from './logs';

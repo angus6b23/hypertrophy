@@ -2,13 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import {
   Dialog,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '~/components/ui/dialog';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';

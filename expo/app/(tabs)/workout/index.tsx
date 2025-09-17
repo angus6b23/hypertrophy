@@ -9,15 +9,15 @@ import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { Button } from '~/components/ui/button';
 import { PlanDayCard } from '~/components/ui/PlanDayCard';
 import { Label } from '@rn-primitives/dropdown-menu';
-import { useState, useRef, useEffect, useContext, createContext, useCallback } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { PlanDay } from 'share/interfaces/Workout';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import { useColorScheme } from 'nativewind';
