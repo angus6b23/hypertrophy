@@ -13976,6 +13976,7 @@ __metadata:
     react-native-swipe-gesture-handler: "npm:^1.0.6"
     react-native-tab-view: "npm:^4.1.0"
     react-native-web: "npm:~0.19.10"
+    separator: "npm:^0.1.0"
     sonner-native: "npm:^0.17.0"
     tailwind-merge: "npm:^3.0.2"
     tailwindcss: "npm:^3.4.0"
@@ -20856,6 +20857,13 @@ __metadata:
     range-parser: "npm:^1.2.1"
     statuses: "npm:^2.0.1"
   checksum: 10c0/531bcfb5616948d3468d95a1fd0adaeb0c20818ba4a500f439b800ca2117971489e02074ce32796fd64a6772ea3e7235fe0583d8241dbd37a053dc3378eff9a5
+  languageName: node
+  linkType: hard
+
+"separator@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "separator@npm:0.1.0"
+  checksum: 10c0/50d6bb6578f9e05f3fc5265d8073329d5f0c4645b8921ec4e484f0237e70afa84865bf1189036e2052c8bc0684795dfd6b0bc16d1a4fad50982ad825ffbec419
   languageName: node
   linkType: hard
 

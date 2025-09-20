@@ -1,11 +1,12 @@
 import { Link, Tabs } from 'expo-router';
 
-import { HeaderButton } from '../../components/HeaderButton';
 import TabBarIcon from '../../components/TabBarIcon';
+import { HeaderButton } from '../../components/HeaderButton';
 
-import { NAV_THEME } from '~/utils/rn-reusables/constants';
-import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
 import { useTranslation } from 'react-i18next';
+
+import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
+import { NAV_THEME } from '~/utils/rn-reusables/constants';
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -33,7 +34,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tools"
+        name="tools/index"
         options={{
           title: t('common.tools'),
           tabBarIcon: ({ color }) => <TabBarIcon name="Wrench" color={color} />,
