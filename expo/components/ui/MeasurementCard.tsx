@@ -1,25 +1,26 @@
-import { useRouter } from 'expo-router';
-import { useContext } from 'react';
-import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useContext } from 'react';
+import { useRouter } from 'expo-router';
+
 import { Measurement } from 'share/interfaces/Measurements';
 
-import { XStack } from './Stacks';
-import { ThemedIcon } from './ThemedIcon';
-import { Button } from './button';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Text } from './text';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './dropdown-menu';
-import { Text } from './text';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Button } from './button';
+import { ThemedIcon } from './ThemedIcon';
+import { XStack } from './Stacks';
 
-import { MeasurementContext } from '~/app/(tabs)/progress/measurement';
-import { fromCm, fromKg } from '~/utils/misc/unit-conversion';
-import { useColors } from '~/utils/rn-reusables/useColors';
 import { useOptionStore } from '~/utils/stores/option-store';
+import { useColors } from '~/utils/rn-reusables/useColors';
+import { fromCm, fromKg } from '~/utils/misc/unit-conversion';
+import { MeasurementContext } from '~/app/(tabs)/progress/measurement';
 
 export const MeasurementCard = ({ data }: { data: Measurement }) => {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ export const MeasurementCard = ({ data }: { data: Measurement }) => {
       </CardHeader>
       <CardContent>
         <XStack className="w-full flex-wrap" padding="none" justify="between" fill={false}>
-          {data.weight !== undefined && (
+          {data.weight && (
             <View className="w-1/3">
               <Text>
                 {t('measurement.weight')}: {fromKg(data.weight, options.unit.measurementWeight)}{' '}
@@ -45,7 +46,7 @@ export const MeasurementCard = ({ data }: { data: Measurement }) => {
               </Text>
             </View>
           )}
-          {data.height !== undefined && (
+          {data.height && (
             <View className="w-1/3">
               <Text>
                 {t('measurement.height')}: {fromCm(data.height, options.unit.measurementLength)}{' '}
@@ -60,7 +61,7 @@ export const MeasurementCard = ({ data }: { data: Measurement }) => {
               </Text>
             </View>
           )}
-          {data.chest !== undefined && (
+          {data.chest && (
             <View className="w-1/3">
               <Text>
                 {t('measurement.chest')}: {fromCm(data.chest, options.unit.measurementLength)}{' '}
@@ -68,7 +69,7 @@ export const MeasurementCard = ({ data }: { data: Measurement }) => {
               </Text>
             </View>
           )}
-          {data.hip !== undefined && (
+          {data.hip && (
             <View className="w-1/3">
               <Text>
                 {t('measurement.hip')}: {fromCm(data.hip, options.unit.measurementLength)}{' '}
@@ -76,7 +77,7 @@ export const MeasurementCard = ({ data }: { data: Measurement }) => {
               </Text>
             </View>
           )}
-          {data.waist !== undefined && (
+          {data.waist && (
             <View className="w-1/3">
               <Text>
                 {t('measurement.waist')}: {fromCm(data.waist, options.unit.measurementLength)}{' '}

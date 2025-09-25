@@ -1,10 +1,11 @@
-import { FlashList } from '@shopify/flash-list';
-import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { useDebouncedCallback } from 'use-debounce';
 import { ScrollView } from 'react-native-gesture-handler';
-import exerciseDb from 'share/exercises/exercises.json';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
+
 import {
   Category,
   Equipment,
@@ -13,17 +14,17 @@ import {
   Mechanic,
   Muscle,
 } from 'share/exercises/types/exercise';
-import { useDebouncedCallback } from 'use-debounce';
+import exerciseDb from 'share/exercises/exercises.json';
 
-import { CheckboxDropdown } from '~/components/ui/CheckboxDropdown';
-import { ExerciseItem, ExerciseItemWithCheckbox } from '~/components/ui/ExerciseItem';
-import { RadioDropdown } from '~/components/ui/RadioDropdown';
-import { XStack, YStack } from '~/components/ui/Stacks';
-import { ThemedIcon } from '~/components/ui/ThemedIcon';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
 import { enumToObject } from '~/utils/typescript/enumToObject';
+import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
+import { Input } from '~/components/ui/input';
+import { Button } from '~/components/ui/button';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { XStack, YStack } from '~/components/ui/Stacks';
+import { RadioDropdown } from '~/components/ui/RadioDropdown';
+import { ExerciseItem, ExerciseItemWithCheckbox } from '~/components/ui/ExerciseItem';
+import { CheckboxDropdown } from '~/components/ui/CheckboxDropdown';
 
 interface ExerciseFilter {
   searchTerm?: string;
@@ -228,7 +229,7 @@ const ExList = () => {
         renderItem={(item) => <ExerciseItem exercise={item.item} />}
         estimatedItemSize={200}
         onEndReached={infinityScroll}
-        onEndReachedThreshold={1}
+        onEndReachedThreshold={2}
       />
     </>
   );

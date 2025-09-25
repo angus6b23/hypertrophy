@@ -1,4 +1,13 @@
+import { ScrollView, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useContext, useEffect, useState } from 'react';
+
+import { useWorkoutStore } from '~/utils/stores/session-store';
+import { useOptionStore } from '~/utils/stores/option-store';
+import { round } from '~/utils/misc/round-numbers';
+import { WeightUnit } from '~/types/units';
+import { LogContext } from '~/app/(zShare)/exercise/logs';
+import { PlanExercise } from 'share/interfaces/Workout';
 import {
   ExerciseRecord,
   RepRecord,
@@ -6,26 +15,18 @@ import {
   SetType,
   TimeRecord,
 } from 'share/interfaces/Records';
-import { useWorkoutStore } from '~/utils/stores/session-store';
-import { XStack } from './Stacks';
-import { Input } from './input';
+import { RecordType } from 'share/exercises/types/exercise';
 import { Text } from './text';
-import { Button } from './button';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
-import { ThemedIcon } from './ThemedIcon';
+import { Input } from './input';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './dropdown-menu';
-import { RecordType } from 'share/exercises/types/exercise';
-import { useOptionStore } from '~/utils/stores/option-store';
-import { WeightUnit } from '~/types/units';
-import { round } from '~/utils/misc/round-numbers';
-import { PlanExercise } from 'share/interfaces/Workout';
-import { LogContext } from '~/app/(zShare)/exercise/logs';
+import { Button } from './button';
+import { ThemedIcon } from './ThemedIcon';
+import { XStack } from './Stacks';
 
 interface LogRepWeightRecord extends Omit<RepWeightRecord, 'reps' | 'weight' | 'type'> {
   reps?: string;

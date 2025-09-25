@@ -2936,7 +2936,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/vector-icons@npm:^14.0.0":
+"@expo/vector-icons@npm:^14.0.0, @expo/vector-icons@npm:~14.0.4":
   version: 14.0.4
   resolution: "@expo/vector-icons@npm:14.0.4"
   dependencies:
@@ -12414,9 +12414,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:~52.0.46":
-  version: 52.0.46
-  resolution: "expo@npm:52.0.46"
+"expo@npm:~52.0.47":
+  version: 52.0.47
+  resolution: "expo@npm:52.0.47"
   dependencies:
     "@babel/runtime": "npm:^7.20.0"
     "@expo/cli": "npm:0.22.26"
@@ -12424,7 +12424,7 @@ __metadata:
     "@expo/config-plugins": "npm:~9.0.17"
     "@expo/fingerprint": "npm:0.11.11"
     "@expo/metro-config": "npm:0.19.12"
-    "@expo/vector-icons": "npm:^14.0.0"
+    "@expo/vector-icons": "npm:~14.0.4"
     babel-preset-expo: "npm:~12.0.11"
     expo-asset: "npm:~11.0.5"
     expo-constants: "npm:~17.0.8"
@@ -12453,7 +12453,7 @@ __metadata:
     expo: bin/cli
     expo-modules-autolinking: bin/autolinking
     fingerprint: bin/fingerprint
-  checksum: 10c0/e0dafbec1d3a8f143ae00938e8e83df8fd99a49f1126b55b21fe48181ad8e643c67270b810570ddee6d1f4f3b9b1c6aaf24dbea5e36a719916f5f7e0dcad2cf6
+  checksum: 10c0/b6ef67338d10e1fd3ecf31cb612c6107e628052fb025a50991e10ee5905ace0734f9ffefbe8436df3764d9eb5b8008d0fcb93ef5dcf7474038d77fc1c0fa58d9
   languageName: node
   linkType: hard
 
@@ -13933,7 +13933,7 @@ __metadata:
     eslint-config-universe: "npm:^12.0.1"
     eslint-plugin-import: "npm:^2.31.0"
     eslint-plugin-prettier: "npm:^5.4.0"
-    expo: "npm:~52.0.46"
+    expo: "npm:~52.0.47"
     expo-asset: "npm:~11.0.5"
     expo-audio: "npm:~0.3.5"
     expo-constants: "npm:17"

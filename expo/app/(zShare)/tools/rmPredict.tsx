@@ -122,6 +122,7 @@ function RmPredictPage() {
             ? NSCA_TABLE.map((val, i) => (
                 <>
                   <XStack
+                    key={i}
                     fill={false}
                     justify="between"
                     className={clsx('w-full rounded-lg', {
@@ -136,6 +137,7 @@ function RmPredictPage() {
               ? BRZYCKI_TABLE.map((val, i) => (
                   <>
                     <XStack
+                      key={i}
                       fill={false}
                       justify="between"
                       className={clsx('w-full rounded-lg', {
@@ -149,6 +151,7 @@ function RmPredictPage() {
               : DOS_REMEDIOS_TABLE.map((val, i) => (
                   <>
                     <XStack
+                      key={i}
                       fill={false}
                       justify="between"
                       className={clsx('w-full rounded-lg', {

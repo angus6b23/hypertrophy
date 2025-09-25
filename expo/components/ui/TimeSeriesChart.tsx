@@ -1,19 +1,20 @@
-import { Circle, RoundedRect, Text as SkiaText, useFont } from '@shopify/react-native-skia';
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
-import { SharedValue, useDerivedValue } from 'react-native-reanimated';
-import { Bar, CartesianChart, ChartPressState, Line, useChartPressState } from 'victory-native';
 import { YAxisProps } from 'victory-native/dist/types';
+import { Bar, CartesianChart, ChartPressState, Line, useChartPressState } from 'victory-native';
+import { SharedValue, useDerivedValue } from 'react-native-reanimated';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useState } from 'react';
+import { Circle, RoundedRect, Text as SkiaText, useFont } from '@shopify/react-native-skia';
 
 import { Text } from './text';
 
-import inter from '~/assets/fonts/inter.ttf';
-import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { ChartTimeframe, chartTimeframe, useChartTimeFrame } from '~/utils/hooks/chart-timeframe';
-import { filterByDate } from '~/utils/misc/filter-data';
 import { useOptionStore } from '~/utils/stores/option-store';
 import { useColors } from '~/utils/rn-reusables/useColors';
+import { filterByDate } from '~/utils/misc/filter-data';
+import { ChartTimeframe, chartTimeframe, useChartTimeFrame } from '~/utils/hooks/chart-timeframe';
+import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import inter from '~/assets/fonts/inter.ttf';
+import NoHistory from './NoHistory';
 
 interface TimeSeriesChartProps {
   data: any[];
@@ -59,13 +60,15 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
   const initYPressState = useCallback(() => {
     const obj = {} as any;
     props.yOptions.forEach((item) => {
-      obj[item.key] = innerData[0][item.key];
+      if (innerData.length > 0) {
+        obj[item.key] = innerData[0][item.key];
+      }
     });
     return obj;
   }, [innerData, props.yOptions]);
 
   const chartPressState = useChartPressState({
-    x: innerData[0][props.xKey],
+    x: innerData[0]?.[props.xKey],
     y: initYPressState(),
   });
 
@@ -106,75 +109,79 @@ export const TimeSeriesChart = (props: TimeSeriesChartProps) => {
           </TabsList>
         </Tabs>
         <View className="mt-2 h-[256]">
-          <CartesianChart
-            domainPadding={{ left: 50, right: 50, top: 20, bottom: 80 }}
-            padding={{ bottom: 0, left: 0, right: 0, top: 0 }}
-            data={innerData}
-            chartPressState={chartPressState.state}
-            xKey={props.xKey}
-            yKeys={yKeys()}
-            xAxis={{
-              font: interFont,
-              formatXLabel: (label: string) =>
-                label
-                  ? new Date(label).toLocaleDateString(lang, {
-                      year: '2-digit',
-                      month: 'numeric',
-                      day: 'numeric',
-                    })
-                  : '',
-              labelColor: colors.text,
-              lineColor: colors.border,
-              labelPosition: 'inset',
-              labelOffset: 0,
-            }}
-            yAxis={yAxisOption() as YAxisProps<any, string>[]}>
-            {/* 👇 render function exposes various data, such as points. */}
-            {({ points, chartBounds }) => (
-              // 👇 and we'll use the Line component to render a line path.
-              <>
-                {props.yOptions.map((item) => {
-                  return item.type === 'bar' ? (
-                    <Bar
-                      key={item.key}
-                      points={points[item.key]}
-                      chartBounds={chartBounds}
-                      color={colors.text}
-                      roundedCorners={{ topLeft: 10, topRight: 10 }}
-                      barWidth={20}
-                      animate={{ type: 'timing', duration: 300 }}
-                      labels={{ position: 'right', font: null }}
-                    />
-                  ) : (
-                    <Line
-                      key={item.key}
-                      points={points[item.key]}
-                      color={colors.text}
-                      curveType="natural"
-                      connectMissingData
-                      strokeWidth={3}
-                      animate={{ type: 'timing', duration: 300 }}
-                    />
-                  );
-                })}
-                {chartPressState.isActive
-                  ? props.yOptions.map((item) => (
-                      <ToolTip
+          {innerData.length > 0 ? (
+            <CartesianChart
+              domainPadding={{ left: 50, right: 50, top: 20, bottom: 80 }}
+              padding={{ bottom: 0, left: 0, right: 0, top: 0 }}
+              data={innerData}
+              chartPressState={chartPressState.state}
+              xKey={props.xKey}
+              yKeys={yKeys()}
+              xAxis={{
+                font: interFont,
+                formatXLabel: (label: string) =>
+                  label
+                    ? new Date(label).toLocaleDateString(lang, {
+                        year: '2-digit',
+                        month: 'numeric',
+                        day: 'numeric',
+                      })
+                    : '',
+                labelColor: colors.text,
+                lineColor: colors.border,
+                labelPosition: 'inset',
+                labelOffset: 0,
+              }}
+              yAxis={yAxisOption() as YAxisProps<any, string>[]}>
+              {/* 👇 render function exposes various data, such as points. */}
+              {({ points, chartBounds }) => (
+                // 👇 and we'll use the Line component to render a line path.
+                <>
+                  {props.yOptions.map((item) => {
+                    return item.type === 'bar' ? (
+                      <Bar
                         key={item.key}
-                        x={chartPressState.state.x.position}
-                        y={chartPressState.state['y'][item.key]['position']}
+                        points={points[item.key]}
+                        chartBounds={chartBounds}
+                        color={colors.text}
+                        roundedCorners={{ topLeft: 10, topRight: 10 }}
+                        barWidth={20}
+                        animate={{ type: 'timing', duration: 300 }}
+                        labels={{ position: 'right', font: null }}
                       />
-                    ))
-                  : null}
-                {chartPressState.isActive && (
-                  <TextTooltip
-                    state={chartPressState.state}
-                    keys={props.yOptions.map((option) => option.key)}
-                  />
-                )}
-              </>
-            )}
-          </CartesianChart>
+                    ) : (
+                      <Line
+                        key={item.key}
+                        points={points[item.key]}
+                        color={colors.text}
+                        curveType="natural"
+                        connectMissingData
+                        strokeWidth={3}
+                        animate={{ type: 'timing', duration: 300 }}
+                      />
+                    );
+                  })}
+                  {chartPressState.isActive
+                    ? props.yOptions.map((item) => (
+                        <ToolTip
+                          key={item.key}
+                          x={chartPressState.state.x.position}
+                          y={chartPressState.state['y'][item.key]['position']}
+                        />
+                      ))
+                    : null}
+                  {chartPressState.isActive && (
+                    <TextTooltip
+                      state={chartPressState.state}
+                      keys={props.yOptions.map((option) => option.key)}
+                    />
+                  )}
+                </>
+              )}
+            </CartesianChart>
+          ) : (
+            <NoHistory />
+          )}
         </View>
       </View>
     </>

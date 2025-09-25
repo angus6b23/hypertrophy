@@ -1,9 +1,11 @@
-import { Workout } from 'share/interfaces/Records';
-import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { create } from 'zustand';
+
+import { Workout } from 'share/interfaces/Records';
+
+import { nanoid } from 'nanoid/non-secure';
 
 import { mmkvStorage } from './persist';
-import { nanoid } from 'nanoid/non-secure';
 
 interface WorkoutState {
   workouts: Workout[];
@@ -49,6 +51,7 @@ export const useWorkoutStore = create<WorkoutState & WorkoutAction>()(
                     new Date(prevState.current!.startTime).getTime() + 4 * 3600 * 1000
                   )
                 ),
+                exercises: prevState.current.exercises ?? [],
                 lastUpdate: new Date(),
                 RPE: rpe,
               } as Workout,

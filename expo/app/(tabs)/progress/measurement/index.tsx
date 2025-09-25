@@ -1,14 +1,15 @@
-import { FlashList } from '@shopify/flash-list';
-import { useRouter } from 'expo-router';
-import { createContext, useCallback, useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
 import { toast } from 'sonner-native';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
 
-import { MeasurementCard } from '~/components/ui/MeasurementCard';
-import { XStack } from '~/components/ui/Stacks';
-import { ThemedIcon } from '~/components/ui/ThemedIcon';
-import { Button } from '~/components/ui/button';
+import { useMeasurementStore } from '~/utils/stores/measurement-store';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
+import { backend } from '~/utils/backend';
+import { Text } from '~/components/ui/text';
 import {
   Dialog,
   DialogContent,
@@ -17,11 +18,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { Text } from '~/components/ui/text';
-import { backend } from '~/utils/backend';
-import { useInfinityScroll } from '~/utils/hooks/infinity-scroll';
-import { useAccountStore } from '~/utils/stores/account-store';
-import { useMeasurementStore } from '~/utils/stores/measurement-store';
+import { Button } from '~/components/ui/button';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { XStack } from '~/components/ui/Stacks';
+import { MeasurementCard } from '~/components/ui/MeasurementCard';
 
 export const MeasurementContext = createContext({ removeId: '', setRemove: (s: string) => {} });
 export const MeasurementPage = () => {

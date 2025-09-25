@@ -1,27 +1,28 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Label } from '@rn-primitives/dropdown-menu';
-import { InsertMeasurementSchema } from 'backend/db/schema/measurements';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { nanoid } from 'nanoid/non-secure';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import RNPickerSelect, { Item } from 'react-native-picker-select';
-import { Measurement } from 'share/interfaces/Measurements';
 import { toast } from 'sonner-native';
-import { z } from 'zod';
+import RNPickerSelect, { Item } from 'react-native-picker-select';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { nanoid } from 'nanoid/non-secure';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Label } from '@rn-primitives/dropdown-menu';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { FormField } from '~/components/ui/FormField';
-import { XStack, YStack } from '~/components/ui/Stacks';
-import { Button } from '~/components/ui/button';
-import { Text } from '~/components/ui/text';
-import { LengthUnit, WeightUnit, lengthUnits, weightUnits } from '~/types/units';
-import { backend } from '~/utils/backend';
-import { removeNullValues } from '~/utils/misc/remove-null-values';
-import { toCm, toKg } from '~/utils/misc/unit-conversion';
-import { useAccountStore } from '~/utils/stores/account-store';
-import { useMeasurementStore } from '~/utils/stores/measurement-store';
+import { Measurement } from 'share/interfaces/Measurements';
+import { InsertMeasurementSchema } from 'backend/db/schema/measurements';
+
 import { useOptionStore } from '~/utils/stores/option-store';
+import { useMeasurementStore } from '~/utils/stores/measurement-store';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { useColors } from '~/utils/rn-reusables/useColors';
+import { toCm, toKg } from '~/utils/misc/unit-conversion';
+import { removeNullValues } from '~/utils/misc/remove-null-values';
+import { backend } from '~/utils/backend';
+import { LengthUnit, WeightUnit, lengthUnits, weightUnits } from '~/types/units';
+import { Text } from '~/components/ui/text';
+import { Button } from '~/components/ui/button';
+import { XStack, YStack } from '~/components/ui/Stacks';
+import { FormField } from '~/components/ui/FormField';
 
 export const MeasurementModal = () => {
   const { t } = useTranslation();
@@ -35,6 +36,7 @@ export const MeasurementModal = () => {
 
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const colors = useColors();
 
   // State for form
   const [state, setState] = useState<Measurement>({
@@ -114,7 +116,7 @@ export const MeasurementModal = () => {
 
     const newRecord = result.data as Measurement;
     // Check for fields entered (date, localId and any one of the field)
-    if (Object.keys(newRecord!).length < 3) {
+    if (Object.keys(newRecord!).length <= 3) {
       toast.error(t('message.no_field_entered'));
       return;
     }
@@ -154,11 +156,15 @@ export const MeasurementModal = () => {
 
   const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
+      borderRadius: 20,
       width: 100,
+      textTransform: 'lowercase',
       marginTop: 'auto',
       paddingLeft: 80,
     },
     inputAndroid: {
+      borderRadius: 20,
+      textTransform: 'lowercase',
       width: 100,
       marginTop: 'auto',
     },
@@ -179,7 +185,9 @@ export const MeasurementModal = () => {
         options={{
           headerShown: true,
           presentation: 'modal',
-          title: t('measurement.add_measurements'),
+          title: recordExist
+            ? t('measurement.update_measurements')
+            : t('measurement.add_measurements'),
         }}
         name={t('measurement.add_measurements')}
       />
@@ -312,11 +320,9 @@ export const MeasurementModal = () => {
             </View>
           </XStack>
         </ScrollView>
-        <YStack padding="none" justify="end" fill={false} className="w-full">
-          <Button className="w-full" onPress={handleSubmit}>
-            <Text>{recordExist ? t('common.update') : t('common.add')} </Text>
-          </Button>
-        </YStack>
+        <Button className="w-full" onPress={handleSubmit}>
+          <Text>{recordExist ? t('common.update') : t('common.add')} </Text>
+        </Button>
       </YStack>
     </>
   );

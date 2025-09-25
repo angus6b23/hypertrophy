@@ -24,6 +24,7 @@ import { Badge } from '~/components/ui/badge';
 import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
 import { XStack, YStack } from '~/components/ui/Stacks';
+import NoHistory from '~/components/ui/NoHistory';
 import { ExerciseRecordItem } from '~/components/ui/ExerciseRecordItem';
 import { ExerciseRecord, RepWeightRecord } from 'share/interfaces/Records';
 
@@ -230,18 +231,6 @@ const ExerciseHistory = ({ id }: { id: number }) => {
         onEndReachedThreshold={1}
       />
     </>
-  );
-};
-
-const NoHistory = () => {
-  const { t } = useTranslation();
-  const colors = useColors();
-  return (
-    <YStack fill={true} padding="none" justify="center" align="center" className="h-96 w-full">
-      <ThemedIcon name="ListFilterPlus" size={96} color={colors.neutral} />
-      <Text className="text-md text-muted-foreground">{t('workout.no_history_found')}</Text>
-      <Text className="text-md text-muted-foreground">{t('workout.do_some_workout')}</Text>
-    </YStack>
   );
 };
 

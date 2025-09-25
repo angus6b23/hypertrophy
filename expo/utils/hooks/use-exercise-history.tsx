@@ -1,3 +1,4 @@
+import { PlanExercise } from 'share/interfaces/Workout';
 import {
   AnyRecord,
   CardioRecord,
@@ -6,10 +7,9 @@ import {
   SetType,
   TimeRecord,
 } from 'share/interfaces/Records';
-import { useWorkoutStore } from '../stores/session-store';
-import exerciseData from 'share/exercises/exercises.json';
-import { PlanExercise } from 'share/interfaces/Workout';
 import { RecordType } from 'share/exercises/types/exercise';
+import exerciseData from 'share/exercises/exercises.json';
+import { useWorkoutStore } from '../stores/session-store';
 
 type MultiRecord = RepRecord[] | RepWeightRecord[] | TimeRecord[];
 
