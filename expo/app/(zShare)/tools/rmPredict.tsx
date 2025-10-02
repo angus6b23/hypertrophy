@@ -19,7 +19,6 @@ import {
   predict1RM,
 } from '~/utils/misc/rm-predict';
 import { Text } from '~/components/ui/text';
-import { Separator } from '~/components/ui/separator';
 import { Input } from '~/components/ui/input';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
