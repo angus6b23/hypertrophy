@@ -50,3 +50,7 @@ export const PathErrors = {
   id_invalid: "Id is invalid",
   param_invalid: "Invalid parameters",
 };
+
+export const InputError = {
+  not_number: "Please enter a number",
+};

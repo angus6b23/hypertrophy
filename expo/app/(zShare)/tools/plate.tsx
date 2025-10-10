@@ -3,23 +3,40 @@ import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import { Stack } from 'expo-router';
 
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
+import { t } from 'i18next';
+
+import { toast } from 'sonner-native';
+
+import { useOptionStore } from '~/utils/stores/option-store';
+import { toKg } from '~/utils/misc/unit-conversion';
 import { round } from '~/utils/misc/round-numbers';
 import { WeightUnit } from '~/types/units';
 import { Text } from '~/components/ui/text';
 import { Input } from '~/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '~/components/ui/dialog';
 import { Button } from '~/components/ui/button';
 import { ThemedIcon } from '~/components/ui/ThemedIcon';
-import { XStack } from '~/components/ui/Stacks';
+import { XStack, YStack } from '~/components/ui/Stacks';
+import { InputError } from 'share/interfaces/error-codes';
 
 const PlateCalculator = () => {
   const { t } = useTranslation();
 
-  const [total, setTotal] = useState(0);
-  const [unit, setUnit] = useState<WeightUnit>(WeightUnit.kg);
+  const defaultUnit = useOptionStore((state) => state.unit.workoutWeight);
+  const [open, setOpen] = useState(false);
+  const [unit, setUnit] = useState<WeightUnit>(defaultUnit);
   const [barWeight, setBarWeight] = useState('20');
-  const [plates, setPlates] = useState<Number[]>([]);
+  const [plates, setPlates] = useState<number[]>([]);
 
   const changeUnit = useCallback(() => {
     setUnit((prevState) => (prevState === WeightUnit.kg ? WeightUnit.lbs : WeightUnit.kg));
@@ -33,35 +50,78 @@ const PlateCalculator = () => {
     return unit === WeightUnit.kg ? round(total) : round(total * 2.2);
   }, [barWeight, plates, unit]);
 
-  const appendPlates = (weight: number) => () => {
-    setPlates((prevState) => [...prevState, weight]);
-  };
+  const appendPlates = useCallback(
+    (weight: number) => () => {
+      setPlates((prevState) => [...prevState, weight]);
+    },
+    []
+  );
+
+  const removePlates = useCallback(() => {
+    setPlates((prevState) => prevState.slice(0, prevState.length - 1));
+  }, []);
 
   const drawPlates = useCallback(() => {
     return plates
+      .map((p) => p)
       .sort((a, b) => a - b)
-      .map((plate) => {
+      .map((plate, i) => {
         switch (plate) {
           case 1.25: {
-            return <View className="w-[10] h-12 bg-slate-600 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-12 bg-slate-400 rounded-sm border-border border-2"
+              />
+            );
           }
           case 2.5: {
-            return <View className="w-[10] h-16 bg-slate-500 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-16 bg-slate-600 rounded-sm border-border border-2"
+              />
+            );
           }
           case 5: {
-            return <View className="w-[10] h-24 bg-black rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-24 bg-black rounded-sm border-border border-2"
+              />
+            );
           }
           case 10: {
-            return <View className="w-[10] h-24 bg-green-500 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-24 bg-green-500 rounded-sm border-border border-2"
+              />
+            );
           }
           case 15: {
-            return <View className="w-[10] h-24 bg-yellow-300 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-24 bg-yellow-300 rounded-sm border-border border-2"
+              />
+            );
           }
           case 20: {
-            return <View className="w-[10] h-24 bg-blue-700 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-24 bg-blue-700 rounded-sm border-border border-2"
+              />
+            );
           }
           case 25: {
-            return <View className="w-[10] h-24 bg-red-600 rounded-sm" />;
+            return (
+              <View
+                key={`${plate},${i}`}
+                className="w-[10] h-24 bg-red-600 rounded-sm border-border border-2"
+              />
+            );
           }
         }
       });
@@ -70,9 +130,19 @@ const PlateCalculator = () => {
   return (
     <>
       <Stack.Screen options={{ headerShown: true, headerTitle: t('tools.plate_calculator') }} />
-      <SafeAreaView className="flex-1 relative p-4">
+      <SafeAreaView className="p-4 pt-0">
+        <SetWeightDialog
+          open={open}
+          setOpen={setOpen}
+          currWeight={calculateTotal()}
+          unit={unit}
+          setPlates={setPlates}
+          base={Number(barWeight)}
+        />
         <XStack fill={false} padding="none" justify="center" align="center">
-          <Text className="text-6xl min-w-24 text-center">{calculateTotal()}</Text>
+          <TouchableOpacity className="p-4 pt-0" onPress={() => setOpen(true)}>
+            <Text className="text-6xl min-w-24 text-center">{calculateTotal()}</Text>
+          </TouchableOpacity>
           <XStack fill={false} padding="none" align="center">
             <Text className="text-2xl">{t(`unit.${unit}`)}</Text>
             <Button variant="ghost" className="p-0" onPress={changeUnit}>
@@ -80,7 +150,7 @@ const PlateCalculator = () => {
             </Button>
           </XStack>
         </XStack>
-        <XStack fill={false} padding="none" justify="center" align="center" className="h-24">
+        <XStack fill={false} padding="none" justify="center" align="center" className="h-24 gap-1">
           {/* Bar shape */}
           <View className="absolute w-full h-4 bg-slate-300 rounded-md" />
           {/* Left side plates */}
@@ -88,7 +158,7 @@ const PlateCalculator = () => {
             {drawPlates()}
           </XStack>
           {/* Center empty spaces */}
-          <View className="w-4 h-8 bg-slate-300 mr-28" />
+          <View className="w-4 h-8 bg-slate-300 mr-36" />
           <View className="w-4 h-8 bg-slate-300" />
           <XStack
             fill={false}
@@ -119,14 +189,20 @@ const PlateCalculator = () => {
             }}>
             <Text className="text-2xl text-background">{t('common.clear')}</Text>
           </Button>
-          <XStack fill={false} padding="none" justify="between" className="flex-wrap">
-            <Button className="w-32 aspect-square bg-slate-300" onPress={appendPlates(1.25)}>
-              <Text className="text-2xl text-black">
+          <XStack fill={false} padding="none" justify="around" className="flex-wrap">
+            <Button
+              className="w-32 aspect-square bg-zinc-200"
+              onPress={removePlates}
+              disabled={plates.length === 0}>
+              <Text className="text-2xl text-black text-center">{t('tools.remove_plate')}</Text>
+            </Button>
+            <Button className="w-32 aspect-square bg-slate-400" onPress={appendPlates(1.25)}>
+              <Text className="text-2xl text-white">
                 {unit === WeightUnit.kg ? `+ 1.25 ${t('unit.kg')}` : `+ 2.75 ${t('unit.lbs')}`}
               </Text>
             </Button>
-            <Button className="w-32 aspect-square bg-slate-300" onPress={appendPlates(2.5)}>
-              <Text className="text-2xl text-black">
+            <Button className="w-32 aspect-square bg-slate-600" onPress={appendPlates(2.5)}>
+              <Text className="text-2xl text-white">
                 {unit === WeightUnit.kg ? `+ 2.5 ${t('unit.kg')}` : `+ 5 ${t('unit.lbs')}`}
               </Text>
             </Button>
@@ -162,4 +238,81 @@ const PlateCalculator = () => {
   );
 };
 
+const SetWeightDialog = ({
+  open,
+  setOpen,
+  currWeight,
+  unit,
+  base,
+  setPlates,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  currWeight: number;
+  unit: WeightUnit;
+  base: number;
+  setPlates: React.Dispatch<React.SetStateAction<number[]>>;
+}) => {
+  const [val, setVal] = useState(currWeight);
+
+  const handleEnter = useCallback(() => {
+    let weight = Number(val);
+    const res: number[] = [];
+
+    if (isNaN(weight)) {
+      toast.error(InputError.not_number);
+    }
+    if (isNaN(base)) {
+      toast.error(InputError.not_number);
+    }
+    weight = unit === WeightUnit.kg ? Number(val) : toKg(Number(val), WeightUnit.lbs);
+    weight -= base;
+    const plates = [25, 20, 15, 10, 5, 2.5, 1.25];
+    while (weight > 2.5) {
+      for (const plate of plates) {
+        if (weight >= plate * 2) {
+          weight -= plate * 2;
+          res.push(plate);
+          break;
+        }
+      }
+    }
+    setPlates(res);
+  }, [val, unit]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="min-w-96">
+        <DialogHeader>
+          <DialogTitle>{t('tools.set_weight')}</DialogTitle>
+          <DialogDescription>
+            <YStack padding="none" fill={false}>
+              <Text>{t('tools.i_want_to_see_a_bar_with')}</Text>
+              <XStack fill={false} padding="none" align="center">
+                <Input
+                  autoFocus
+                  inputMode="numeric"
+                  className="flex-1"
+                  value={val.toString()}
+                  selectTextOnFocus
+                  onChangeText={(s) => setVal(s)}
+                />
+                <Text className="">{t(`unit.${unit}`)}</Text>
+              </XStack>
+            </YStack>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <XStack fill={false} justify="between" padding="none" className="w-full">
+            <DialogClose asChild>
+              <Button className="flex-1" onPress={handleEnter}>
+                <Text>{t('common.enter')}</Text>
+              </Button>
+            </DialogClose>
+          </XStack>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 export default PlateCalculator;
