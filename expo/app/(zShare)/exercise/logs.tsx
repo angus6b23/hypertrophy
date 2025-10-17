@@ -1,28 +1,19 @@
-import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
 import { TabBar, TabView } from 'react-native-tab-view';
-import exerciseDb from 'share/exercises/exercises.json';
-import { Exercise, RecordType } from 'share/exercises/types/exercise';
-import { Text } from '~/components/ui/text';
-import { Button } from '~/components/ui/button';
-import { Dimensions, View } from 'react-native';
-import { useColors } from '~/utils/rn-reusables/useColors';
-import { BannerImage } from './[id]';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SwipeGesture } from 'react-native-swipe-gesture-handler';
 import Animated, { FadeInDown, FadeInUp, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
-import { useExerciseHistory } from '~/utils/hooks/use-exercise-history';
-import {
-  RepRecordForm,
-  RepWithWeightRecordForm,
-  TimeRecordForm,
-} from '~/components/ui/ExerciseLogForms';
-import { AnyRecord, RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
-import { PlanExercise } from 'share/interfaces/Workout';
-import { XStack } from '~/components/ui/Stacks';
-import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { Dimensions, View } from 'react-native';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { t } from 'i18next';
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAudioPlayer } from 'expo-audio';
+
+import { useWorkoutStore } from '~/utils/stores/session-store';
+import { useColors } from '~/utils/rn-reusables/useColors';
+import { useExerciseHistory } from '~/utils/hooks/use-exercise-history';
+import { useCurrentPlan } from '~/utils/hooks/use-current-plan';
+import { Text } from '~/components/ui/text';
+import { Input } from '~/components/ui/input';
 import {
   Dialog,
   DialogClose,
@@ -33,9 +24,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { useWorkoutStore } from '~/utils/stores/session-store';
-import { useAudioPlayer } from 'expo-audio';
+import { Button } from '~/components/ui/button';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { XStack } from '~/components/ui/Stacks';
+import {
+  RepRecordForm,
+  RepWithWeightRecordForm,
+  TimeRecordForm,
+} from '~/components/ui/ExerciseLogForms';
+import { CustomTab } from '~/components/ui/CustomTab';
+import { PlanExercise } from 'share/interfaces/Workout';
+import { AnyRecord, RepRecord, RepWeightRecord, TimeRecord } from 'share/interfaces/Records';
+import { Exercise, RecordType } from 'share/exercises/types/exercise';
+import exerciseDb from 'share/exercises/exercises.json';
+import { BannerImage } from './[id]';
 
 interface LogContextType {
   showImg: boolean;
@@ -124,34 +126,18 @@ const ExerciseLogs = () => {
       <Stack.Screen
         options={{ title: `${currDay.name}`, headerShown: true, headerShadowVisible: false }}
       />
-      <TabView
-        navigationState={{
-          index: tab,
-          routes: exercises.map((ex, i) => ({
-            key: `${i.toString()}-${ex.exercisePlanId}`,
-            title: ex.name,
-          })),
-        }}
-        style={{ padding: 0 }}
-        renderScene={({ route }) => (
+      <CustomTab
+        routes={exercises.map((ex, i) => ({
+          key: `${i.toString()}-${ex.exercisePlanId}`,
+          title: ex.name,
+        }))}
+        screens={({ route }) => (
           <LogTab
             exercise={exercises[Number(route.key.split('-')[0])] as Exercise}
             planExercise={currDay.exercises[Number(route.key.split('-')[0])] as PlanExercise}
           />
         )}
-        onIndexChange={setTab}
-        initialLayout={{ width: Dimensions.get('window').width }}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            activeColor={colors.text}
-            inactiveColor={colors.text}
-            style={{ backgroundColor: colors.background, width: Dimensions.get('window').width }}
-            indicatorStyle={{ backgroundColor: colors.text }}
-            scrollEnabled={true}
-          />
-        )}
-        swipeEnabled={true}
+        tabBarProps={{}}
       />
     </LogContext.Provider>
   );

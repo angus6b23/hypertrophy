@@ -9,6 +9,8 @@ import { useCallback, useState } from 'react';
 
 import clsx from 'clsx';
 
+import { Picker } from '@react-native-picker/picker';
+
 import { useColors } from '~/utils/rn-reusables/useColors';
 import { useColorScheme } from '~/utils/rn-reusables/useColorScheme';
 import { round } from '~/utils/misc/round-numbers';
@@ -84,35 +86,54 @@ function RmPredictPage() {
             />
             <Text className="text-lg">{t('workout.reps')}</Text>
           </XStack>
-          <XStack className="bg-transparent w-full" padding="none" fill={false} justify="between">
+          <XStack
+            className="bg-transparent w-full"
+            padding="none"
+            fill={false}
+            justify="between"
+            align="center">
             <Text className="text-lg">{t('tools.table')}:</Text>
-            <RNPickerSelect
-              onValueChange={setTable}
-              value={table}
-              style={{
-                inputAndroid: {
-                  fontSize: 16,
-                  paddingRight: 12,
-                  color: colors.text,
-                },
-                inputIOS: {
-                  fontSize: 16,
-                  color: colors.text,
-                },
-              }}
-              items={[
-                {
-                  label: 'NSCA / Baechle',
-                  value: 'nsca',
-                  key: 'nsca',
-                },
-                { label: 'Brzycki', value: 'brzycki', key: 'brzycki' },
-                { label: 'dos Remedios', value: 'dos_Remedios', key: 'dos_Remedios' },
-              ]}
-              Icon={() => <></>}
-              darkTheme={colorScheme === 'dark'}
-              useNativeAndroidPickerStyle={false}
-            />
+            <View className="flex-1">
+              <Picker
+                style={{ color: 'white', textAlign: 'right', alignItems: 'flex-end' }}
+                className="flex-1 text-foreground"
+                selectedValue={table}
+                mode="dialog"
+                onValueChange={(value) => {
+                  setTable(value);
+                }}>
+                <Picker.Item label="NSCA / Baechle" value="nsca" />
+                <Picker.Item label="Brzycki" value="brzycki" />
+                <Picker.Item label="dos Remedios" value="dos_Remedios" />
+              </Picker>
+            </View>
+            {/* <RNPickerSelect */}
+            {/*   onValueChange={setTable} */}
+            {/*   value={table} */}
+            {/*   style={{ */}
+            {/*     inputAndroid: { */}
+            {/*       fontSize: 16, */}
+            {/*       paddingRight: 12, */}
+            {/*       color: colors.text, */}
+            {/*     }, */}
+            {/*     inputIOS: { */}
+            {/*       fontSize: 16, */}
+            {/*       color: colors.text, */}
+            {/*     }, */}
+            {/*   }} */}
+            {/*   items={[ */}
+            {/*     { */}
+            {/*       label: 'NSCA / Baechle', */}
+            {/*       value: 'nsca', */}
+            {/*       key: 'nsca', */}
+            {/*     }, */}
+            {/*     { label: 'Brzycki', value: 'brzycki', key: 'brzycki' }, */}
+            {/*     { label: 'dos Remedios', value: 'dos_Remedios', key: 'dos_Remedios' }, */}
+            {/*   ]} */}
+            {/*   Icon={() => <></>} */}
+            {/*   darkTheme={colorScheme === 'dark'} */}
+            {/*   useNativeAndroidPickerStyle={false} */}
+            {/* /> */}
           </XStack>
           <XStack fill={false} justify="between" className="w-full mt-4">
             <Text className="text-xl font-bold">{t('tools.rm_max')}</Text>

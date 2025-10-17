@@ -1,20 +1,22 @@
-import { Label } from '@rn-primitives/dropdown-menu';
-import { FlashList } from '@shopify/flash-list';
-import { Stack, useRouter } from 'expo-router';
-import { t } from 'i18next';
-import { nanoid } from 'nanoid/non-secure';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
-import MaterialTabs from 'react-native-material-tabs';
-import { Plan, PlanDay } from 'share/interfaces/Workout';
 import { toast } from 'sonner-native';
+import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { nanoid } from 'nanoid/non-secure';
+import { t } from 'i18next';
+import { Stack, useRouter } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
+import { Label } from '@rn-primitives/dropdown-menu';
 
-import { PlanCard } from '~/components/ui/PlanCard';
-import { XStack, YStack } from '~/components/ui/Stacks';
-import { ThemedIcon } from '~/components/ui/ThemedIcon';
-import { Button } from '~/components/ui/button';
-import { Checkbox } from '~/components/ui/checkbox';
+import { CustomTab } from '~/components/ui/CustomTab';
+import { Plan, PlanDay } from 'share/interfaces/Workout';
+
+import { PublicPlans } from '~/views/plans/PublicPlans';
+import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
+import { useAccountStore } from '~/utils/stores/account-store';
+import { backend } from '~/utils/backend';
+import { Text } from '~/components/ui/text';
+import { Input } from '~/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -23,31 +25,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Text } from '~/components/ui/text';
-import { backend } from '~/utils/backend';
-import { useColors } from '~/utils/rn-reusables/useColors';
-import { useAccountStore } from '~/utils/stores/account-store';
-import { useWorkoutPlanStore } from '~/utils/stores/workout-plan-store';
-import { PublicPlans } from '~/views/plans/PublicPlans';
+import { Checkbox } from '~/components/ui/checkbox';
+import { Button } from '~/components/ui/button';
+import { ThemedIcon } from '~/components/ui/ThemedIcon';
+import { XStack, YStack } from '~/components/ui/Stacks';
+import { PlanCard } from '~/components/ui/PlanCard';
 
 const ListPlanPage = () => {
-  const [tab, setTab] = useState(0);
-  const colors = useColors();
   return (
     <>
       <Stack.Screen options={{ headerShown: true, title: t('plan.workout_plans') }} />
-      <MaterialTabs
-        items={[t('plan.plans'), t('plan.public_plans')]}
-        selectedIndex={tab}
-        onChange={setTab}
-        barColor={colors.card}
-        indicatorColor={colors.primary}
-        activeTextColor={colors.text}
-        inactiveTextColor={colors.text}
+      <CustomTab
+        routes={[
+          { key: 'plans', title: t('plan.plans') },
+          { key: 'public', title: 'public_plans' },
+        ]}
+        screens={({ route }) => {
+          if (route.key === 'plans') return <MyPlans />;
+          else return <PublicPlans />;
+        }}
+        tabBarProps={{ scrollEnabled: false }}
       />
-      {tab === 0 && <MyPlans />}
-      {tab === 1 && <PublicPlans />}
     </>
   );
 };

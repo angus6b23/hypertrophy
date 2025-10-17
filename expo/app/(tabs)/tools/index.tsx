@@ -33,7 +33,7 @@ export default function ToolPage() {
               <Text className="text-xl text-center">{t('tools.TDEE_calculator')}</Text>
             </Card>
           </TouchableNativeFeedback>
-          <TouchableNativeFeedback>
+          <TouchableNativeFeedback onPress={() => router.push('/(zShare)/tools/units')}>
             <Card className="p-8 min-w-48 flex-1 flex flex-col gap-4 bg-muted justify-center items-center">
               <ThemedIcon name="Replace" size={32} />
               <Text className="text-xl text-center">{t('tools.unit_convertor')}</Text>

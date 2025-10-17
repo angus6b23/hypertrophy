@@ -1,10 +1,10 @@
-import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
-import { YStack } from '~/components/ui/Stacks';
-import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
-import { Text } from '~/components/ui/text';
 import { useMeasurementStore } from '~/utils/stores/measurement-store';
+import { Text } from '~/components/ui/text';
+import { TimeSeriesChart } from '~/components/ui/TimeSeriesChart';
+import { YStack } from '~/components/ui/Stacks';
 
 export const StatisticsPage = () => {
   return (
@@ -26,24 +26,22 @@ export const BodyCompositionChart = () => {
   return (
     <YStack>
       <Text className="text-lg font-bold">{t('stat.body_composition')}</Text>
-      {measurements.length > 0 && (
-        <TimeSeriesChart
-          data={measurements}
-          xKey="date"
-          yOptions={[
-            {
-              key: 'weight',
-              configDomain: 10,
-              type: 'bar',
-            },
-            {
-              key: 'bodyFat',
-              configDomain: 5,
-              type: 'line',
-            },
-          ]}
-        />
-      )}
+      {/* {measurements.length > 0 && ( */}
+      {/*   <TimeSeriesChart */}
+      {/*     data={measurements} */}
+      {/*     xKey="date" */}
+      {/*     yOptions={[ */}
+      {/*       { */}
+      {/*         key: 'weight', */}
+      {/*         type: 'bar', */}
+      {/*       }, */}
+      {/*       { */}
+      {/*         key: 'bodyFat', */}
+      {/*         type: 'line', */}
+      {/*       }, */}
+      {/*     ]} */}
+      {/*   /> */}
+      {/* )} */}
     </YStack>
   );
 };
